@@ -2,7 +2,24 @@ import React from 'react'
 
 const home = () => {
   return (
-    <div>home</div>
+    <div>testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      testing that we can commit changes brrrrtesting that we can commit changes brrrr
+      testing that we can commit changes brrrr
+      
+    </div>
+
   )
 }
 
