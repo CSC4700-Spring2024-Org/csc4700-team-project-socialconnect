@@ -19,6 +19,9 @@ const Sidebar = () => {
         <li>
           <Link to="/calendar">Calendar</Link>
         </li>
+        <li>
+          <Link to="/account">Account</Link>
+        </li>
         {/* Add more links for other pages */}
       </ul>
     </div>

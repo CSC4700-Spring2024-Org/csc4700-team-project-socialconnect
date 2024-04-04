@@ -1,9 +1,19 @@
+/* styles/HomePage.css */
 
+body {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-color: #212121; /* Set background color to match the grid */
+  }
+  
 .dashboard {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two columns */
     grid-template-rows: repeat(2, 1fr); /* Two rows */
     height: 100vh; /* Full viewport height */
+    width: 90%;
+    margin-left: 10%;
+    background-color: #212121;
   }
   
   .box {
