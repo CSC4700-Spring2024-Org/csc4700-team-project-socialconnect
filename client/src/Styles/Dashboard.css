@@ -10,7 +10,41 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
-    border: 1px solid rgb(0, 140, 255);
+    color: rgb(255, 0, 0);
+    background-color: #212121;
+    border: 1px solid rgb(255, 0, 0);
+  }
+  
+  .sidebar {
+    background-color: #212121; /* Dark background color */
+    color: #fff; /* Text color */
+    height: 100%; /* Full height */
+    width: 10%; /* Fixed width */
+    position: fixed; /* Fixed position */
+    top: 0; /* Position from the top */
+    left: 0; /* Position from the left */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    padding-top: 20px; /* Top padding */
+  }
+  
+  .sidebar ul {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
+  }
+  
+  .sidebar ul li {
+    padding: 10px 0; /* Vertical padding */
+  }
+  
+  .sidebar ul li a {
+    color: rgb(255, 255, 255); /* Text color for links */
+    text-decoration: none; /* Remove underline */
+    display: block; /* Make links block elements */
+    padding: 10px 20px; /* Padding for links */
+    transition: 0.3s; /* Smooth transition on hover */
+  }
+  
+  .sidebar ul li a:hover {
+    background-color: #ff0000; /* Darker background on hover */
   }
   
