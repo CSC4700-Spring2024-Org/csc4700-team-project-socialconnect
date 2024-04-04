@@ -8,6 +8,7 @@ body {
   
 .dashboard {
     display: grid;
+    position: fixed;
     grid-template-columns: repeat(2, 1fr); /* Two columns */
     grid-template-rows: repeat(2, 1fr); /* Two rows */
     height: 100vh; /* Full viewport height */
@@ -58,3 +59,48 @@ body {
     background-color: #ff0000; /* Darker background on hover */
   }
   
+  /* styles/CommentSection.css */
+
+.comment-section-container {
+    width: 100%; /* Adjust width as needed */
+    height: 300px; /* Fixed height */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+  
+  .comment-section {
+    padding: 10px;
+    border: 1px solid rgb(255, 0, 0);
+    margin-top: 1%;
+    margin-right: 1%;
+  }
+  
+  .comment-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000;
+  }
+  
+  .comment-list {
+    list-style-type: none;
+    padding-left: 20px; /* Indent the list */
+    color: #ff0000;
+  }
+  
+  .comment-item {
+    margin-bottom: 10px; /* Add spacing between comments */
+  }
+  .comment-section-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .comment-section-container::-webkit-scrollbar-track {
+    background:rgb(0, 0, 0)
+  }
+  
+  .comment-section-container::-webkit-scrollbar-thumb {
+    background: rgb(255, 0, 0);
+  }
+  
+  .comment-section-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(255, 255, 255);
+  }  
