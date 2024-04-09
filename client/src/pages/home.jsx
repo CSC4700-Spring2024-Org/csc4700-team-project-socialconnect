@@ -4,6 +4,7 @@ import Sidebar from '/Users/joeylamanna/Desktop/csc4700-team-project-socialconne
 import CommentSection from './CommentSection';
 import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { getUser } from '../features/authSlice';
 
 const Home = () => {
