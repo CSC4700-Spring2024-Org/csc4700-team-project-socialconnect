@@ -62,6 +62,18 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (thunkAP
     }
 })
 
+export const logout = createAsyncThunk('auth/logout', async (thunkAPI) => {
+  try {
+    return await authService.logout();
+  } catch (error) {
+    const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -128,6 +140,14 @@ export const authSlice = createSlice({
           state.isLoading = false
           state.isError = true
           state.message = action.payload
+        })
+        .addCase(logout.fulfilled, (state) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.user = null
+        })
+        .addCase(logout.pending, (state) => {
+          state.isLoading = true
         })
     },
   })

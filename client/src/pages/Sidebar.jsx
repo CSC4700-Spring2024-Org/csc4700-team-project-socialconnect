@@ -1,7 +1,7 @@
 // components/Sidebar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '/Users/joeylamanna/Desktop/csc4700-team-project-socialconnect/client/src/Styles/Sidebar.css';
+import '../Styles/Sidebar.css';
 
 const Sidebar = () => {
   return (

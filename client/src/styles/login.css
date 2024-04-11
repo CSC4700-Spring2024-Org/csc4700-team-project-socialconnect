@@ -30,7 +30,7 @@
   align-items: center;
 }
 
-.container .box {
+.container .boxC {
   position: relative;
   width: 50%;
   height: 100%;
@@ -42,14 +42,14 @@
   padding: 40px;
 }
 
-.container .box h2 {
+.container .boxC h2 {
   color: #fff;
   font-size: 1.2em;
   font-weight: 500;
   margin-bottom: 10px;
 }
 
-.container .box button {
+.container .boxC button {
   cursor: pointer;
   padding: 10px 20px;
   background: #fff;

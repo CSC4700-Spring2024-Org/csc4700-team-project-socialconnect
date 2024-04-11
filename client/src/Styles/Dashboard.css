@@ -3,7 +3,6 @@
 body {
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
-    background-color: #212121; /* Set background color to match the grid */
   }
   
 .dashboard {

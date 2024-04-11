@@ -1,6 +1,5 @@
-import React from 'react';
-import '/Users/joeylamanna/Desktop/csc4700-team-project-socialconnect/client/src/Styles/Dashboard.css';
-import Sidebar from '/Users/joeylamanna/Desktop/csc4700-team-project-socialconnect/client/src/pages/Sidebar.jsx'
+import '../Styles/Dashboard.css';
+import Sidebar from '../pages/Sidebar'
 import CommentSection from './CommentSection';
 import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -13,19 +12,27 @@ const Home = () => {
 
   const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
 
+  const [initialRenderCompleted, setInitialRenderCompleted] = useState(false);
+
   useEffect(() => {
     if (!user) {
-      dispatch(getUser())
+      dispatch(getUser()).finally(() => {
+        setInitialRenderCompleted(true);
+      });
+    } else {
+      setInitialRenderCompleted(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isSuccess && user) {
-      navigate('/')
-    } else if (!isLoading && (isError || (!isSuccess && !user))) {
-      navigate('/login')
+    if (initialRenderCompleted && !isLoading) {
+      if (isSuccess && user) {
+        navigate('/');
+      } else if (isError || (!isSuccess && !user)) {
+        navigate('/login');
+      }
     }
-  }, [user, isSuccess, isError, navigate, isLoading]);
+  }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted]);
   
   return (
     <div className="dashboard">

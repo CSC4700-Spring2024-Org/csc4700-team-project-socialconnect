@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import '../styles/login.css'
+import '../Styles/login.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { login, reset, register } from '../features/authSlice'
@@ -26,7 +26,7 @@ const Login = () => {
          toast.error(message)
       }
 
-      if (isSuccess || user) {
+      if ((isSuccess || user) && !isLoading) {
          navigate('/')
       }
 
@@ -66,11 +66,11 @@ const Login = () => {
    return (
       <div className={`outer ${slide === true ? "slide" : ""}`}>
          <div class="container">
-            <div class="box signin">
+            <div class="boxC signin">
                <h2>Already Have An Account?</h2>
                <button class="signinBtn" onClick={() => setSlide(!slide)}>Sign in</button>
             </div>
-            <div class="box signup">
+            <div class="boxC signup">
                <h2>Don't Have An Account?</h2>
                <button class="SignupBtn" onClick={() => setSlide(!slide)}>Sign up</button>
             </div>

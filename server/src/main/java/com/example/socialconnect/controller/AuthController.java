@@ -154,4 +154,25 @@ public class AuthController {
         return ResponseEntity.ok(userResponse);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue("token")String refreshToken, HttpServletResponse response) {
+        refreshTokenService.deleteRefreshToken(refreshToken);
+        ResponseCookie cookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        ResponseCookie refreshCookie = ResponseCookie.from("token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        return ResponseEntity.ok().body(null);
+    }
 }

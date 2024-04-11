@@ -1,6 +1,6 @@
 // components/CommentSection.js
 import React from 'react';
-import '/Users/joeylamanna/Desktop/csc4700-team-project-socialconnect/client/src/Styles/Dashboard.css';
+import '../Styles/Dashboard.css';
 
 const CommentSection = () => {
     // Sample list of comments with user, platform, and comment information

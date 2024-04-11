@@ -38,12 +38,29 @@ const getUser = async () => {
     }
 }
 
+const logout = async () => {
+    try {
+        const response = await axios.post(API_URL + 'logout')
+
+        return response.data;
+    } catch (error) {
+        if (error.response.status === 401) {
+            const refreshResponse = await refreshToken();
+            if (refreshResponse !== 401) {
+                const newResponse = await axios.post(API_URL + 'logout');
+                return newResponse.data;
+            }
+        }
+    }
+}
+
 
 const authService = {
     register,
     login,
     refreshToken,
     getUser,
+    logout
 }
 
 export default authService;

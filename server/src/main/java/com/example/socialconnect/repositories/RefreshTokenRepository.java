@@ -2,6 +2,9 @@ package com.example.socialconnect.repositories;
 
 import com.example.socialconnect.models.RefreshToken;
 
+import jakarta.transaction.Transactional;
+
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +22,12 @@ public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Int
         value = "SELECT * FROM REFRESH_TOKENS WHERE USER_ID = :id"
     )
     Optional<RefreshToken> findByUserId(@Param("id")Long id);
+
+    @Modifying
+    @Transactional
+    @Query(
+        nativeQuery = true,
+        value = "UPDATE REFRESH_TOKENS SET TOKEN = NULL, EXPIRY_DATE = CURRENT_TIMESTAMP WHERE TOKEN = :token"
+    )
+    void deleteByToken(@Param("token")String token);
 }
