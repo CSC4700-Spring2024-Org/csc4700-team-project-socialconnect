@@ -8,18 +8,6 @@ const CommentSection = () => {
       { user: 'User1', platform: 'Twitter', comment: 'This is the first comment.' },
       { user: 'User2', platform: 'Facebook', comment: 'This is the second comment.' },
       { user: 'User3', platform: 'Instagram', comment: 'This is the third comment.' },
-      { user: 'User1', platform: 'Twitter', comment: 'This is the first comment.' },
-      { user: 'User2', platform: 'Facebook', comment: 'This is the second comment.' },
-      { user: 'User3', platform: 'Instagram', comment: 'This is the third comment.' },
-      { user: 'User1', platform: 'Twitter', comment: 'This is the first comment.' },
-      { user: 'User2', platform: 'Facebook', comment: 'This is the second comment.' },
-      { user: 'User3', platform: 'Instagram', comment: 'This is the third comment.' },
-      { user: 'User1', platform: 'Twitter', comment: 'This is the first comment.' },
-      { user: 'User2', platform: 'Facebook', comment: 'This is the second comment.' },
-      { user: 'User3', platform: 'Instagram', comment: 'This is the third comment.' },
-      { user: 'User1', platform: 'Twitter', comment: 'This is the first comment.' },
-      { user: 'User2', platform: 'Facebook', comment: 'This is the second comment.' },
-      { user: 'User3', platform: 'Instagram', comment: 'This is the third comment.' },
       // Add more comments as needed
     ];
   

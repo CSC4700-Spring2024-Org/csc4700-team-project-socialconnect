@@ -5,6 +5,7 @@ import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getUser } from '../features/authSlice';
+import Example from './analytics';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -35,12 +36,13 @@ const Home = () => {
   }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted]);
   
   return (
+    
     <div className="dashboard">
       <Sidebar/>
       <div className="box">Box 1 </div>
       <div className="box">Box 2</div>
-      <div className="comment"> <CommentSection /></div>
-      <div className="box">Box 4</div>
+      <div className="box"> <CommentSection /></div>
+      <div className="box"> <Example /></div>
     </div>
   );
 };

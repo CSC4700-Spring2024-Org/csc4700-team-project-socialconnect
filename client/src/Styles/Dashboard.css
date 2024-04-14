@@ -1,4 +1,7 @@
 /* styles/HomePage.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
     margin: 0; /* Remove default margin */
@@ -6,28 +9,31 @@ body {
   }
   
 .dashboard {
-    display: grid;
-    position: fixed;
-    grid-template-columns: repeat(2, 1fr); /* Two columns */
-    grid-template-rows: repeat(2, 1fr); /* Two rows */
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    display: flex;
     height: 100vh; /* Full viewport height */
     width: 90%;
     margin-left: 10%;
-    background-color: #212121;
+    background-color: #ffffff;
   }
   
   .box {
-    display: flex;
-    justify-content: center;
+    width: 30%;
+    height: 40%;
     align-items: center;
-    color: rgb(255, 0, 0);
-    background-color: #212121;
-    border: 1px solid rgb(255, 0, 0);
+    color: rgb(0, 0, 0);
+    background-color: #f4f4f4;
+    border: 1px solid rgb(0, 0, 0);
+  }
+  .box4 {
+    width: 80%;
+    height: 40%;
   }
   
   .sidebar {
-    background-color: #212121; /* Dark background color */
-    color: #fff; /* Text color */
+    background-color: #ffffff; /* Dark background color */
+    color: rgb(3, 0, 0); /* Text color */
     height: 100%; /* Full height */
     width: 10%; /* Fixed width */
     position: fixed; /* Fixed position */
@@ -47,7 +53,7 @@ body {
   }
   
   .sidebar ul li a {
-    color: rgb(255, 255, 255); /* Text color for links */
+    color: rgb(3, 3, 3); /* Text color for links */
     text-decoration: none; /* Remove underline */
     display: block; /* Make links block elements */
     padding: 10px 20px; /* Padding for links */
@@ -60,13 +66,8 @@ body {
   
   /* styles/CommentSection.css */
 
-.comment-section-container {
-    width: 100%; /* Adjust width as needed */
-    height: 300px; /* Fixed height */
-    overflow-y: auto; /* Enable vertical scrolling */
-  }
   
-  .comment-section {
+  /* .comment-section {
     padding: 10px;
     border: 1px solid rgb(255, 0, 0);
     margin-top: 1%;
@@ -81,12 +82,12 @@ body {
   
   .comment-list {
     list-style-type: none;
-    padding-left: 20px; /* Indent the list */
+    padding-left: 20px; 
     color: #ff0000;
   }
   
   .comment-item {
-    margin-bottom: 10px; /* Add spacing between comments */
+    margin-bottom: 10px; 
   }
   .comment-section-container::-webkit-scrollbar {
     width: 8px;
@@ -102,4 +103,4 @@ body {
   
   .comment-section-container::-webkit-scrollbar-thumb:hover {
     background: rgb(255, 255, 255);
-  }  
+  }   */
