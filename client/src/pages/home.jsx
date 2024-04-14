@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getUser } from '../features/authSlice';
 import Example from './analytics';
+import { BarChart } from '@tremor/react';
+import Example1 from './chart';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -40,9 +42,9 @@ const Home = () => {
     <div className="dashboard">
       <Sidebar/>
       <div className="box">Box 1 </div>
-      <div className="box">Box 2</div>
+      <div className="box"> <Example1/> </div>
       <div className="box"> <CommentSection /></div>
-      <div className="box"> <Example /></div>
+      <div className="box4"> <Example /></div>
     </div>
   );
 };

@@ -1,3 +1,5 @@
+
+
 // 'use client';
 import { AreaChart, Card, List, ListItem } from '@tremor/react';
 
@@ -8,73 +10,73 @@ function classNames(...classes) {
 const data = [
   {
     date: 'Jan 23',
-    Organic: 232,
-    Sponsored: 0,
+    Instagram: 232,
+    TikTok: 0,
   },
   {
     date: 'Feb 23',
-    Organic: 241,
-    Sponsored: 0,
+    Instagram: 241,
+    TikTok: 0,
   },
   {
     date: 'Mar 23',
-    Organic: 291,
-    Sponsored: 0,
+    Instagram: 291,
+    TikTok: 0,
   },
   {
     date: 'Apr 23',
-    Organic: 101,
-    Sponsored: 0,
+    Instagram: 101,
+    TikTok: 0,
   },
   {
     date: 'May 23',
-    Organic: 318,
-    Sponsored: 0,
+    Instagram: 318,
+    TikTok: 0,
   },
   {
     date: 'Jun 23',
-    Organic: 205,
-    Sponsored: 0,
+    Instagram: 205,
+    TikTok: 0,
   },
   {
     date: 'Jul 23',
-    Organic: 372,
-    Sponsored: 0,
+    Instagram: 372,
+    TikTok: 0,
   },
   {
     date: 'Aug 23',
-    Organic: 341,
-    Sponsored: 0,
+    Instagram: 341,
+    TikTok: 0,
   },
   {
     date: 'Sep 23',
-    Organic: 387,
-    Sponsored: 120,
+    Instagram: 387,
+    TikTok: 120,
   },
   {
     date: 'Oct 23',
-    Organic: 220,
-    Sponsored: 0,
+    Instagram: 220,
+    TikTok: 0,
   },
   {
     date: 'Nov 23',
-    Organic: 372,
-    Sponsored: 0,
+    Instagram: 372,
+    TikTok: 0,
   },
   {
     date: 'Dec 23',
-    Organic: 321,
-    Sponsored: 0,
+    Instagram: 321,
+    TikTok: 0,
   },
 ];
 
 const summary = [
   {
-    name: 'Organic',
+    name: 'Instagram',
     value: 3273,
   },
   {
-    name: 'Sponsored',
+    name: 'TikTok',
     value: 120,
   },
 ];
@@ -83,8 +85,8 @@ const valueFormatter = (number) =>
   `${Intl.NumberFormat('us').format(number).toString()}`;
 
 const statusColor = {
-  Organic: 'bg-blue-500',
-  Sponsored: 'bg-violet-500',
+  Instagram: 'bg-purple',
+  TikTok: 'bg-purple',
 };
 
 export default function Example() {
@@ -97,11 +99,11 @@ export default function Example() {
         <AreaChart
           data={data}
           index="date"
-          categories={['Organic', 'Sponsored']}
-          colors={['blue', 'violet']}
+          categories={['Instagram', 'TikTok']}
+          colors={['bg-purple', 'bg-violet']}
           valueFormatter={valueFormatter}
           showLegend={false}
-          showYAxis={false}
+          showYAxis={true}
           showGradient={false}
           startEndOnly={true}
           className="mt-6 h-32"
@@ -111,7 +113,7 @@ export default function Example() {
             <ListItem key={item.name}>
               <div className="flex items-center space-x-2">
                 <span
-                  className={classNames(statusColor[item.name], 'h-0.5 w-3')}
+                  className={classNames(statusColor['Instagram'], 'h-0.5 w-3')}
                   aria-hidden={true}
                 />
                 <span>{item.name}</span>
