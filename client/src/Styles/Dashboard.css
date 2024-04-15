@@ -18,6 +18,7 @@ body {
     background-color: #ffffff;
   }
   
+  /* Link to access FullCalendar: https://www.npmjs.com/package/@fullcalendar/react */
   .box1 {
     border-radius: 10px;
     width: 30%;
@@ -28,7 +29,7 @@ body {
     overflow: auto;
   }
  
-  .box {
+  .box2 {
     border-radius: 10px;
     width: 40%;
     height: 40%;
@@ -37,6 +38,17 @@ body {
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
+
+  .box3 {
+    border-radius: 10px;
+    width: 40%;
+    height: 40%;
+    align-items: center;
+    background-color: #f4f4f4;
+    border: 1px solid rgb(0, 0, 0);
+    overflow: auto;
+  }
+
   .box4 {
     border-radius: 10px;
     width: 50%;

@@ -65,8 +65,8 @@ const Home = () => {
        events={events}
        eventContent={renderEventContent}
       /> </div>
-      <div className="box"> <Example1/> </div>
-      <div className="box"> <CommentSection /></div>
+      <div className="box2"> <Example1/> </div>
+      <div className="box3"> <CommentSection /></div>
       <div className="box4"> <Example /></div>
     </div>
   );
