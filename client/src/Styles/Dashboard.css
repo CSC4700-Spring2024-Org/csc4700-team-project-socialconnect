@@ -18,6 +18,11 @@ body {
     background-color: #ffffff;
   }
   
+  .box1 {
+    width: 50%;
+    height: 70%;
+  }
+ 
   .box {
     border-radius: 10px;
     width: 40%;

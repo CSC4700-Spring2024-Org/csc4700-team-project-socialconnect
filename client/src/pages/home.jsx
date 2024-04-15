@@ -8,6 +8,9 @@ import { getUser } from '../features/authSlice';
 import Example from './analytics';
 import { BarChart } from '@tremor/react';
 import Example1 from './chart';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+
 
 const Home = () => {
   const navigate = useNavigate();
@@ -37,11 +40,30 @@ const Home = () => {
     }
   }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted]);
   
+  const events = [
+    { title: 'Meeting', start: new Date() }
+  ] 
+
+  function renderEventContent(eventInfo) {
+    return (
+      <>
+        <b>{eventInfo.timeText}</b>
+        <i>{eventInfo.event.title}</i>
+      </>
+    )
+  } 
+
   return (
     
     <div className="dashboard">
       <Sidebar/>
-      <div className="box">Box 1 </div>
+      <div className="box1"><FullCalendar
+       plugins={[dayGridPlugin]}
+       initialView='dayGridMonth'
+       weekends={true}
+       events={events}
+       eventContent={renderEventContent}
+      /> </div>
       <div className="box"> <Example1/> </div>
       <div className="box"> <CommentSection /></div>
       <div className="box4"> <Example /></div>
