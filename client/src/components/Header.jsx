@@ -13,6 +13,7 @@ const Header = () => {
   return (
     <>
       <header className='header'>
+        Social Connect
           <CgProfile className='profileIcon' onClick={() => setOpen(!open)}/>
       </header>
       <div className={`dropdown-menu ${open ? 'active' : 'inactive'}`}>

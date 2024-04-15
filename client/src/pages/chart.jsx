@@ -1,129 +1,200 @@
 // 'use client';
-import { BarChart, Card, Divider, Switch } from '@tremor/react';
-import { useState } from 'react';
+import { RiArrowRightUpLine } from '@remixicon/react';
+import { Card, Divider } from '@tremor/react';
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
 
 const data = [
   {
-    date: 'Jan 23',
-    'This Year': 68560,
-    'Last Year': 28560,
+    name: 'Alissia Stone',
+    initial: 'AS',
+    textColor: 'text-fuchsia-800 dark:text-fuchsia-500',
+    bgColor: 'bg-fuchsia-100 dark:bg-fuchsia-500/20',
+    email: 'a.stone@gmail.com',
+    href: 'www.instagram.com',
+    details: [
+      {
+        type: 'Role',
+        value: 'member',
+      },
+      {
+        type: 'Last active',
+        value: '2d ago',
+      },
+    ],
   },
   {
-    date: 'Feb 23',
-    'This Year': 70320,
-    'Last Year': 30320,
+    name: 'Emma Bern',
+    initial: 'EB',
+    textColor: 'text-blue-800 dark:text-blue-500',
+    bgColor: 'bg-blue-100 dark:bg-blue-500/20',
+    email: 'e.bern@gmail.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'member',
+      },
+      {
+        type: 'Last active',
+        value: '1d ago',
+      },
+    ],
   },
   {
-    date: 'Mar 23',
-    'This Year': 80233,
-    'Last Year': 70233,
+    name: 'Aaron McFlow',
+    initial: 'AM',
+    textColor: 'text-pink-800 dark:text-pink-500',
+    bgColor: 'bg-pink-100 dark:bg-pink-500/20',
+    email: 'a.flow@acme.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'admin',
+      },
+      {
+        type: 'Last active',
+        value: '2min ago',
+      },
+    ],
   },
   {
-    date: 'Apr 23',
-    'This Year': 55123,
-    'Last Year': 45123,
+    name: 'Thomas Palstein',
+    initial: 'TP',
+    textColor: 'text-emerald-800 dark:text-emerald-500',
+    bgColor: 'bg-emerald-100 dark:bg-emerald-500/20',
+    email: 't.palstein@acme.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'admin',
+      },
+      {
+        type: 'Last active',
+        value: '18min ago',
+      },
+    ],
   },
   {
-    date: 'May 23',
-    'This Year': 56000,
-    'Last Year': 80600,
+    name: 'Sarah Johnson',
+    initial: 'SJ',
+    textColor: 'text-orange-800 dark:text-orange-500',
+    bgColor: 'bg-orange-100 dark:bg-orange-500/20',
+    email: 's.johnson@gmail.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'member',
+      },
+      {
+        type: 'Last active',
+        value: '3h ago',
+      },
+    ],
   },
   {
-    date: 'Jun 23',
-    'This Year': 100000,
-    'Last Year': 85390,
+    name: 'David Smith',
+    initial: 'DS',
+    textColor: 'text-indigo-800 dark:text-indigo-500',
+    bgColor: 'bg-indigo-100 dark:bg-indigo-500/20',
+    email: 'd.smith@gmail.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'guest',
+      },
+      {
+        type: 'Last active',
+        value: '4h ago',
+      },
+    ],
   },
   {
-    date: 'Jul 23',
-    'This Year': 85390,
-    'Last Year': 45340,
-  },
-  {
-    date: 'Aug 23',
-    'This Year': 80100,
-    'Last Year': 70120,
-  },
-  {
-    date: 'Sep 23',
-    'This Year': 75090,
-    'Last Year': 69450,
-  },
-  {
-    date: 'Oct 23',
-    'This Year': 71080,
-    'Last Year': 63345,
-  },
-  {
-    date: 'Nov 23',
-    'This Year': 61210,
-    'Last Year': 100330,
-  },
-  {
-    date: 'Dec 23',
-    'This Year': 60143,
-    'Last Year': 45321,
+    name: 'Megan Brown',
+    initial: 'MB',
+    textColor: 'text-yellow-800 dark:text-yellow-500',
+    bgColor: 'bg-yellow-100 dark:bg-yellow-500/20',
+    email: 'm.brown@gmail.com',
+    href: '#',
+    details: [
+      {
+        type: 'Role',
+        value: 'admin',
+      },
+      {
+        type: 'Last active',
+        value: '1d ago',
+      },
+    ],
   },
 ];
 
-function valueFormatter(number) {
-  const formatter = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-    notation: 'compact',
-    compactDisplay: 'short',
-    style: 'currency',
-    currency: 'USD',
-  });
-
-  return formatter.format(number);
-}
-
 export default function Example1() {
-  const [showComparison, setShowComparison] = useState(false);
   return (
     <>
-      <Card className="sm:mx-auto sm:max-w-2xl">
-        <h3 className="ml-1 mr-1 font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-          Sales overview
+      <div className="flex items-center space-x-2">
+        <h3 className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+          Members
         </h3>
-        <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr.
-        </p>
-        <BarChart
-          data={data}
-          index="date"
-          categories={
-            showComparison ? ['Last Year', 'This Year'] : ['This Year']
-          }
-          colors={showComparison ? ['cyan', 'blue'] : ['blue']}
-          valueFormatter={valueFormatter}
-          yAxisWidth={45}
-          className="mt-6 hidden h-60 sm:block"
-        />
-        <BarChart
-          data={data}
-          index="date"
-          categories={
-            showComparison ? ['Last Year', 'This Year'] : ['This Year']
-          }
-          colors={showComparison ? ['cyan', 'blue'] : ['blue']}
-          valueFormatter={valueFormatter}
-          showYAxis={false}
-          className="mt-4 h-56 sm:hidden"
-        />
-        <Divider />
-        <div className="mb-2 flex items-center space-x-3">
-          <Switch
-            id="comparison"
-            onChange={() => setShowComparison(!showComparison)}
-          />
-          <label
-            htmlFor="comparison"
-            className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
-          >
-            Show same period last year
-          </label>
-        </div>
-      </Card>
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-tremor-full bg-tremor-background-subtle text-tremor-label font-medium text-tremor-content-strong dark:bg-dark-tremor-background-subtle dark:text-dark-tremor-content-strong">
+          {data.length}
+        </span>
+      </div>
+      <Divider className="my-4" />
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {data.map((member) => (
+          <Card key={member.name} className="group p-4">
+            <div className="flex items-center space-x-4">
+              <span
+                className={classNames(
+                  member.textColor,
+                  member.bgColor,
+                  'flex h-12 w-12 shrink-0 items-center justify-center rounded-tremor-full text-tremor-default font-medium',
+                )}
+                aria-hidden={true}
+              >
+                {member.initial}
+              </span>
+              <div className="truncate">
+                <p className="truncate text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                  <a href={member.href} className="focus:outline-none">
+                    {/* Extend link to entire card */}
+                    <span className="absolute inset-0" aria-hidden={true} />
+                    {member.name}
+                  </a>
+                </p>
+                <p className="truncate text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                  {member.email}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 grid grid-cols-2 divide-x divide-tremor-border border-t border-tremor-border dark:divide-dark-tremor-border dark:border-dark-tremor-border">
+              {member.details.map((item) => (
+                <div key={item.type} className="truncate px-3 py-2">
+                  <p className="truncate text-tremor-label text-tremor-content dark:text-dark-tremor-content">
+                    {item.type}
+                  </p>
+                  <p className="truncate text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <span
+              className="pointer-events-none absolute right-4 top-4 text-tremor-content-subtle group-hover:text-tremor-content dark:text-dark-tremor-content-subtle group-hover:dark:text-dark-tremor-content"
+              aria-hidden={true}
+            >
+              <RiArrowRightUpLine className="h-4 w-4" aria-hidden={true} />
+            </span>
+          </Card>
+        ))}
+      </div>
     </>
   );
 }

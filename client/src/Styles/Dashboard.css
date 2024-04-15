@@ -6,6 +6,7 @@
 body {
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
+    overflow: hidden;
   }
   
 .dashboard {
@@ -20,6 +21,7 @@ body {
   
   /* Link to access FullCalendar: https://www.npmjs.com/package/@fullcalendar/react */
   .box1 {
+    margin-top: 1%;
     border-radius: 10px;
     width: 30%;
     height: 30%;
@@ -30,6 +32,7 @@ body {
   }
  
   .box2 {
+    margin-top: 2%;
     border-radius: 10px;
     width: 40%;
     height: 40%;
@@ -60,16 +63,19 @@ body {
   }
   
   .sidebar {
-    background-color: #ffffff; /* Dark background color */
+    background-color: #ffffff; 
     /* color: rgb(3, 0, 0);  */
     height: 100%; /* Full height */
     width: 10%; /* Fixed width */
     position: fixed; /* Fixed position */
-    top: 0; /* Position from the top */
+    top: 1; /* Position from the top */
     left: 0; /* Position from the left */
     overflow-x: hidden; /* Hide horizontal scrollbar */
     padding-top: 20px; /* Top padding */
-  }
+    border: 1px solid rgb(0, 0, 0); 
+    border-top: #f4f4f4;
+    
+ }
   
   .sidebar ul {
     list-style-type: none; /* Remove bullet points */
@@ -89,7 +95,7 @@ body {
   }
   
   .sidebar ul li a:hover {
-    background-color: #ff0000; /* Darker background on hover */
+    background-color: #009dff; /* Darker background on hover */
   }
   
   /* styles/CommentSection.css */
