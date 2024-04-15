@@ -1,5 +1,3 @@
-
-
 // 'use client';
 import { AreaChart, Card, List, ListItem } from '@tremor/react';
 
@@ -9,75 +7,91 @@ function classNames(...classes) {
 
 const data = [
   {
-    date: 'Jan 23',
-    Instagram: 232,
-    TikTok: 0,
+    date: 'Jan 1',
+    TikTok: 12,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Feb 23',
-    Instagram: 241,
-    TikTok: 0,
+    date: 'Feb 1',
+    TikTok: 241,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Mar 23',
-    Instagram: 291,
-    TikTok: 0,
+    date: 'Mar 1',
+    TikTok: 291,
+    Instagram: 0,
+    Youtube: 500,
   },
   {
-    date: 'Apr 23',
-    Instagram: 101,
-    TikTok: 0,
+    date: 'Apr 1',
+    TikTok: 101,
+    Instagram: 0,
+    Youtube: 100,
   },
   {
-    date: 'May 23',
-    Instagram: 318,
-    TikTok: 0,
+    date: 'May 1',
+    TikTok: 318,
+    Instagram: 0,
+    Youtube: 200,
   },
   {
-    date: 'Jun 23',
-    Instagram: 205,
-    TikTok: 0,
+    date: 'Jun 1',
+    TikTok: 205,
+    Instagram: 0,
+    Youtube: 400,
   },
   {
-    date: 'Jul 23',
-    Instagram: 372,
-    TikTok: 0,
+    date: 'Jul 1',
+    TikTok: 372,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Aug 23',
-    Instagram: 341,
-    TikTok: 0,
+    date: 'Aug 1',
+    TikTok: 341,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Sep 23',
-    Instagram: 387,
-    TikTok: 120,
+    date: 'Sep 1',
+    TikTok: 387,
+    Instagram: 120,
+    Youtube: 20,
   },
   {
-    date: 'Oct 23',
-    Instagram: 220,
-    TikTok: 0,
+    date: 'Oct 1',
+    TikTok: 220,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Nov 23',
-    Instagram: 372,
-    TikTok: 0,
+    date: 'Nov 1',
+    TikTok: 372,
+    Instagram: 0,
+    Youtube: 20,
   },
   {
-    date: 'Dec 23',
-    Instagram: 321,
-    TikTok: 0,
+    date: 'Dec 31',
+    TikTok: 321,
+    Instagram: 0,
+    Youtube: 20,
   },
 ];
 
 const summary = [
   {
-    name: 'Instagram',
+    name: 'TikTok',
     value: 3273,
   },
   {
-    name: 'TikTok',
+    name: 'Instagram',
     value: 120,
+  },
+  {
+    name: 'Youtube',
+    value: 1360,
   },
 ];
 
@@ -85,25 +99,26 @@ const valueFormatter = (number) =>
   `${Intl.NumberFormat('us').format(number).toString()}`;
 
 const statusColor = {
-  Instagram: 'bg-purple',
-  TikTok: 'bg-purple',
+  TikTok: 'bg-stone-500',
+  Instagram: 'bg-pink-500',
+  Youtube:'bg-red-500',
 };
 
 export default function Example() {
   return (
     <>
       <Card className="sm:mx-auto sm:max-w-lg">
-        <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+        <h3 className="font-medium text-tremor-content-strong:text-tremor-content-strong">
           Follower metrics
         </h3>
         <AreaChart
           data={data}
           index="date"
-          categories={['Instagram', 'TikTok']}
-          colors={['bg-purple', 'bg-violet']}
+          categories={['TikTok', 'Instagram','Youtube']}
+          colors={['emerald', 'pink','red']}
           valueFormatter={valueFormatter}
-          showLegend={false}
-          showYAxis={true}
+          showLegend={true}
+          showYAxis={false}
           showGradient={false}
           startEndOnly={true}
           className="mt-6 h-32"
@@ -113,7 +128,7 @@ export default function Example() {
             <ListItem key={item.name}>
               <div className="flex items-center space-x-2">
                 <span
-                  className={classNames(statusColor['Instagram'], 'h-0.5 w-3')}
+                  className={classNames(statusColor[item.name], 'h-0.5 w-3')}
                   aria-hidden={true}
                 />
                 <span>{item.name}</span>
