@@ -58,8 +58,7 @@ const Login = () => {
          username,
          password
       }
-
-      console.log("register submit called")
+      
       dispatch(register(userData))
    }
 

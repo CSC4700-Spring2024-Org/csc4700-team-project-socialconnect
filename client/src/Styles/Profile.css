@@ -1,0 +1,95 @@
+.account-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+body {
+    background-color: #f4f4f4;
+}
+
+.profile-sidebar {
+    display: flex;
+    width: 25%;
+    float: left;
+    align-items: center;
+    justify-content:flex-start;
+    flex-direction: column;
+    background-color: #ffffff;
+    margin: 1rem;
+}
+
+.sidebar-item {
+    background-color: #ffffff;
+    width: 90%;
+    height: 2rem;
+    text-align: center;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center; /* Center the text horizontally */
+    align-items: center; /* Center the text vertically */
+}
+
+.sidebar-item:hover {
+    background-color: #f4f4f4;
+    cursor: pointer;
+    font-weight: 525;
+}
+
+
+.connections-container {
+    background-color: #ffffff;
+    overflow: hidden; /* Clear the float */
+    margin: 1rem;
+}
+
+.connections-header {
+    text-align: center;
+    margin-top: 1.5em;
+}
+
+.connections {
+    background-color: #ffffff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Changed to space-between */
+    padding: 1.5em;
+}
+
+.connections div {
+    width: 15rem;
+    height: 15rem;
+    margin: 1em 0; /* Added margin to space the items vertically */
+    padding: 1em;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    background-color: #ffffff;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+}
+
+.connections button {
+    width: 90%;
+    height: 20%;
+    margin-top: 2.75rem;
+    border-radius: 5px;
+}
+
+.connections button:hover {
+    cursor: pointer;
+}
+
+.connections span {
+    margin-top: 0.5rem;
+}
+
+.connections svg {
+    width: 30%;
+    height: 30%;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-top: 1rem;
+}

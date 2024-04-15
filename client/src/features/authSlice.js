@@ -30,10 +30,11 @@ export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
     try {
       return await authService.login(user)
     } catch (error) {
+      console.log(error.response)
       const message =
         (error.response && error.response.data && error.response.data.message) ||
         error.message ||
-        error.toString()
+        error.response.data.message.toString()
       return thunkAPI.rejectWithValue(message)
     }
 })
@@ -57,7 +58,7 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (thunkAP
         const message =
             (error.response && error.response.data && error.response.data.message) ||
             error.message ||
-            error.toString()
+            error.message.toString()
         return thunkAPI.rejectWithValue(message)
     }
 })
@@ -113,6 +114,7 @@ export const authSlice = createSlice({
           state.isLoading = false
           state.isError = true
           state.message = action.payload
+          console.log(state.message)
           state.user = null
         })
         .addCase(refreshToken.pending, (state) => {

@@ -18,10 +18,10 @@ const Header = () => {
       <div className={`dropdown-menu ${open ? 'active' : 'inactive'}`}>
         <ul>
           <li className='dropdownItem'>
-            <a>My profile</a>
+            <span onClick={() => {setOpen(!open); navigate('/profile')}}>My profile</span>
           </li>
           <li className='dropdownItem'>
-            <a onClick={() => {dispatch(logout()); navigate('/login')}}>Logout</a>
+            <span onClick={() => {dispatch(logout()); navigate('/login')}}>Logout</span>
           </li>
         </ul>
       </div>
