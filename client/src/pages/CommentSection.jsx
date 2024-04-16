@@ -12,18 +12,7 @@ const CommentSection = () => {
     ];
   
     return (
-      // <div className="comment-section-container">
-      //   <div className="comment-section">
-      //     <h2 className="comment-header">Comments</h2>
-      //     <ul className="comment-list">
-      //       {comments.map((comment, index) => (
-      //         <li key={index} className="comment-item">
-      //           <strong>{comment.user}</strong> from {comment.platform}: {comment.comment}
-      //         </li>
-      //       ))}
-      //     </ul>
-      //   </div>
-      // </div>
+      // Documentation: https://flowbite.com/blocks/publisher/comments/
       
       <section class="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
         <div class="max-w-2xl mx-auto px-4">
