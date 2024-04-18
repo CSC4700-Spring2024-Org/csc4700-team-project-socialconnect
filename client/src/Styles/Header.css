@@ -5,7 +5,6 @@
     align-items: center;
     height: 3em;
     border: 1px solid rgb(0, 0, 0);
-    padding: 1%;
 }
 
 .profileIcon {
@@ -69,4 +68,13 @@
   .dropdownItem span{
     max-width: 100px;
     margin-left: 10px;
+  }
+
+  img {
+    width: 5%;
+    height: 100%;
+  }
+  
+  img:hover {
+    cursor: pointer;
   }

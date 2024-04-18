@@ -4,6 +4,7 @@ import { CgProfile } from 'react-icons/cg'
 import { logout } from '../features/authSlice'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import SocialConnectLogo from '../SocialConnectLogo.png'
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -13,7 +14,7 @@ const Header = () => {
   return (
     <>
       <header className='header'>
-        Social Connect
+          <img src={SocialConnectLogo} onClick={() => {navigate('/')}}></img>
           <CgProfile className='profileIcon' onClick={() => setOpen(!open)}/>
       </header>
       <div className={`dropdown-menu ${open ? 'active' : 'inactive'}`}>

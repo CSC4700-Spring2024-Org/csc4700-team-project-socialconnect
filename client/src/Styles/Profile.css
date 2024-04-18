@@ -26,8 +26,8 @@ body {
     text-align: center;
     margin-top: 10px;
     display: flex;
-    justify-content: center; /* Center the text horizontally */
-    align-items: center; /* Center the text vertically */
+    justify-content: center;
+    align-items: center;
 }
 
 .sidebar-item:hover {
@@ -39,7 +39,7 @@ body {
 
 .connections-container {
     background-color: #ffffff;
-    overflow: hidden; /* Clear the float */
+    overflow: hidden;
     margin: 1rem;
 }
 
@@ -52,14 +52,14 @@ body {
     background-color: #ffffff;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* Changed to space-between */
+    justify-content: space-between;
     padding: 1.5em;
 }
 
 .connections div {
     width: 15rem;
     height: 15rem;
-    margin: 1em 0; /* Added margin to space the items vertically */
+    margin: 1em 0;
     padding: 1em;
     font-weight: 700;
     text-align: center;
@@ -76,10 +76,13 @@ body {
     height: 20%;
     margin-top: 2.75rem;
     border-radius: 5px;
+    background-color: #f4f4f4;
 }
 
 .connections button:hover {
     cursor: pointer;
+    background-color: #f0f0f0;
+    font-weight: 750;
 }
 
 .connections span {
