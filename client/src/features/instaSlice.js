@@ -3,6 +3,7 @@ import instaService from './instaService'
 
 const initialState = {
     instaPage: null,
+    comments: null,
     isErrorInsta: false,
     isSuccessInsta: false,
     isLoadingInsta: false,
@@ -72,7 +73,8 @@ export const instaSlice = createSlice({
         .addCase(getInstaProfile.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
-          state.instaPage = action.payload
+          state.instaPage = action.payload.page
+          state.comments = action.payload.comments
         })
         .addCase(getInstaProfile.rejected, (state, action) => {
           state.isLoading = false
