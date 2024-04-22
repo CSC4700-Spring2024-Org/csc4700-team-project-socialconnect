@@ -5,12 +5,11 @@ import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getUser } from '../features/authSlice';
-import Example from './analytics';
+import Analytics from './analytics';
 import { BarChart } from '@tremor/react';
 import Example1 from './chart';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { getInstaProfile } from '../features/instaSlice';
+import Calendar from './calendar';
 
 
 const Home = () => {
@@ -453,23 +452,15 @@ const Home = () => {
       </>
     )
   } 
-
+ 
   return (
-    <> 
-      {!isLoading ? <div className="dashboard">
-        <Sidebar/>
-        <div className="box1"><FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView='dayGridMonth'
-        weekends={true}
-        events={events}
-        eventContent={renderEventContent}
-        /> </div>
-        <div className="box2"> <h2 className=''> Recent Posts </h2> <Example1 data={userData.business_discovery.media.data} /> </div>
-        <div className="box3"> <CommentSection /></div>
-        <div className="box4"> <Example /></div>
-      </div>: <></>}
-    </>
+    <div className="dashboard">
+      <Sidebar/>
+      <div className="box1"> <Calendar/> </div>
+      <div className="box2"> <Example1/> </div>
+      <div className="box3"> <CommentSection/> </div>
+      <div className="box4"> <Analytics/> </div>
+    </div>
   );
 };
 

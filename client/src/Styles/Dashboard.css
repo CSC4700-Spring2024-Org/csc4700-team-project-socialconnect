@@ -100,6 +100,13 @@ body {
   .sidebar ul li a:hover {
     background-color: #009dff; /* Darker background on hover */
   }
+
+  .custom-tooltip {
+    background-color: rgba(255, 255, 255, 0.9); 
+    padding: 8px; 
+    border-radius: 4px; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);  
+  }
   
   /* styles/CommentSection.css */
 
