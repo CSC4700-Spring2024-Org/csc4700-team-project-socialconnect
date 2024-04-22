@@ -21,8 +21,7 @@ body {
   
   /* Link to access FullCalendar: https://www.npmjs.com/package/@fullcalendar/react */
   .box1 {
-    margin-top: 2%;
-    margin-right: 2%;
+    margin-top: 2rem;
     border-radius: 10px;
     width: 40%;
     height: 40%;
@@ -33,7 +32,7 @@ body {
   }
  
   .box2 {
-    margin-top: 2%;
+    margin-top: 2rem;
     border-radius: 10px;
     width: 50%;
     height: 40%;
@@ -44,7 +43,7 @@ body {
   }
 
   .box3 {
-    margin-bottom: 3%;
+    margin-bottom: 2rem;
     border-radius: 10px;
     width: 40%;
     height: 40%;
@@ -55,6 +54,7 @@ body {
   }
 
   .box4 {
+    margin-bottom: 2rem;
     border-radius: 10px;
     width: 50%;
     height: 40%;

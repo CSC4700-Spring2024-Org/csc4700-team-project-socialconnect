@@ -10,6 +10,7 @@ import { BarChart } from '@tremor/react';
 import Example1 from './chart';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import { getInstaProfile } from '../features/instaSlice';
 
 
 const Home = () => {
@@ -17,6 +18,7 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
+  const { instaPage, isErrorInsta, isSuccessInsta, isLoadingInsta } = useSelector((state) => state.insta)
 
   const [initialRenderCompleted, setInitialRenderCompleted] = useState(false);
 
@@ -34,6 +36,7 @@ const Home = () => {
     if (initialRenderCompleted && !isLoading) {
       if (isSuccess && user) {
         navigate('/');
+        dispatch(getInstaProfile(user))
       } else if (isError || (!isSuccess && !user)) {
         navigate('/login');
       }
@@ -55,20 +58,21 @@ const Home = () => {
 
  
   return (
-    
-    <div className="dashboard">
-      <Sidebar/>
-      <div className="box1"><FullCalendar
-       plugins={[dayGridPlugin]}
-       initialView='dayGridMonth'
-       weekends={true}
-       events={events}
-       eventContent={renderEventContent}
-      /> </div>
-      <div className="box2"> <Example1/> </div>
-      <div className="box3"> <CommentSection /></div>
-      <div className="box4"> <Example /></div>
-    </div>
+    <>
+      {!isLoading ? <div className="dashboard">
+        <Sidebar/>
+        <div className="box1"><FullCalendar
+        plugins={[dayGridPlugin]}
+        initialView='dayGridMonth'
+        weekends={true}
+        events={events}
+        eventContent={renderEventContent}
+        /> </div>
+        <div className="box2"> <Example1/> </div>
+        <div className="box3"> <CommentSection /></div>
+        <div className="box4"> <Example /></div>
+      </div> : <></>}
+    </>
   );
 };
 

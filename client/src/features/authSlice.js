@@ -15,12 +15,7 @@ export const register = createAsyncThunk(
         try {
             return await authService.register(user)
         } catch (error) {
-            const message = 
-            (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-            error.message ||
-            error.toString()
+            const message = error.response.status
             return thunkAPI.rejectWithValue(message)
         }
     }
@@ -30,11 +25,7 @@ export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
     try {
       return await authService.login(user)
     } catch (error) {
-      console.log(error.response)
-      const message =
-        (error.response && error.response.data && error.response.data.message) ||
-        error.message ||
-        error.response.data.message.toString()
+      const message = error.response.status
       return thunkAPI.rejectWithValue(message)
     }
 })
@@ -75,6 +66,20 @@ export const logout = createAsyncThunk('auth/logout', async (thunkAPI) => {
   }
 })
 
+export const setInstagram = createAsyncThunk(
+  'auth/setInstagram',
+  async (instaToken, thunkAPI) => {
+      try {
+          return await authService.setInstagram(instaToken)
+      } catch (error) {
+          const message = (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.toString()
+          return thunkAPI.rejectWithValue(message)
+      }
+  }
+)
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -99,7 +104,9 @@ export const authSlice = createSlice({
         .addCase(register.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
-          state.message = action.payload
+          if (action.payload === 400) {
+            state.message = "Username taken!"
+          }
           state.user = null
         })
         .addCase(login.pending, (state) => {
@@ -113,8 +120,9 @@ export const authSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
-          state.message = action.payload
-          console.log(state.message)
+          if (action.payload === 401) {
+            state.message = "Invalid Username/Password"
+          }
           state.user = null
         })
         .addCase(refreshToken.pending, (state) => {
@@ -150,6 +158,9 @@ export const authSlice = createSlice({
         })
         .addCase(logout.pending, (state) => {
           state.isLoading = true
+        })
+        .addCase(setInstagram.fulfilled, (state, action) => {
+          state.user.instaRefresh = action.payload
         })
     },
   })

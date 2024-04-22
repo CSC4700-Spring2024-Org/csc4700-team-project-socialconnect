@@ -13,15 +13,11 @@ const Sidebar = () => {
           <Link to="/analytics">Analytics</Link>
         </li>
         <li>
-          <Link to="/posts">Posts</Link>
+          <Link to="/post">Post</Link>
         </li>
         <li>
           <Link to="/calendar">Calendar</Link>
         </li>
-        <li>
-          <Link to="/account">Account</Link>
-        </li>
-        {/* Add more links for other pages */}
       </ul>
     </div>
   );
