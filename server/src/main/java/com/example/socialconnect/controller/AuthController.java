@@ -26,12 +26,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = "https://www.danbfrost.com", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api")
 public class AuthController {
@@ -65,6 +66,7 @@ public class AuthController {
             UserResponse userResponse = modelMapper.map(userRepository.findByUsername(authRequestDTO.getUsername()), UserResponse.class);
             // set accessToken to cookie header
             ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                    .domain(".danbfrost.com")
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")
@@ -73,6 +75,7 @@ public class AuthController {
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
             ResponseCookie refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
+                    .domain(".danbfrost.com")
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")
@@ -91,6 +94,7 @@ public class AuthController {
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@CookieValue(name="token") String refreshToken, HttpServletResponse response){
+        System.out.println(refreshToken);
         Optional<RefreshToken> optionalEntity = refreshTokenService.findByToken(refreshToken);
         RefreshToken refreshTokenObj;
         if (optionalEntity.isPresent()) {
@@ -102,8 +106,8 @@ public class AuthController {
         if (refreshTokenService.verifyExpiration(refreshTokenObj) != null) {
                 User user = refreshTokenObj.getUserInfo();
                 String accessToken = jwtService.generateToken(user.getUsername());
-                System.out.println("CREATING NEW COOKIES");
                 ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                        .domain(".danbfrost.com")
                         .httpOnly(true)
                         .secure(true)
                         .sameSite("None")
@@ -112,6 +116,7 @@ public class AuthController {
                         .build();
                 response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
                 ResponseCookie refreshCookie = ResponseCookie.from("token", refreshTokenObj.getToken())
+                        .domain(".danbfrost.com")
                         .httpOnly(true)
                         .secure(true)
                         .sameSite("None")
@@ -136,6 +141,7 @@ public class AuthController {
         String accessToken = jwtService.generateToken(userRequest.getUsername());
         // set accessToken to cookie header
         ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                .domain(".danbfrost.com")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -144,6 +150,7 @@ public class AuthController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         ResponseCookie refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
+                .domain(".danbfrost.com")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -158,6 +165,7 @@ public class AuthController {
     public ResponseEntity<?> logout(@CookieValue("token")String refreshToken, HttpServletResponse response) {
         refreshTokenService.deleteRefreshToken(refreshToken);
         ResponseCookie cookie = ResponseCookie.from("accessToken", "")
+                .domain(".danbfrost.com")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -166,6 +174,7 @@ public class AuthController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         ResponseCookie refreshCookie = ResponseCookie.from("token", "")
+                .domain(".danbfrost.com")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -173,6 +182,11 @@ public class AuthController {
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        return ResponseEntity.ok().body(null);
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<?> health() {
         return ResponseEntity.ok().body(null);
     }
 }

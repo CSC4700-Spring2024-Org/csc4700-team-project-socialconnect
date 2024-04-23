@@ -19,7 +19,7 @@ public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Int
 
     @Query(
         nativeQuery = true,
-        value = "SELECT * FROM REFRESH_TOKENS WHERE USER_ID = :id"
+        value = "SELECT * FROM refresh_tokens WHERE USER_ID = :id"
     )
     Optional<RefreshToken> findByUserId(@Param("id")Long id);
 
@@ -27,7 +27,7 @@ public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Int
     @Transactional
     @Query(
         nativeQuery = true,
-        value = "UPDATE REFRESH_TOKENS SET TOKEN = NULL, EXPIRY_DATE = CURRENT_TIMESTAMP WHERE TOKEN = :token"
+        value = "UPDATE refresh_tokens SET TOKEN = NULL, EXPIRY_DATE = CURRENT_TIMESTAMP WHERE TOKEN = :token"
     )
     void deleteByToken(@Param("token")String token);
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080/api/';
+const API_URL = 'https://api.danbfrost.com:443/api/';
 
 axios.defaults.withCredentials = true;
 
@@ -54,13 +54,30 @@ const logout = async () => {
     }
 }
 
+const setInstagram = async (instaToken) => {
+    try {
+        const response = await axios.post(API_URL + 'setInstagram', {token : instaToken});
+
+        return instaToken;
+    } catch (error) {
+        if (error.response.status === 401) {
+            const refreshResponse = await refreshToken();
+            if (refreshResponse !== 401) {
+                const newResponse = await axios.post(API_URL + 'setInstagram', instaToken);
+                return instaToken;
+            }
+        }
+    }
+}
+
 
 const authService = {
     register,
     login,
     refreshToken,
     getUser,
-    logout
+    logout,
+    setInstagram
 }
 
 export default authService;
