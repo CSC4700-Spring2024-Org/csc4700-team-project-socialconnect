@@ -2,6 +2,7 @@
 import { AreaChart, Card, List, ListItem } from '@tremor/react';
 import Spinner from '../components/Spinner';
 import { useSelector } from 'react-redux'
+import NoAccount from '../components/NoAccount';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -43,8 +44,12 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Analytics() {
-  const { instaPage, isLoadingInsta, isSuccessInsta } = useSelector((state) => state.insta)
+  const { instaPage, isLoadingInsta } = useSelector((state) => state.insta)
+  const { user, isLoading } = useSelector((state) => state.auth);
   
+  if (!isLoading && (user && !user.instaRefresh)) {
+    return <NoAccount />
+  }
   if (isLoadingInsta || !instaPage) {
     return <Spinner />
   }

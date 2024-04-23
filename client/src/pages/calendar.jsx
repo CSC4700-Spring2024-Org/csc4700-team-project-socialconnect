@@ -2,6 +2,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import Spinner from '../components/Spinner';
 import { useSelector } from 'react-redux';
+import NoAccount from '../components/NoAccount';
 
 function renderEventContent(eventInfo) {
     return (
@@ -12,7 +13,13 @@ function renderEventContent(eventInfo) {
 } 
 
 export default function Calendar() {
-  const { instaPage, isLoadingInsta, isSuccessInsta } = useSelector((state) => state.insta)
+  const { instaPage, isLoadingInsta } = useSelector((state) => state.insta)
+
+  const { user, isLoading } = useSelector((state) => state.auth);
+  
+  if (!isLoading && (user && !user.instaRefresh)) {
+    return <NoAccount />
+  }
 
   if (isLoadingInsta || !instaPage) {
     return <Spinner />

@@ -3,51 +3,59 @@ import React from 'react';
 import '../Styles/Dashboard.css';
 import { useSelector } from 'react-redux';
 import Spinner from '../components/Spinner';
+import NoAccount from '../components/NoAccount';
 
 const CommentSection = () => {
     // Sample list of comments with user, platform, and comment information
-    const { comments, isLoadingInsta, isSuccessInsta } = useSelector((state) => state.insta)
+    const { comments, isLoadingInsta } = useSelector((state) => state.insta)
+    const { user, isLoading } = useSelector((state) => state.auth);
+  
+    if (!isLoading && (user && !user.instaRefresh)) {
+      return <NoAccount />
+    }
 
     if (isLoadingInsta || !comments) {
       return <Spinner />
     }
 
     return (
-      <section class="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
-        <div class="max-w-2xl mx-auto px-4">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{comments.length}</h2>
-          </div>
-        {comments.map((comment) => {
-              <article class="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
-              <footer class="flex justify-between items-center mb-2">
-                  <div class="flex items-center">
-                  <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                    {comment.username}
-                  </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate>{comment.timestamp}</time></p>
-                  </div>
-              </footer>
-              <p className="text-gray-500 dark:text-gray-400">{comment.text}</p>
-          </article>
-          {comment.replies ? comment.replies.data.map((reply) => {
-            <article className="p-6 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
-              <footer class="flex justify-between items-center mb-2">
-                  <div class="flex items-center">
-                  <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                    {reply.username}
-                  </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate dateTime="2022-02-12"
-                              title="February 12th, 2022">{reply.timestamp}</time></p>
-                  </div>
-              </footer>
-              <p class="text-gray-500 dark:text-gray-400">{reply.text}</p>
-          </article>
-          }):<></>}
-        })}
-      </div>
-    </section>
-    );
+        <div className='comments-dashboard-container'>
+            <h3 className='comments-title'>Newest Comments</h3>
+            {comments.map((commentObj) => {
+              return commentObj.map((comment) => {
+                const commentDate = new Date(comment.timestamp);
+                const formattedCommentDate = `${commentDate.getMonth() + 1}/${commentDate.getDate()}/${commentDate.getFullYear()}`;            
+                return (
+                    <div className='comment-container' key={comment.id}>
+                        <div className='name-date-container'>
+                            <p className='comment-username'>{comment.username}</p>
+                            <p className='comment-date'>{formattedCommentDate}</p>
+                        </div>
+                        <p className='comment-text'>{comment.text}</p>
+                        <footer></footer>
+                        {comment.replies ? 
+                        <>
+                            <div className='replies-header'>Replies</div>
+                            {comment.replies.data.map((reply) => {
+                                const replyDate = new Date(reply.timestamp);
+                                const formattedReplyDate = `${replyDate.getMonth() + 1}/${replyDate.getDate()}/${replyDate.getFullYear()}`;         
+                                return (
+                                    <div className='reply-comment-container' key={reply.id}>
+                                        <div className='name-date-container'>
+                                            <p className='comment-username'>{reply.username}</p>
+                                            <p className='comment-date'>{formattedReplyDate}</p>
+                                        </div>
+                                        <p className='comment-text'>{reply.text}</p>
+                                        <footer></footer>
+                                    </div>
+                                );
+                            })}
+                        </> : <></>}
+                    </div>
+                );})
+            })}
+        </div>
+      );
   };
   
   export default CommentSection;
