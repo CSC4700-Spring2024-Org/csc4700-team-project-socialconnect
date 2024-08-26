@@ -9,6 +9,6 @@ public interface UserService {
 
     UserResponse getUser();
 
-    void updateInstagram(String token);
+    String updateInstagram(String token);
 
 }

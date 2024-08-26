@@ -1,7 +1,4 @@
-/* styles/HomePage.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 body {
     margin: 0; /* Remove default margin */
@@ -10,13 +7,19 @@ body {
   }
   
 .dashboard {
+    background: linear-gradient(to bottom, #1DBED6, #576EE3);
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .dashboard-content {
     flex-wrap: wrap;
     justify-content: space-evenly;
     display: flex;
-    height: 100vh; /* Full viewport height */
-    width: 90%;
-    margin-left: 10%;
-    background-color: #ffffff;
+    height: 100vh;
+    width: 10%;
+    flex: 1;
   }
   
   /* Link to access FullCalendar: https://www.npmjs.com/package/@fullcalendar/react */
@@ -26,7 +29,7 @@ body {
     width: 40%;
     height: 40%;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: transparent;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
@@ -38,9 +41,10 @@ body {
     border-radius: 10px;
     width: 50%;
     height: 40%;
-    background-color: #f4f4f4;
+    background-color: transparent;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto; 
+    z-index: 1;
   }
 
   .box3 {
@@ -49,7 +53,7 @@ body {
     width: 40%;
     height: 40%;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: transparent;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
@@ -60,67 +64,42 @@ body {
     width: 50%;
     height: 40%;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: transparent;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
-  
-  .sidebar {
-    background-color: #ffffff; 
-    /* color: rgb(3, 0, 0);  */
-    height: 100%; /* Full height */
-    width: 10%; /* Fixed width */
-    position: fixed; /* Fixed position */
-    top: 1; /* Position from the top */
-    left: 0; /* Position from the left */
-    overflow-x: hidden; /* Hide horizontal scrollbar */
-    padding-top: 20px; /* Top padding */
-    border: 1px solid rgb(0, 0, 0); 
-    border-top: #f4f4f4;
-    
- }
-  
-  .sidebar ul {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0; /* Remove default padding */
-  }
-  
-  .sidebar ul li {
-    padding: 10px 0; /* Vertical padding */
-  }
-  
-  .sidebar ul li a {
-    color: rgb(3, 3, 3); /* Text color for links */
-    text-decoration: none; /* Remove underline */
-    display: block; /* Make links block elements */
-    padding: 10px 20px; /* Padding for links */
-    transition: 0.3s; /* Smooth transition on hover */
-  }
-  
-  .sidebar ul li a:hover {
-    background-color: #009dff; /* Darker background on hover */
+
+  .box1, .box2, .box3, .box4 {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .custom-tooltip {
-    background-color: rgba(255, 255, 255, 0.9); 
-    padding: 8px; 
-    border-radius: 4px; 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);  
-  }
-  
   .comments-dashboard-container {
-    background: white;
+    background: transparent;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   }
+
+  /* Making title more prominent */
   .comments-title {
     font-weight: bolder;
-    color: gray;
+    color: #fff; /* White text for contrast */
     margin-left: 1rem;
     padding: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Adding text shadow for depth */
+    margin-top: 1rem;
   }
+  .replies-header {
+    font-weight: bolder;
+    color: #fff;
+    margin-left: 1rem;
+    padding: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    background: none;
+  }
+
+  /* Adding a subtle box shadow for comment containers */
   .comment-container {
     display: flex;
     flex-direction: column;
@@ -128,28 +107,91 @@ body {
     justify-content: center;
     width: 85%;
     margin-top: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Adding a box shadow for depth */
+    border-radius: 10px; /* Rounding corners */
   }
+
+  /* Making username more vibrant */
+  .comment-username {
+    color: #f7ff79;
+    font-weight: 700;
+  }
+
+  .comment-date {
+    margin-left: 1rem;
+  }
+
+  .comment-text {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .reply-button {
+    background: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    margin-left: auto;
+    margin-right: 1rem;
+    transition: all 0.3s ease-in-out;
+    border-radius: 5px;
+    color: #8179ff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  .reply-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Styling reply input */
+  .reply-input {
+    width: 80%;
+    border-radius: 20px;
+    transition: all ease-in-out .5s;
+    padding: 0.7rem 1rem;
+    border: 2px solid #8179ff;
+    background-color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+  }
+  .reply-input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 10px rgba(255, 224, 130, 0.5);
+  }
+
   .name-date-container {
     display: flex;
     flex-direction: row;
-  }
-  .comment-username {
-    color: black;
-    font-weight: 700;
-  }
-  .comment-date {
-    color: gray;
-    font-weight: 400;
-    margin-left: 0.5rem;
+    margin-left: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
-  footer {
-    border-top: 1px solid #D1D5DB;
-  }
   .reply-comment-container {
-    margin-left: 2rem;
+    margin-left: 1rem;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
   }
-  .replies-header {
-    font-weight: bolder;
-    margin-top: 1.5rem;
+
+  .reply-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .send-button {
+    position: relative;
+    transform: translate(-175%, -50%);
+    cursor: pointer;
+  }
+
+  .replies-divider {
+    border: 1px solid #fff;
+    margin-bottom: 1.5rem;
+    width: 80%;
+    position: relative;
+    left: 10%;
   }

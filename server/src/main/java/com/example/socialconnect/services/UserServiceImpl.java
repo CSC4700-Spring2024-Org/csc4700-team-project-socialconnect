@@ -1,16 +1,19 @@
 package com.example.socialconnect.services;
 
+import com.example.socialconnect.dtos.FacebookResponseDTO;
 import com.example.socialconnect.dtos.UserRequest;
 import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,6 +22,12 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     ModelMapper modelMapper = new ModelMapper();
+
+    @Value("${fb.appId}")
+    private String fb_id;
+
+    @Value("${fb.secret}")
+    private String fb_secret;
 
     @Override
     public UserResponse saveUser(UserRequest userRequest) {
@@ -55,10 +64,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateInstagram(String token) {
+    public String updateInstagram(String token) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetail = (UserDetails) authentication.getPrincipal();
         String usernameFromAcessToken = userDetail.getUsername();
-        userRepository.updateInstagram(token, usernameFromAcessToken);
+        if (token.equals("None")) {
+            userRepository.updateInstagram(null, usernameFromAcessToken);
+            return null;
+        }
+        else {
+            System.out.println("TOKEN = " + token);
+            RestTemplate restTemplate = new RestTemplate();
+            FacebookResponseDTO result = restTemplate.getForObject("https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id="+fb_id+"&client_secret="+fb_secret+"&fb_exchange_token="+token, FacebookResponseDTO.class);
+            userRepository.updateInstagram(result.access_token, usernameFromAcessToken);
+            return result.access_token;
+        }
     }
 }

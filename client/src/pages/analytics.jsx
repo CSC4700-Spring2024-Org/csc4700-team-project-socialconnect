@@ -102,37 +102,33 @@ export default function Analytics() {
 
   return (
     <>
-      <Card className="sm:mx-auto sm:max-w-lg">
-        <h3 className="font-medium text-tremor-content-strong:text-tremor-content-strong">
-          Likes
-        </h3>
+      <Card className="analytics-card">
+        <h3 className="likes-header">Likes</h3>
         <AreaChart
           data={data}
           index="date"
-          //categories={['TikTok', 'Instagram','Youtube']}
-          //colors={['emerald', 'pink','red']}
-          categories={['Instagram']}
-          colors={['pink']}
+          categories={['TikTok', 'Instagram', 'Youtube']}
+          colors={['emerald', 'pink', 'red']}
           valueFormatter={valueFormatter}
           showLegend={false}
           showYAxis={true}
           showGradient={true}
           startEndOnly={true}
-          className="mt-6 h-32"
+          className="analytics-area-chart"
           showTooltip={true}
           customTooltip={CustomTooltip}
         />
-        <List className="mt-2">
+        <List className="analytics-list">
           {summary.map((item) => (
             <ListItem key={item.name}>
-              <div className="flex items-center space-x-2">
+              <div className="list-item-div">
                 <span
-                  className={classNames(statusColor[item.name], 'h-0.5 w-3')}
+                  className={classNames(statusColor[item.name], 'list-item-span')}
                   aria-hidden={true}
                 />
                 <span>{item.name}</span>
               </div>
-              <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+              <span className="likes-count">
                 {valueFormatter(item.value)}
               </span>
             </ListItem>

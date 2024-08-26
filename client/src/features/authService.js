@@ -58,13 +58,13 @@ const setInstagram = async (instaToken) => {
     try {
         const response = await axios.post(API_URL + 'setInstagram', {token : instaToken});
 
-        return instaToken;
+        return response.data;
     } catch (error) {
         if (error.response.status === 401) {
             const refreshResponse = await refreshToken();
             if (refreshResponse !== 401) {
                 const newResponse = await axios.post(API_URL + 'setInstagram', instaToken);
-                return instaToken;
+                return newResponse.data;
             }
         }
     }

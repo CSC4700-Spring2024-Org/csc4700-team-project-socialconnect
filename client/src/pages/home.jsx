@@ -1,5 +1,4 @@
 import '../Styles/Dashboard.css';
-import Sidebar from '../pages/Sidebar'
 import CommentSection from './CommentSection';
 import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -9,6 +8,7 @@ import Analytics from './analytics';
 import { getInstaProfile } from '../features/instaSlice';
 import Calendar from './calendar';
 import Chart from './chart';
+import { toast } from 'react-toastify';
 
 
 const Home = () => {
@@ -16,6 +16,7 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
+  const { message, isErrorInsta, instaPage } = useSelector((state) => state.insta)
 
   const [initialRenderCompleted, setInitialRenderCompleted] = useState(false);
 
@@ -33,22 +34,26 @@ const Home = () => {
     if (initialRenderCompleted && !isLoading) {
       if (isSuccess && user) {
         navigate('/');
-        if (user.instaRefresh) {
+        if (isErrorInsta) {
+          toast.error(message)
+        }
+        if (user.instaRefresh && !instaPage) {
           dispatch(getInstaProfile(user))
         }
       } else if (isError || (!isSuccess && !user)) {
         navigate('/login');
       }
     }
-  }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted]);
+  }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted, message, isErrorInsta]);
  
   return (
     <div className="dashboard">
-      <Sidebar/>
-      <div className="box1"> <Calendar/> </div>
-      <div className="box2"> <Chart/> </div>
-      <div className="box3"> <CommentSection/> </div>
-      <div className="box4"> <Analytics/> </div>
+      <div className='dashboard-content'>
+        <div className="box1"> <Calendar/> </div>
+        <div className="box2"> <Chart/> </div>
+        <div className="box3"> <CommentSection/> </div>
+        <div className="box4"> <Analytics/> </div>
+      </div>
     </div>
   );
 };

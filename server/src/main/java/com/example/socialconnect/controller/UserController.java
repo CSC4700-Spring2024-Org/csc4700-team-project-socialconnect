@@ -41,8 +41,8 @@ public class UserController {
     @PostMapping("/setInstagram")
     public ResponseEntity<String> setInstagramToken(@RequestBody RefreshTokenRequestDTO token) {
         try {
-            userService.updateInstagram(token.getToken());
-            return ResponseEntity.ok("Updated instagram");
+            String res = userService.updateInstagram(token.getToken());
+            return ResponseEntity.ok(res);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

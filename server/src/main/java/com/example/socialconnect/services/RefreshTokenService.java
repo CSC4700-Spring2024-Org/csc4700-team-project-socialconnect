@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +33,9 @@ public class RefreshTokenService {
     public RefreshToken updateRefreshToken(String username) {
         Long userId = userRepository.findByUsername(username).getId();
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId).get();
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant())) {
+            return refreshToken;
+        }
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
         return refreshTokenRepository.save(refreshToken);

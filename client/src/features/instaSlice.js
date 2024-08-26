@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import instaService from './instaService'
+import { setInstagram } from './authSlice';
 
 const initialState = {
     instaPage: null,
@@ -16,7 +17,7 @@ const getFacebookPages = (user) => {
         "me/accounts",
         { access_token: user.instaRefresh },
         (response) => {
-          resolve(response.data);
+          resolve(response);
         }
       );
     });
@@ -42,7 +43,11 @@ export const getInstaProfile = createAsyncThunk(
     async (user, thunkAPI) => {
         try {
             const facebookPages = await getFacebookPages(user);
-            const instagramAccountId = await getInstagramAccountId(facebookPages[0].id, user);
+            if (facebookPages.error && facebookPages.error.code === 190) {
+              thunkAPI.dispatch(setInstagram("None"))
+              return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+            }
+            const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
             return await instaService.getInstaProfile(instagramAccountId, user.instaRefresh)
         } catch (error) {
             const message =
@@ -59,26 +64,26 @@ export const instaSlice = createSlice({
     initialState,
     reducers: {
       reset: (state) => {
-        state.isLoading = false
-        state.isSuccess = false
-        state.isError = false
+        state.isLoadingInsta = false
+        state.isSuccessInsta = false
+        state.isErrorInsta = false
         state.message = ''
       },
     },
     extraReducers: (builder) => {
       builder
         .addCase(getInstaProfile.pending, (state) => {
-          state.isLoading = true
+          state.isLoadingInsta = true
         })
         .addCase(getInstaProfile.fulfilled, (state, action) => {
-          state.isLoading = false
-          state.isSuccess = true
+          state.isLoadingInsta = false
+          state.isSuccessInsta = true
           state.instaPage = action.payload.page
           state.comments = action.payload.comments
         })
         .addCase(getInstaProfile.rejected, (state, action) => {
-          state.isLoading = false
-          state.isError = true
+          state.isLoadingInsta = false
+          state.isErrorInsta = true
           state.message = action.payload
         })
     },

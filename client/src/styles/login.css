@@ -1,23 +1,16 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-
 .outer {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #03a9f4;
+  background: #576EE3;
   transition: 1s;
 }
 
 .slide {
-  background: #f43648;
+  background: #1DBED6;
 }
 
 .container {
@@ -28,6 +21,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 .container .boxC {
@@ -133,7 +130,7 @@
 }
 
 .formBx .form form input[type="submit"] {
-  background: #03a9f4;
+  background: #576EE3;
   border: none;
   color: #fff;
   max-width: 100px;
@@ -142,5 +139,44 @@
 }
 
 .formBx .signupform form input[type="submit"] {
-  background: #f43648;
+  background: #1DBED6;
+}
+
+.check {
+    color: green;
+    margin-right: 0.25rem;
+}
+.circle {
+    color: red;
+    margin-right: 0.25rem;
+}
+
+.requirements-list {
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    padding-left: 1rem;
+    margin-top: 0;
+}
+
+.password-content {
+    font-size: 0.8em;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    opacity: 0;
+    max-height: 0px;
+    overflow: hidden;
+    transition: all 1s ease;
+}
+
+.password-content.show {
+  opacity: 1;
+  max-height: 500px;
+}
+
+.password-requirements-header {
+  margin: 0;
+  padding: 0;
 }
