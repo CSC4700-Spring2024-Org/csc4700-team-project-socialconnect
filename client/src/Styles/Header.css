@@ -1,9 +1,10 @@
 .header {
-    color: white;
-    background-color: #212121;
+    color: rgb(0, 0, 0);
+    background-color: #C7D2FE;
     display: flex;
     align-items: center;
     height: 3em;
+    border: 1px solid rgb(0, 0, 0);
 }
 
 .profileIcon {
@@ -67,4 +68,13 @@
   .dropdownItem span{
     max-width: 100px;
     margin-left: 10px;
+  }
+
+  img {
+    width: 5%;
+    height: 100%;
+  }
+  
+  img:hover {
+    cursor: pointer;
   }

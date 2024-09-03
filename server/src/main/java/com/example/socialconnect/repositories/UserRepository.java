@@ -21,7 +21,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
    @Transactional
    @Query(
       nativeQuery = true,
-      value = "UPDATE USERS SET INSTA_REFRESH = :token, INSTA_DATE = CURRENT_TIMESTAMP WHERE username = :username"
+      value = "UPDATE users SET INSTA_REFRESH = CASE WHEN :token IS NULL THEN NULL ELSE :token END, INSTA_DATE = CURRENT_TIMESTAMP WHERE username = :username"
    )
    void updateInstagram(@Param("token")String token, @Param("username")String username);
 }

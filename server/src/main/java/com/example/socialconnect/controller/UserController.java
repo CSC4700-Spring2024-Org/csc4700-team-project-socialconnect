@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = "https://www.danbfrost.com", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -41,8 +41,8 @@ public class UserController {
     @PostMapping("/setInstagram")
     public ResponseEntity<String> setInstagramToken(@RequestBody RefreshTokenRequestDTO token) {
         try {
-            userService.updateInstagram(token.getToken());
-            return ResponseEntity.ok("Updated instagram");
+            String res = userService.updateInstagram(token.getToken());
+            return ResponseEntity.ok(res);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,0 +1,62 @@
+/* .feedContainer {
+    width: 200px;
+    justify-content: space-around;
+    gap: 5px;
+    padding: 0px;
+    
+  } */
+
+  .feedContainer {
+    position: relative;
+    width: 30%;
+    height: 100%;
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: hidden; /* Enable vertical scrolling */
+    margin: 0.5rem;
+}
+
+.caption {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  color: white;
+  padding: 5px;
+  box-sizing: border-box;
+  pointer-events: none; /* Allows click events to pass through */
+  z-index: 1; /* Ensure the caption is above the video */
+}
+
+.captionButton {
+  font-size: 12px;
+  padding: 5px;
+  margin-top: 5px;
+  background-color: #f4f4f4;
+  border: none;
+  cursor: pointer;
+}
+
+
+ 
+
+  .recentposts-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .img {
+    width: 100%;
+    height: auto;
+    transition: all 100ms ease-out;
+  }
+  
+  .caption:hover {
+    transform: scale(1.24);
+  }
