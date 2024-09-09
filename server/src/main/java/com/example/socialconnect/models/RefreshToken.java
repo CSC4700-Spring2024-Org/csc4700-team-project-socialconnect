@@ -30,4 +30,7 @@ public class RefreshToken {
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private User userInfo;
 
+    @Column(name="USER_AGENT")
+    private String userAgent;
+
 }

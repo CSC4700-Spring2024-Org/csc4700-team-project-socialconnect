@@ -1,4 +1,6 @@
-package com.example.socialconnect.dtos;
+package com.example.socialconnect.dtos.InstagramDTOs;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthRequestDTO {
-    private String username;
-    private String password;
-    private String userAgent;
+public class CommentResponseDTO {
+    public List<CommentDTO> data; 
 }

@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,24 +19,29 @@ public class RefreshTokenService {
     @Autowired
     UserRepository userRepository;
 
-    public RefreshToken createRefreshToken(String username){
+    public RefreshToken createRefreshToken(String username, String userAgent){
         RefreshToken refreshToken = RefreshToken.builder()
                 .userInfo(userRepository.findByUsername(username))
+                .userAgent(userAgent)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(2592000000L))
                 .build();
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken updateRefreshToken(String username) {
+    public RefreshToken updateRefreshToken(String username, String userAgent) {
         Long userId = userRepository.findByUsername(username).getId();
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId).get();
-        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant())) {
-            return refreshToken;
+        Optional<RefreshToken> optionalObj = refreshTokenRepository.findByUserId(userId, userAgent);
+        if (optionalObj.isPresent() && Instant.now().isBefore(optionalObj.get().getExpiryDate())) {
+            return optionalObj.get();
         }
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
-        return refreshTokenRepository.save(refreshToken);
+        if (optionalObj.isPresent()) {
+            RefreshToken refreshToken = optionalObj.get();
+            refreshToken.setToken(UUID.randomUUID().toString());
+            refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
+            return refreshTokenRepository.save(refreshToken);
+        }
+        return createRefreshToken(username, userAgent);
     }
 
     public void deleteRefreshToken(String token) {
@@ -53,7 +56,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token){
         if(token.getExpiryDate().compareTo(Instant.now())<0){
             refreshTokenRepository.delete(token);
-            throw new RuntimeException(token.getToken() + " Refresh token is expired. Please make a new login..!");
+            return null;
         }
         return token;
 

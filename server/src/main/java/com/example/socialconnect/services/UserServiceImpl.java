@@ -1,8 +1,8 @@
 package com.example.socialconnect.services;
 
-import com.example.socialconnect.dtos.FacebookResponseDTO;
 import com.example.socialconnect.dtos.UserRequest;
 import com.example.socialconnect.dtos.UserResponse;
+import com.example.socialconnect.dtos.InstagramDTOs.FacebookResponseDTO;
 import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.UserRepository;
 import org.modelmapper.ModelMapper;

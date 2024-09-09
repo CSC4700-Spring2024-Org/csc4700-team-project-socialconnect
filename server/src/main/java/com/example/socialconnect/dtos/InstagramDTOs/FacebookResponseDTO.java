@@ -1,4 +1,4 @@
-package com.example.socialconnect.dtos;
+package com.example.socialconnect.dtos.InstagramDTOs;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

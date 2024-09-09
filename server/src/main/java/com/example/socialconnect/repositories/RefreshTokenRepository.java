@@ -19,9 +19,9 @@ public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Int
 
     @Query(
         nativeQuery = true,
-        value = "SELECT * FROM refresh_tokens WHERE USER_ID = :id"
+        value = "SELECT * FROM refresh_tokens WHERE USER_ID = :id AND user_agent = :userAgent"
     )
-    Optional<RefreshToken> findByUserId(@Param("id")Long id);
+    Optional<RefreshToken> findByUserId(@Param("id")Long id, @Param("userAgent")String userAgent);
 
     @Modifying
     @Transactional

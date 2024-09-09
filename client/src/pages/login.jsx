@@ -14,6 +14,7 @@ const Login = () => {
    })
 
    const { username, password } = formData
+   const userAgent = navigator.userAgent
 
    const [requirements, setRequirements] = useState({
       length: false,
@@ -79,6 +80,7 @@ const Login = () => {
       const userData = {
          username,
          password,
+         userAgent
       }
 
       dispatch(login(userData))
@@ -89,7 +91,8 @@ const Login = () => {
 
       const userData = {
          username,
-         password
+         password,
+         userAgent
       }
       
       dispatch(register(userData))

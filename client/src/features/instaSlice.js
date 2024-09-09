@@ -11,44 +11,17 @@ const initialState = {
     message: '',
 }
 
-const getFacebookPages = (user) => {
-    return new Promise((resolve) => {
-      window.FB.api(
-        "me/accounts",
-        { access_token: user.instaRefresh },
-        (response) => {
-          resolve(response);
-        }
-      );
-    });
-  };
-
-  const getInstagramAccountId = (facebookPageId, user) => {
-    return new Promise((resolve) => {
-      window.FB.api(
-        facebookPageId,
-        {
-          access_token: user.instaRefresh,
-          fields: "instagram_business_account",
-        },
-        (response) => {
-          resolve(response.instagram_business_account.id);
-        }
-      );
-    });
-  };
-
 export const getInstaProfile = createAsyncThunk(
     'insta/profile',
     async (user, thunkAPI) => {
         try {
-            const facebookPages = await getFacebookPages(user);
-            if (facebookPages.error && facebookPages.error.code === 190) {
-              thunkAPI.dispatch(setInstagram("None"))
-              return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
-            }
-            const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
-            return await instaService.getInstaProfile(instagramAccountId, user.instaRefresh)
+            // const facebookPages = await getFacebookPages(user);
+            // if (facebookPages.error && facebookPages.error.code === 190) {
+            //   thunkAPI.dispatch(setInstagram("None"))
+            //   return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+            // }
+            // const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
+            return await instaService.getInstaProfile(user.instaRefresh)
         } catch (error) {
             const message =
                 (error.response && error.response.data && error.response.data.message) ||
