@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BusinessDiscoveryListDTO {
-    public BusinessDiscoveryDTO business_discovery;
+    private BusinessDiscoveryDTO business_discovery;
 }

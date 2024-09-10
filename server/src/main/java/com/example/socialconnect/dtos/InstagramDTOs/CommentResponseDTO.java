@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CommentResponseDTO {
-    public List<CommentDTO> data; 
+    private List<CommentDTO> data; 
 }

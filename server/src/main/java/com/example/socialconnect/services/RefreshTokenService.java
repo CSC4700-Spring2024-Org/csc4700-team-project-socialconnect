@@ -1,6 +1,7 @@
 package com.example.socialconnect.services;
 
 import com.example.socialconnect.models.RefreshToken;
+import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.RefreshTokenRepository;
 import com.example.socialconnect.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,9 @@ public class RefreshTokenService {
     @Autowired
     UserRepository userRepository;
 
-    public RefreshToken createRefreshToken(String username, String userAgent){
+    public RefreshToken createRefreshToken(User user, String userAgent){
         RefreshToken refreshToken = RefreshToken.builder()
-                .userInfo(userRepository.findByUsername(username))
+                .userInfo(user)
                 .userAgent(userAgent)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(2592000000L))
@@ -29,9 +30,8 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken updateRefreshToken(String username, String userAgent) {
-        Long userId = userRepository.findByUsername(username).getId();
-        Optional<RefreshToken> optionalObj = refreshTokenRepository.findByUserId(userId, userAgent);
+    public RefreshToken updateRefreshToken(User user, String userAgent) {
+        Optional<RefreshToken> optionalObj = refreshTokenRepository.findByUserId(user.getId(), userAgent);
         if (optionalObj.isPresent() && Instant.now().isBefore(optionalObj.get().getExpiryDate())) {
             return optionalObj.get();
         }
@@ -41,7 +41,7 @@ public class RefreshTokenService {
             refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
             return refreshTokenRepository.save(refreshToken);
         }
-        return createRefreshToken(username, userAgent);
+        return createRefreshToken(user, userAgent);
     }
 
     public void deleteRefreshToken(String token) {

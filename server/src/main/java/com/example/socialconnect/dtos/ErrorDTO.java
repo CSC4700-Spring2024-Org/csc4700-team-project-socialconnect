@@ -1,6 +1,4 @@
-package com.example.socialconnect.dtos.InstagramDTOs;
-
-import java.util.List;
+package com.example.socialconnect.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AccountDTO {
-    private List<DataDTO> data;
+public class ErrorDTO {
+    private String error;
+    private int code;
 }

@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DataDTO {
-    public String access_token;
-    public String category;
-    public List<CategoryListDTO> category_list;
-    public String name;
-    public String id;
-    public List<String> tasks;
+    private String access_token;
+    private String category;
+    private List<CategoryListDTO> category_list;
+    private String name;
+    private String id;
+    private List<String> tasks;
 }

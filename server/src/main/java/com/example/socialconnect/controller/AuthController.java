@@ -3,7 +3,6 @@ package com.example.socialconnect.controller;
 import com.example.socialconnect.dtos.AuthRequestDTO;
 import com.example.socialconnect.dtos.JwtResponseDTO;
 import com.example.socialconnect.dtos.UserRequest;
-import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.models.RefreshToken;
 import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.UserRepository;
@@ -64,10 +63,10 @@ public class AuthController {
     public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if(authentication.isAuthenticated()){
-            RefreshToken refreshToken = refreshTokenService.updateRefreshToken(authRequestDTO.getUsername(), authRequestDTO.getUserAgent());
+            User user = (User) authentication.getPrincipal();
+            RefreshToken refreshToken = refreshTokenService.updateRefreshToken(user, authRequestDTO.getUserAgent());
             String accessToken = jwtService.generateToken(authRequestDTO.getUsername());
-            UserResponse userResponse = modelMapper.map(userRepository.findByUsername(authRequestDTO.getUsername()), UserResponse.class);
-            // set accessToken to cookie header
+
             ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
                     .httpOnly(true)
                     .secure(true)
@@ -89,7 +88,8 @@ public class AuthController {
                 cookie.domain(cookieDomain);
             }
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
-            return ResponseEntity.ok(userResponse);
+            user.setPassword(null);
+            return ResponseEntity.ok(user);
 
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
@@ -142,19 +142,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletResponse response) {
-        UserResponse userResponse = userService.saveUser(userRequest);
+        User userResponse = userService.saveUser(userRequest);
         if (userResponse.getUsername() == null) {
                 return ResponseEntity.badRequest().body("Username already taken");
         }
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userRequest.getUsername(), userRequest.getUserAgent());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
         String accessToken = jwtService.generateToken(userRequest.getUsername());
         // set accessToken to cookie header
         ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
-        .httpOnly(true)
-        .secure(true)
-        .sameSite("None")
-        .path("/")
-        .maxAge(cookieExpiry);
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .maxAge(cookieExpiry);
         if (!cookieDomain.equals("localhost")) {
             cookie.domain(cookieDomain);
         }
@@ -170,6 +170,7 @@ public class AuthController {
             cookie.domain(cookieDomain);
         }
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
+        userRequest.setPassword(null);
         return ResponseEntity.ok(userResponse);
     }
 

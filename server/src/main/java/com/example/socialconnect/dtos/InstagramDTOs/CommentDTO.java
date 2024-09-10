@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CommentDTO {
-    public String username;
-    public String text;
-    public String timestamp;
-    public String id;
-    public CommentResponseDTO replies;
+    private String username;
+    private String text;
+    private String timestamp;
+    private String id;
+    private CommentResponseDTO replies;
 }

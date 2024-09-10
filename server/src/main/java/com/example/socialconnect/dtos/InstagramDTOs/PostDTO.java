@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostDTO {
-    public String id;
-    public String caption;
-    public Integer like_count;
-    public Integer comments_count;
-    public String timestamp;
-    public String username;
-    public String media_product_type;
-    public String media_type;
-    public String permalink;
-    public String media_url;
+    private String id;
+    private String caption;
+    private Integer like_count;
+    private Integer comments_count;
+    private String timestamp;
+    private String username;
+    private String media_product_type;
+    private String media_type;
+    private String permalink;
+    private String media_url;
 }

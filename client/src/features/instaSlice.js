@@ -21,7 +21,15 @@ export const getInstaProfile = createAsyncThunk(
             //   return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
             // }
             // const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
-            return await instaService.getInstaProfile(user.instaRefresh)
+            const res = await instaService.getInstaProfile(user.instaRefresh)
+            if (res.error) {
+              if (res.code === 190) {
+                thunkAPI.dispatch(setInstagram("None"))
+                return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+              }
+              return thunkAPI.rejectWithValue(res.error)
+            }
+            return res;
         } catch (error) {
             const message =
                 (error.response && error.response.data && error.response.data.message) ||

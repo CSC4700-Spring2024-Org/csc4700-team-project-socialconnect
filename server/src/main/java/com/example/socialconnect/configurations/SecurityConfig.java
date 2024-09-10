@@ -41,7 +41,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**")
+                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**", "api/instagramProfile/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

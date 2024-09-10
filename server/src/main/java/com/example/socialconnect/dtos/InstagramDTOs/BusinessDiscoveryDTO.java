@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BusinessDiscoveryDTO {
-    public String username;
-    public String website;
-    public String name;
-    public Long ig_id;
-    public String id;
-    public String profile_picture_url;
-    public String biography;
-    public Integer follows_count;
-    public Integer followers_count;
-    public Integer media_count;
-    public BusinessDiscoveryDataDTO media; 
+    private String username;
+    private String website;
+    private String name;
+    private Long ig_id;
+    private String id;
+    private String profile_picture_url;
+    private String biography;
+    private Integer follows_count;
+    private Integer followers_count;
+    private Integer media_count;
+    private BusinessDiscoveryDataDTO media; 
 }

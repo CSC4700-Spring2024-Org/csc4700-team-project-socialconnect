@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private String fb_secret;
 
     @Override
-    public UserResponse saveUser(UserRequest userRequest) {
+    public User saveUser(UserRequest userRequest) {
         if(userRequest.getUsername() == null){
             throw new RuntimeException("Parameter username is not found in request..!!");
         } else if(userRequest.getPassword() == null){
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userRepository.findByUsername(userRequest.getUsername()) != null) {
-            return new UserResponse();
+            return new User();
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String rawPassword = userRequest.getPassword();
@@ -49,8 +49,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        return userResponse;
+        return user;
     }
 
     @Override
@@ -76,8 +75,8 @@ public class UserServiceImpl implements UserService {
             System.out.println("TOKEN = " + token);
             RestTemplate restTemplate = new RestTemplate();
             FacebookResponseDTO result = restTemplate.getForObject("https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id="+fb_id+"&client_secret="+fb_secret+"&fb_exchange_token="+token, FacebookResponseDTO.class);
-            userRepository.updateInstagram(result.access_token, usernameFromAcessToken);
-            return result.access_token;
+            userRepository.updateInstagram(result.getAccess_token(), usernameFromAcessToken);
+            return result.getAccess_token();
         }
     }
 }

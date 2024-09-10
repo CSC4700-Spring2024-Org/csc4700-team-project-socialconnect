@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BusinessDiscoveryDataDTO {
     @JsonFormat(with=JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<PostDTO> data;
+    private List<PostDTO> data;
 }

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class InstaBusinessAcct {
-    public CategoryListDTO instagram_business_account;
+    private CategoryListDTO instagram_business_account;
 }
