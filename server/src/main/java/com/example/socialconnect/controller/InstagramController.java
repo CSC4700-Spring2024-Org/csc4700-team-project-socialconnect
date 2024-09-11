@@ -18,7 +18,7 @@ public class InstagramController {
     InstagramService instagramService;
 
     @GetMapping("/instagramProfile")
-    public ResponseEntity<Object> getInstagramProfile(@RequestParam String token) {
+    public ResponseEntity<?> getInstagramProfile(@RequestParam String token) {
         return ResponseEntity.ok(instagramService.getInstagramInfo(token));
     }
 }

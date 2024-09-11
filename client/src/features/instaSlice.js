@@ -57,15 +57,15 @@ export const instaSlice = createSlice({
           state.isLoadingInsta = true
         })
         .addCase(getInstaProfile.fulfilled, (state, action) => {
-          state.isLoadingInsta = false
           state.isSuccessInsta = true
           state.instaPage = action.payload.page
           state.comments = action.payload.comments
+          state.isLoadingInsta = false
         })
         .addCase(getInstaProfile.rejected, (state, action) => {
-          state.isLoadingInsta = false
           state.isErrorInsta = true
           state.message = action.payload
+          state.isLoadingInsta = false
         })
     },
   })
