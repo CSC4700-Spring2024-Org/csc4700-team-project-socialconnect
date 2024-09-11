@@ -11,44 +11,25 @@ const initialState = {
     message: '',
 }
 
-const getFacebookPages = (user) => {
-    return new Promise((resolve) => {
-      window.FB.api(
-        "me/accounts",
-        { access_token: user.instaRefresh },
-        (response) => {
-          resolve(response);
-        }
-      );
-    });
-  };
-
-  const getInstagramAccountId = (facebookPageId, user) => {
-    return new Promise((resolve) => {
-      window.FB.api(
-        facebookPageId,
-        {
-          access_token: user.instaRefresh,
-          fields: "instagram_business_account",
-        },
-        (response) => {
-          resolve(response.instagram_business_account.id);
-        }
-      );
-    });
-  };
-
 export const getInstaProfile = createAsyncThunk(
     'insta/profile',
     async (user, thunkAPI) => {
         try {
-            const facebookPages = await getFacebookPages(user);
-            if (facebookPages.error && facebookPages.error.code === 190) {
-              thunkAPI.dispatch(setInstagram("None"))
-              return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+            // const facebookPages = await getFacebookPages(user);
+            // if (facebookPages.error && facebookPages.error.code === 190) {
+            //   thunkAPI.dispatch(setInstagram("None"))
+            //   return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+            // }
+            // const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
+            const res = await instaService.getInstaProfile(user.instaRefresh)
+            if (res.error) {
+              if (res.code === 190) {
+                thunkAPI.dispatch(setInstagram("None"))
+                return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
+              }
+              return thunkAPI.rejectWithValue(res.error)
             }
-            const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
-            return await instaService.getInstaProfile(instagramAccountId, user.instaRefresh)
+            return res;
         } catch (error) {
             const message =
                 (error.response && error.response.data && error.response.data.message) ||
@@ -76,15 +57,15 @@ export const instaSlice = createSlice({
           state.isLoadingInsta = true
         })
         .addCase(getInstaProfile.fulfilled, (state, action) => {
-          state.isLoadingInsta = false
           state.isSuccessInsta = true
           state.instaPage = action.payload.page
           state.comments = action.payload.comments
+          state.isLoadingInsta = false
         })
         .addCase(getInstaProfile.rejected, (state, action) => {
-          state.isLoadingInsta = false
           state.isErrorInsta = true
           state.message = action.payload
+          state.isLoadingInsta = false
         })
     },
   })

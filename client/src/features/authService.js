@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_URL = 'https://api.danbfrost.com:443/api/';
+//const API_URL = 'https://api.danbfrost.com:443/api/';
+const API_URL = 'http://localhost:8080/api/'
 
 axios.defaults.withCredentials = true;
 
@@ -23,51 +24,21 @@ const refreshToken = async () => {
 }
 
 const getUser = async () => {
-    try {
-        const response = await axios.get(API_URL + 'profile');
+    const response = await axios.get(API_URL + 'profile');
 
-        return response.data;
-    } catch (error) {
-        if (error.response.status === 401) {
-            const refreshResponse = await refreshToken();
-            if (refreshResponse !== 401) {
-                const newResponse = await axios.get(API_URL + 'profile');
-                return newResponse.data;
-            }
-        }
-    }
+    return response.data;
 }
 
 const logout = async () => {
-    try {
-        const response = await axios.post(API_URL + 'logout')
+    const response = await axios.post(API_URL + 'logout')
 
-        return response.data;
-    } catch (error) {
-        if (error.response.status === 401) {
-            const refreshResponse = await refreshToken();
-            if (refreshResponse !== 401) {
-                const newResponse = await axios.post(API_URL + 'logout');
-                return newResponse.data;
-            }
-        }
-    }
+    return response.data;
 }
 
 const setInstagram = async (instaToken) => {
-    try {
-        const response = await axios.post(API_URL + 'setInstagram', {token : instaToken});
+    const response = await axios.post(API_URL + 'setInstagram', {token : instaToken});
 
-        return response.data;
-    } catch (error) {
-        if (error.response.status === 401) {
-            const refreshResponse = await refreshToken();
-            if (refreshResponse !== 401) {
-                const newResponse = await axios.post(API_URL + 'setInstagram', instaToken);
-                return newResponse.data;
-            }
-        }
-    }
+    return response.data;
 }
 
 

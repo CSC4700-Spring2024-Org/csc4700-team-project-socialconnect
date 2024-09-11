@@ -1,13 +1,14 @@
 package com.example.socialconnect.controller;
 
 import com.example.socialconnect.dtos.*;
+import com.example.socialconnect.models.User;
 import com.example.socialconnect.services.RefreshTokenService;
 import com.example.socialconnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "https://www.danbfrost.com", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = {"https://www.danbfrost.com", "http://localhost:3000"}, maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -19,9 +20,10 @@ public class UserController {
     RefreshTokenService refreshTokenService;
 
     @PostMapping(value = "/save")
-    public ResponseEntity<UserResponse> saveUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<User> saveUser(@RequestBody UserRequest userRequest) {
         try {
-            UserResponse userResponse = userService.saveUser(userRequest);
+            User userResponse = userService.saveUser(userRequest);
+            userResponse.setPassword(null);
             return ResponseEntity.ok(userResponse);
         } catch (Exception e) {
             throw new RuntimeException(e);
