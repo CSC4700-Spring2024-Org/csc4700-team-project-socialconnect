@@ -1,0 +1,8 @@
+.post-container {
+    background: linear-gradient(to bottom, #1DBED6, #576EE3);
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
