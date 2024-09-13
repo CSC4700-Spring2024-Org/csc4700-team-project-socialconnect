@@ -9,26 +9,38 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomUserDetails extends User implements UserDetails {
-
+public class CustomUserDetails implements UserDetails {
+    private String email;
     private String username;
     private String password;
+    private User user;
     Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User byUsername) {
         this.username = byUsername.getUsername();
         this.password= byUsername.getPassword();
+        this.email = byUsername.getEmail();
+        this.user = byUsername;
         List<GrantedAuthority> auths = new ArrayList<>();
 
         auths.add(new SimpleGrantedAuthority("USER"));
         this.authorities = auths;
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public User getUser() {
+        return user;
+    }
+    
     @Override
     public String getPassword() {
         return password;

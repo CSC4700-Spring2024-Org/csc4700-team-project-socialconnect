@@ -27,6 +27,8 @@ public class RefreshTokenService {
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(2592000000L))
                 .build();
+        System.out.println(refreshToken.getUserInfo().getEmail());
+        userRepository.save(user);
         return refreshTokenRepository.save(refreshToken);
     }
 
@@ -39,6 +41,7 @@ public class RefreshTokenService {
             RefreshToken refreshToken = optionalObj.get();
             refreshToken.setToken(UUID.randomUUID().toString());
             refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
+            refreshToken.setUserInfo(user);
             return refreshTokenRepository.save(refreshToken);
         }
         return createRefreshToken(user, userAgent);

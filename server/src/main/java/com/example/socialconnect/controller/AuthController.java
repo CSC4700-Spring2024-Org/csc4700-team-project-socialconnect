@@ -3,6 +3,7 @@ package com.example.socialconnect.controller;
 import com.example.socialconnect.dtos.AuthRequestDTO;
 import com.example.socialconnect.dtos.ErrorDTO;
 import com.example.socialconnect.dtos.UserRequest;
+import com.example.socialconnect.helpers.CustomUserDetails;
 import com.example.socialconnect.models.RefreshToken;
 import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.UserRepository;
@@ -13,6 +14,7 @@ import com.example.socialconnect.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -60,11 +62,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
+        System.out.println("AUTHENTICATION DONE");
         if(authentication.isAuthenticated()){
-            User user = (User) authentication.getPrincipal();
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.getUser();
             RefreshToken refreshToken = refreshTokenService.updateRefreshToken(user, authRequestDTO.getUserAgent());
             String accessToken = jwtService.generateToken(authRequestDTO.getUsername());
-
+            System.out.println("HERE 2");
             ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
                     .httpOnly(true)
                     .secure(true)
@@ -99,6 +103,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletResponse response) {
+        System.out.println(userRequest.getEmail());
+        String randomCode = RandomString.make(64);
+        userRequest.setVerificationCode(randomCode);
+        userRequest.setEnabled(false);
         User userResponse = userService.saveUser(userRequest);
         if (userResponse.getUsername() == null) {
             ErrorDTO errorDTO = new ErrorDTO();

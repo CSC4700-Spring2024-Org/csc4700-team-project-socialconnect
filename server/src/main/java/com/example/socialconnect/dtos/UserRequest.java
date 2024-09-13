@@ -14,4 +14,7 @@ public class UserRequest {
     private String username;
     private String password;
     private String userAgent;
+    private String email;
+    private String verificationCode;
+    private Boolean enabled;
 }
