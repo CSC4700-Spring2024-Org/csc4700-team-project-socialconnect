@@ -11,18 +11,25 @@ import com.example.socialconnect.services.JwtService;
 import com.example.socialconnect.services.RefreshTokenService;
 import com.example.socialconnect.services.UserService;
 
+import io.jsonwebtoken.io.IOException;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.UnsupportedEncodingException;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -102,7 +109,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletResponse response) {
+    public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletResponse response, HttpServletRequest request) {
         System.out.println(userRequest.getEmail());
         String randomCode = RandomString.make(64);
         userRequest.setVerificationCode(randomCode);
@@ -113,33 +120,58 @@ public class AuthController {
             errorDTO.setError("Username already taken");
             return ResponseEntity.ok(errorDTO);
         }
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
-        String accessToken = jwtService.generateToken(userRequest.getUsername());
-        // set accessToken to cookie header
-        ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .path("/")
-            .maxAge(cookieExpiry);
-        if (!cookieDomain.equals("localhost")) {
-            cookie.domain(cookieDomain);
+        try {
+            userService.sendVerificationEmail(userResponse, getSiteURL(request));
+        } catch (Exception e) {
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError("Error sending verification email");
+            return ResponseEntity.ok(errorDTO);
         }
+        return ResponseEntity.ok().body(null);
+        
+        // RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
+        // String accessToken = jwtService.generateToken(userRequest.getUsername());
+        // // set accessToken to cookie header
+        // ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
+        //     .httpOnly(true)
+        //     .secure(true)
+        //     .sameSite("None")
+        //     .path("/")
+        //     .maxAge(cookieExpiry);
+        // if (!cookieDomain.equals("localhost")) {
+        //     cookie.domain(cookieDomain);
+        // }
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
-        ResponseCookie.ResponseCookieBuilder refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .path("/")
-                .maxAge(cookieExpiry * 12 * 24 * 30);
-        if (!cookieDomain.equals("localhost")) {
-            cookie.domain(cookieDomain);
-        }
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
-        userRequest.setPassword(null);
-        return ResponseEntity.ok(userResponse);
+        // response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
+        // ResponseCookie.ResponseCookieBuilder refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
+        //         .httpOnly(true)
+        //         .secure(true)
+        //         .sameSite("None")
+        //         .path("/")
+        //         .maxAge(cookieExpiry * 12 * 24 * 30);
+        // if (!cookieDomain.equals("localhost")) {
+        //     cookie.domain(cookieDomain);
+        // }
+        // response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
+        // userRequest.setPassword(null);
+        // return ResponseEntity.ok(userResponse);
     }
+
+    @GetMapping("/verify")
+    public void verifyUser(@Param("code") String code, HttpServletResponse response) throws IOException, java.io.IOException {
+        if (userService.verify(code)) {
+            response.sendRedirect("http://localhost:3000/verifySuccess");
+        } else {
+            response.sendRedirect("http://localhost:3000/verifyFailed");
+        }
+    }
+    
+
+
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = "http://localhost:3000"; 
+        return siteURL.replace(request.getServletPath(), "");
+    }  
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue("token")String refreshToken, HttpServletResponse response) {

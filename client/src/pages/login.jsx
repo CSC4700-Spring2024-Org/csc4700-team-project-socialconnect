@@ -98,6 +98,7 @@ const Login = () => {
       }
       
       dispatch(register(userData))
+      navigate('/verifyEmail')
    }
 
    return (
