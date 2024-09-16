@@ -3,6 +3,9 @@ import DragNdrop from '../components/DragNDrop';
 import '../Styles/Post.css'
 import AWS from "aws-sdk"
 import PostingProgressBar from '../components/PostingProgressBar';
+import NextButton from '../components/NextButton';
+import { CSSTransition } from 'react-transition-group'
+import BackButton from '../components/BackButton';
 
 const Post = () => {
     const [files, setFiles] = useState([]);
@@ -52,13 +55,40 @@ const Post = () => {
         });
       };
 
-    return (
-        <div className='post-container'>
-            <h1>Image</h1>
-            <DragNdrop onFilesSelected={setFiles} width='50%' height='50%'/>
-            <PostingProgressBar active={currStage} />
-        </div>
-    )
+      return (
+        <>
+          <CSSTransition
+            in={currStage === 1}
+            timeout={500}
+            classNames="slide"
+            unmountOnExit
+          >
+            <div className="post-container">
+              <h2>Upload Content Here</h2>
+              <DragNdrop onFilesSelected={setFiles} width="50%" height="50%" />
+              <div className="next-button-container">
+                <NextButton show={files.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
+              </div>
+              <PostingProgressBar active={currStage} />
+            </div>
+          </CSSTransition>
+    
+          <CSSTransition
+            in={currStage !== 1}
+            timeout={500}
+            classNames="slide"
+            unmountOnExit
+          >
+            <div className="post-container-2">
+              <h2>New Post</h2>
+              <input className='caption-input' type='text'/>
+              <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
+              <PostingProgressBar active={currStage} />
+            </div>
+          </CSSTransition>
+        </>
+      );
+    
 }
 
 export default Post

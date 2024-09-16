@@ -1,0 +1,93 @@
+.back-cta {
+    display: flex;
+    padding: 11px 33px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    background: #6225e6;
+    transition: 1s;
+    box-shadow: 6px 6px 0 black;
+    transform: skewX(-15deg);
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .back-cta.show {
+    opacity: 1;
+  }
+  
+  
+  .back-cta:focus {
+    outline: none;
+  }
+  
+  .back-cta:hover {
+    transition: 0.5s;
+    box-shadow: 10px 10px 0 #fbc638;
+  }
+  
+  .back-cta .back-second {
+    transition: 0.5s;
+    margin-left: 0px;
+  }
+  
+  .back-cta:hover .back-second {
+    transition: 0.5s;
+    margin-left: 45px;
+  }
+  
+  .back-span {
+    transform: skewX(15deg);
+  }
+  
+  .back-second {
+    width: 20px;
+    margin-right: 30px;
+    position: relative;
+    top: 6%;
+  }
+  
+  .back-one {
+    transition: 0.4s;
+    transform: translateX(-30%);
+  }
+  
+  .back-two {
+    transition: 0.5s;
+    transform: translateX(-60%);
+  }
+  .back-three {
+    transition: 0.5s;
+    transform: translateX(-90%);
+  }
+  
+  .back-cta:hover .back-three {
+    animation: color_anim 1s infinite 0.2s;
+    transform: translateX(-60%);
+  }
+  
+  .back-cta:hover .back-one {
+    animation: color_anim 1s infinite 0.6s;
+    transform: translateX(-30%);
+  }
+  
+  .back-cta:hover .back-two {
+    transform: translateX(0%);
+    animation: color_anim 1s infinite 0.4s;
+  }
+  
+  @keyframes color_anim {
+    0% {
+      fill: white;
+    }
+  
+    50% {
+      fill: #fbc638;
+    }
+  
+    100% {
+      fill: white;
+    }
+  }  
