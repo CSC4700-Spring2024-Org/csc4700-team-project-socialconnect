@@ -68,10 +68,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response){
+        System.out.println("hello");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         System.out.println("AUTHENTICATION DONE");
         if(authentication.isAuthenticated()){
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            if(!userDetails.isEnabled())
+            {
+                ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError("Please Verify Your Email");
+                return ResponseEntity.ok(errorDTO);
+            }
             User user = userDetails.getUser();
             RefreshToken refreshToken = refreshTokenService.updateRefreshToken(user, authRequestDTO.getUserAgent());
             String accessToken = jwtService.generateToken(authRequestDTO.getUsername());
@@ -169,7 +176,7 @@ public class AuthController {
 
 
     private String getSiteURL(HttpServletRequest request) {
-        String siteURL = "http://localhost:3000"; 
+        String siteURL = request.getRequestURL().toString();
         return siteURL.replace(request.getServletPath(), "");
     }  
 

@@ -43,8 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                     req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**", "api/instagramProfile/**", "api/verify/**")
                         .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        
                 ).sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

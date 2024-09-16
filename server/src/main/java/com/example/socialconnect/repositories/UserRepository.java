@@ -25,7 +25,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
    )
    void updateInstagram(@Param("token")String token, @Param("username")String username);
 
-   @Query("SELECT u FROM User u WHERE u.verification_code = :code")
-    public User findByVerificationCode(@Param("code") String code);
+   @Query("SELECT u FROM User u WHERE u.verificationCode = :code")
+   public User findByVerificationCode(@Param("code") String code);
+   
 
 }
