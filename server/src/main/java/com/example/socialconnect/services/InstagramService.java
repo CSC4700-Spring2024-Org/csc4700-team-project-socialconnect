@@ -14,7 +14,10 @@ import com.example.socialconnect.dtos.InstagramDTOs.BusinessDiscoveryListDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessWithCommentsDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CommentDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CommentResponseDTO;
+import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
+import com.example.socialconnect.dtos.InstagramDTOs.GenericIDDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
+import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -57,6 +60,56 @@ public class InstagramService {
             overallResponse.setComments(commentsRes);
             
             return overallResponse;
+        } catch (Exception e) {
+            ErrorDTO dto = new ErrorDTO();
+            String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);
+
+            // Parse the JSON using Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode;
+            try {
+                 jsonNode = objectMapper.readTree(jsonPart);
+            } catch (Exception e2) {
+                return e2;
+            }
+
+            int errorCode = jsonNode.path("error").path("code").asInt();
+            String errorMessage = jsonNode.path("error").path("message").asText();
+            dto.setError(errorMessage);
+            dto.setCode(errorCode);
+            
+            return dto;
+        }
+    }
+
+    public Object createInstagramPost(CreatePostDTO postDTO, String accessToken) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://graph.facebook.com/v19.0/me/accounts?access_token="+accessToken;
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+            URI uri = builder.build().toUri();
+            AccountDTO response = restTemplate.getForObject(uri, AccountDTO.class);
+
+            url = "https://graph.facebook.com/v19.0/" + response.getData().get(0).getId() + "?access_token=" + accessToken + "&fields=instagram_business_account";
+            builder = UriComponentsBuilder.fromUriString(url);
+            uri = builder.build().toUri();
+            InstaBusinessAcct res2 = restTemplate.getForObject(uri, InstaBusinessAcct.class);
+
+            url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media?media_type=REELS&video_url=" + postDTO.getUrls()[0] + "&caption=" + postDTO.getCaption() + "&share_to_feed=true&access_token=" + accessToken;
+            builder = UriComponentsBuilder.fromUriString(url);
+            uri = builder.build().toUri();
+            GenericIDDTO res3 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+
+            url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media_publish?creation_id=" + res3.getId() + "&access_token=" + accessToken;
+            builder = UriComponentsBuilder.fromUriString(url);
+            uri = builder.build().toUri();
+            GenericIDDTO res4 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+
+            url = "https://graph.facebook.com/v19.0/" + res4.getId() + "?fields=media_url&access_token=" + accessToken;
+            builder = UriComponentsBuilder.fromUriString(url);
+            uri = builder.build().toUri();
+            PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
+            return mediaURLRes.getMedia_url();
         } catch (Exception e) {
             ErrorDTO dto = new ErrorDTO();
             String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);

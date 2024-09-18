@@ -32,12 +32,17 @@
     transition: 0.5s;
     margin-left: 0px;
   }
-  
-  .back-cta:hover .back-second {
+
+  .back-cta:hover .back-span {
     transition: 0.5s;
-    margin-left: 45px;
+    margin-left: 25px;
   }
-  
+
+  .back-cta .back-span {
+    transition: 0.5s;
+    margin-left: 0px;
+  }
+
   .back-span {
     transform: skewX(15deg);
   }
