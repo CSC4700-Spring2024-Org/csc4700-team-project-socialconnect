@@ -11,6 +11,7 @@ import BackButton from '../components/BackButton';
 import { FaInstagram, FaTiktok, FaTwitter, FaYoutube } from 'react-icons/fa';
 import instaService from '../features/instaService';
 import { toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const Post = () => {
     const [files, setFiles] = useState([]);
@@ -161,7 +162,7 @@ const Post = () => {
                   <NextButton show={postData.caption.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
                 </div>
               </div>
-              <PostingProgressBar active={currStage} />
+              <PostingProgressBar active={currStage-1} />
             </div>
           </CSSTransition>
 
@@ -201,6 +202,17 @@ const Post = () => {
 
           <CSSTransition
             in={currStage === 5}
+            timeout={500}
+            classNames="slide"
+            unmountOnExit
+          >
+            <div className="post-container">
+              <Loading />
+            </div>
+          </CSSTransition>
+
+          <CSSTransition
+            in={currStage === 6}
             timeout={500}
             classNames="slide"
             unmountOnExit
