@@ -8,8 +8,13 @@ const getInstaProfile = async (token) => {
     return {page: res.data.business_discovery, comments: res.data.comments}
 }
 
+const createInstagramPost = async(token, postData) => {
+    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData)
+}
+
 const instaService = {
-    getInstaProfile
+    getInstaProfile,
+    createInstagramPost
 }
 
 export default instaService;

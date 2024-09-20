@@ -102,8 +102,9 @@ export default function Analytics() {
 
   return (
     <>
-      <Card className="analytics-card">
-        <h3 className="likes-header">Likes</h3>
+    <Card className="analytics-card">
+      <h3 className="likes-header">Likes</h3>
+      <div className="chart-container">
         <AreaChart
           data={data}
           index="date"
@@ -118,23 +119,24 @@ export default function Analytics() {
           showTooltip={true}
           customTooltip={CustomTooltip}
         />
-        <List className="analytics-list">
-          {summary.map((item) => (
-            <ListItem key={item.name}>
-              <div className="list-item-div">
-                <span
-                  className={classNames(statusColor[item.name], 'list-item-span')}
-                  aria-hidden={true}
-                />
-                <span>{item.name}</span>
-              </div>
-              <span className="likes-count">
-                {valueFormatter(item.value)}
-              </span>
-            </ListItem>
-          ))}
-        </List>
-      </Card>
-    </>
+      </div>
+      <List className="analytics-list">
+        {summary.map((item) => (
+          <ListItem key={item.name}>
+            <div className="list-item-div">
+              <span
+                className={classNames(statusColor[item.name], 'list-item-span')}
+                aria-hidden={true}
+              />
+              <span>{item.name}</span>
+            </div>
+            <span className="likes-count">
+              {valueFormatter(item.value)}
+            </span>
+          </ListItem>
+        ))}
+      </List>
+    </Card>
+  </>
   );
 }

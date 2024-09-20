@@ -26,7 +26,7 @@ public class RefreshToken {
     @Column(name = "EXPIRY_DATE")
     private Instant expiryDate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private User userInfo;
 
