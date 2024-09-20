@@ -4,6 +4,10 @@ import com.example.socialconnect.models.RefreshToken;
 import com.example.socialconnect.models.User;
 import com.example.socialconnect.repositories.RefreshTokenRepository;
 import com.example.socialconnect.repositories.UserRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +24,13 @@ public class RefreshTokenService {
     @Autowired
     UserRepository userRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public RefreshToken createRefreshToken(User user, String userAgent){
+        User managedUser = entityManager.getReference(User.class, user.getId());
         RefreshToken refreshToken = RefreshToken.builder()
-                .userInfo(user)
+                .userInfo(managedUser)
                 .userAgent(userAgent)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(2592000000L))
@@ -39,6 +47,7 @@ public class RefreshTokenService {
             RefreshToken refreshToken = optionalObj.get();
             refreshToken.setToken(UUID.randomUUID().toString());
             refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L));
+            refreshToken.setUserInfo(user);
             return refreshTokenRepository.save(refreshToken);
         }
         return createRefreshToken(user, userAgent);

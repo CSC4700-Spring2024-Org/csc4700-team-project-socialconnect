@@ -41,10 +41,9 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**", "api/instagramProfile/**")
+                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**", "api/instagramProfile/**", "api/verify/**")
                         .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        
                 ).sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
