@@ -143,8 +143,9 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
-import { AgCharts } from 'ag-charts-react'; // Correct import for React version of ag-charts
+import { AgCharts } from 'ag-charts-react';
 import '../Styles/Analytics.css';
 import { useSelector } from 'react-redux';
 import NoAccount from '../components/NoAccount';
@@ -154,30 +155,42 @@ export default function Analytics() {
   const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
 
-  // Define state at the top of the component
-  const [chartOptions, setChartOptions] = useState({
+  const [instaChartOptions, setInstaChartOptions] = useState({
     axes: [
       {
         type: 'time',
-        position: 'bottom'
+        position: 'bottom',
+        label: {
+          format: '%b'
+        }
       },
       {
         type: 'number',
         position: 'left',
-        title: { text: 'Likes' }, // Optional: Add axis title
+        title: { text: 'Likes' }, 
       }
     ],
-    data: [],
+    data: [], 
     series: [
       {
         type: 'line',
         xKey: 'date',
-        yKey: 'Instagram', // Updated to match your data's structure
+        yKey: 'Instagram',
         stroke: '#0072B5',
         marker: {
           enabled: true,
           size: 8,
           fill: '#0072B5',
+        },
+        tooltip: {
+          enabled: true, // Enable tooltips
+          renderer: (params) => {
+            const yValue = params.yValue; // Access yValue
+            return {
+              title: 'Data Point',
+              content: `Date: ${params.xValue}<br/>Likes: ${yValue}`
+            };
+          },
         },
       }
     ],
@@ -187,8 +200,9 @@ export default function Analytics() {
     }
   });
 
+  const [selectedOption, setSelectedOption] = useState('Instagram'); 
+
   useEffect(() => {
-    // Check data is available and loading is complete
     if (!isLoadingInsta && instaPage) {
       const likeCounts = instaPage.business_discovery.media.data.map(media => media.like_count);
       const dates = instaPage.business_discovery.media.data.map(media => media.timestamp);
@@ -198,20 +212,18 @@ export default function Analytics() {
         return {
           Instagram: likeCount,
           date: dateObject,
-          TikTok: 0, // Placeholder values
-          Youtube: 0 // Placeholder values
+          TikTok: 0, 
+          Youtube: 0 
         };
       });
 
-      // Update chart options with dynamic data
-      setChartOptions((prevOptions) => ({
+      setInstaChartOptions((prevOptions) => ({
         ...prevOptions,
         data: dynamicData
       }));
     }
-  }, [isLoadingInsta, instaPage]); // Dependency array
+  }, [isLoadingInsta, instaPage]); 
 
-  // Handle early returns for loading states
   if (!isLoading && (user && !user.instaRefresh)) {
     return <NoAccount />;
   }
@@ -219,9 +231,23 @@ export default function Analytics() {
     return <Spinner />;
   }
 
+  const handleDropdownChange = (e) => {
+    setSelectedOption(e.target.value);
+    console.log(`Selected option: ${e.target.value}`);
+  };
+
   return (
-    <div>
-      <AgCharts options={chartOptions} />
+    <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
+        <select value={selectedOption} onChange={handleDropdownChange}>
+          <option value="Instagram">Instagram</option>
+          <option value="TikTok">TikTok</option>
+          <option value="YouTube">YouTube</option>
+        </select>
+      </div>
+      <div >
+        {selectedOption == 'Instagram' && <AgCharts options={instaChartOptions} /> }
+      </div>
     </div>
   );
 }
