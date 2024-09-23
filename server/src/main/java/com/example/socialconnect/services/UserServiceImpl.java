@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
                 + "Please click the link below to verify your registration:<br>"
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
                 + "Thank you,<br>"
-                + "Your company name.";
+                + "Social Connect.";
         
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

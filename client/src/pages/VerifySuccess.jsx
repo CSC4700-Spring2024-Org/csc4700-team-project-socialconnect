@@ -1,12 +1,15 @@
-import React from 'react'
+import React from 'react';
+import '../Styles/VerifySuccess.css'
 
 const VerifySuccess = () => {
   return (
-    <div class="container text-center">
-    <h3>Congratulations, your account has been verified.</h3>
-    <h4><a href="/login">Click here to Login</a></h4>
-</div>
-  )
-}
+      <div className='verify-success-container'>
+        <h3 className='success-header'>Congratulations, your account has been verified.</h3>
+        <h4 className='h4verify'>
+          <a href="/login">Click here to Login</a>
+        </h4>
+      </div>
+  );
+};
 
-export default VerifySuccess
+export default VerifySuccess;

@@ -83,27 +83,33 @@ public class InstagramService {
     }
 
     public Object createInstagramPost(CreatePostDTO postDTO, String accessToken) {
+        System.out.println("HELLO");
         try {
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://graph.facebook.com/v19.0/me/accounts?access_token="+accessToken;
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             URI uri = builder.build().toUri();
             AccountDTO response = restTemplate.getForObject(uri, AccountDTO.class);
+            System.out.println(response.getData().get(0).getId());
 
             url = "https://graph.facebook.com/v19.0/" + response.getData().get(0).getId() + "?access_token=" + accessToken + "&fields=instagram_business_account";
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             InstaBusinessAcct res2 = restTemplate.getForObject(uri, InstaBusinessAcct.class);
+            System.out.println(res2.getInstagram_business_account().getId());
 
             url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media?media_type=REELS&video_url=" + postDTO.getUrls()[0] + "&caption=" + postDTO.getCaption() + "&share_to_feed=true&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             GenericIDDTO res3 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
-
+            System.out.println(res3.getId());
+            
             url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media_publish?creation_id=" + res3.getId() + "&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
+            Thread.sleep(30000);
             GenericIDDTO res4 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+            System.out.println(res4.getId());
 
             url = "https://graph.facebook.com/v19.0/" + res4.getId() + "?fields=media_url&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
