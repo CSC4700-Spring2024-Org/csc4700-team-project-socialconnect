@@ -14,6 +14,7 @@ import com.example.socialconnect.dtos.InstagramDTOs.BusinessDiscoveryListDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessWithCommentsDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CommentDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CommentResponseDTO;
+import com.example.socialconnect.dtos.InstagramDTOs.ContainerProgressDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.GenericIDDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
@@ -99,6 +100,25 @@ public class InstagramService {
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             GenericIDDTO res3 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+            
+            int count = 0;
+            while (count < 5) {
+                url = "https://graph.facebook.com/v19.0/" + res3.getId() + "?fields=status_code";
+                builder = UriComponentsBuilder.fromUriString(url);
+                uri = builder.build().toUri();
+                ContainerProgressDTO containerProgress = restTemplate.getForObject(uri, ContainerProgressDTO.class);
+                if (containerProgress.getStatus_code().equals("FINISHED")) {
+                    break;
+                } else {
+                    Thread.sleep(30000);
+                }
+                count++;
+                if (count == 5) {
+                    ErrorDTO dto = new ErrorDTO();
+                    dto.setError("Error creating post container. Please try again later.");
+                    return dto;
+                }
+            }
 
             url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media_publish?creation_id=" + res3.getId() + "&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);

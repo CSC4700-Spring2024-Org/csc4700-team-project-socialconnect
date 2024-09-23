@@ -25,12 +25,26 @@ const Post = () => {
 
     const navigate = useNavigate();
 
+    let sanitizedFileNames = []
+
     const platforms = [
       { name: 'Instagram', icon: <FaInstagram /> },
       { name: 'TikTok', icon: <FaTiktok /> },
       { name: 'X', icon: <FaTwitter /> },
       { name: 'YouTube', icon: <FaYoutube /> }
     ];
+
+    const S3_BUCKET = "socialconnect-post-storage";
+    const REGION = "us-east-2";
+
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+      secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
+    });
+    const s3 = new AWS.S3({
+      params: { Bucket: S3_BUCKET },
+      region: REGION,
+    });
 
     const togglePlatform = (platform) => {
       setSelectedPlatforms((prev) =>
@@ -48,30 +62,22 @@ const Post = () => {
         } else {
           setPostLinks(prev => [...prev, res.data])
           setCurrStage(prev => prev + 1)
+          deleteFromS3()
         }
       }
     }
 
-    const uploadFile = async () => {
-        const S3_BUCKET = "socialconnect-post-storage";
-        const REGION = "us-east-2";
-    
-        AWS.config.update({
-          accessKeyId: process.env.REACT_APP_ACCESS_KEY,
-          secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
-        });
-        const s3 = new AWS.S3({
-          params: { Bucket: S3_BUCKET },
-          region: REGION,
-        });
-    
+    const uploadFile = async () => {    
         let totalSize = files.reduce((acc, file) => acc + file.size, 0);
         let totalUploaded = 0;
 
         const uploadPromises = files.map(file => {
+          const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9_.]/g, "_");
+          sanitizedFileNames.push(sanitizedFileName)
+
           const params = {
             Bucket: S3_BUCKET,
-            Key: file.name,
+            Key: sanitizedFileName,
             Body: file,
           };
 
@@ -94,6 +100,27 @@ const Post = () => {
           alert("Error uploading files.")
         }
       };
+
+      const deleteFromS3 = async () => {
+        const uploadPromises = sanitizedFileNames.map(file => {
+          return new Promise((resolve, reject) => {
+            try {
+                var params = { Bucket: S3_BUCKET, Key: file };
+                s3.deleteObject(params, function(err, data) {
+                    if (err) reject(err);
+                    else resolve(data);
+                });
+            } catch (e) {
+                reject(e);
+            }
+        })})
+
+        try {
+          await Promise.all(uploadPromises)
+        } catch (err) {
+          toast.error(err)
+        }
+      }
 
       useEffect(() => {
         if (!isLoading) {
