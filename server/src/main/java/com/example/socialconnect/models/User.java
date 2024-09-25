@@ -31,4 +31,13 @@ public class User {
     @Column(name = "INSTA_REFRESH")
     private String instaRefresh;
 
+    @Column(name = "EMAIL")
+    private String email;
+
+    @Column(name = "VERIFICATION_CODE", length = 64)
+    private String verificationCode;
+
+    @Column(name="ENABLED")
+    private boolean enabled;
+
 }

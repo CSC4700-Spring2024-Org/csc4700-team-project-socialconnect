@@ -24,4 +24,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
       value = "UPDATE users SET INSTA_REFRESH = CASE WHEN :token IS NULL THEN NULL ELSE :token END, INSTA_DATE = CURRENT_TIMESTAMP WHERE username = :username"
    )
    void updateInstagram(@Param("token")String token, @Param("username")String username);
+
+   @Query("SELECT u FROM User u WHERE u.verificationCode = :code")
+   public User findByVerificationCode(@Param("code") String code);
+   
+
 }

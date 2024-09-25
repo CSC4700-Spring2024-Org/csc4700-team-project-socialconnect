@@ -57,6 +57,7 @@ const Post = () => {
     const handlePost = async () => {
       if (selectedPlatforms.includes('Instagram')) {
         const res = await instaService.createInstagramPost(user.instaRefresh, {urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})
+        console.log(res)
         if (res.data.error) {
           toast(res.data.error)
         } else {
@@ -84,7 +85,7 @@ const Post = () => {
           return s3.upload(params)
             .on("httpUploadProgress", (evt) => {
               totalUploaded += evt.loaded;
-              const overallProgress = parseInt((totalUploaded * 100) / totalSize);
+              const overallProgress = parseInt((totalUploaded) / totalSize);
               setUploadProgress(overallProgress);
             })
             .promise();

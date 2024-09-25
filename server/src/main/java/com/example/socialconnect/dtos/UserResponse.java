@@ -16,4 +16,8 @@ public class UserResponse {
     private String username;
     private Date instaDate;
     private String instaRefresh;
+    private String email;
+    private String verificationCode;
+    private Boolean enabled;
+
 }
