@@ -40,7 +40,7 @@ export default function Analytics() {
         marker: {
           enabled: true,
           size: 8,
-          fill: 'white',
+          fill: 'black',
         },
         tooltip: {
           enabled: true,

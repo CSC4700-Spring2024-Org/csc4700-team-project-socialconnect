@@ -7,7 +7,7 @@ body {
   }
   
 .dashboard {
-    background: linear-gradient(to bottom, #1DBED6, #576EE3);
+    background: #f5f5f5;
     display: flex;
     width: 100%;
     height: 100%;
@@ -29,7 +29,7 @@ body {
     width: 40%;
     height: 40%;
     align-items: center;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
@@ -41,7 +41,7 @@ body {
     border-radius: 10px;
     width: 50%;
     height: 40%;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto; 
     z-index: 1;
@@ -53,7 +53,7 @@ body {
     width: 40%;
     height: 40%;
     align-items: center;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
@@ -64,14 +64,21 @@ body {
     width: 50%;
     height: 40%;
     align-items: center;
-    background-color: transparent;
+    background-color: rgb(255, 255, 255);
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
 
   .box1, .box2, .box3, .box4 {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, .1);
+    transition: box-shadow 0.3s ease; /* Smooth transition effect */
+}
+
+/* Add box shadow on hover */
+.box1:hover, .box2:hover, .box3:hover, .box4:hover {
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.7); /* Change shadow on hover */
+}
+
 
   .comments-dashboard-container {
     background: transparent;
@@ -84,7 +91,7 @@ body {
   /* Making title more prominent */
   .comments-title {
     font-weight: bolder;
-    color: #fff; /* White text for contrast */
+    color: #000000; /* White text for contrast */
     margin-left: 1rem;
     padding: 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Adding text shadow for depth */
@@ -113,7 +120,7 @@ body {
 
   /* Making username more vibrant */
   .comment-username {
-    color: #f7ff79;
+    color: #8179ff;
     font-weight: 700;
   }
 
@@ -127,7 +134,7 @@ body {
   }
 
   .reply-button {
-    background: #fff;
+    background: #e0e0e0;
     border: none;
     padding: 0.5rem 1rem;
     margin-top: 0.5rem;
@@ -142,7 +149,7 @@ body {
   }
   .reply-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
   }
 
   /* Styling reply input */
