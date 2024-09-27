@@ -90,23 +90,27 @@ public class InstagramService {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             URI uri = builder.build().toUri();
             AccountDTO response = restTemplate.getForObject(uri, AccountDTO.class);
+            System.out.println("LOL");
 
             url = "https://graph.facebook.com/v19.0/" + response.getData().get(0).getId() + "?access_token=" + accessToken + "&fields=instagram_business_account";
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             InstaBusinessAcct res2 = restTemplate.getForObject(uri, InstaBusinessAcct.class);
+            System.out.println("LOL");
 
             url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "/media?media_type=REELS&video_url=" + postDTO.getUrls()[0] + "&caption=" + postDTO.getCaption() + "&share_to_feed=true&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             GenericIDDTO res3 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+            System.out.println("LOL");
             
             int count = 0;
             while (count < 5) {
-                url = "https://graph.facebook.com/v19.0/" + res3.getId() + "?fields=status_code";
+                url = "https://graph.facebook.com/v19.0/" + res3.getId() + "?fields=status_code&access_token=" + accessToken;
                 builder = UriComponentsBuilder.fromUriString(url);
                 uri = builder.build().toUri();
                 ContainerProgressDTO containerProgress = restTemplate.getForObject(uri, ContainerProgressDTO.class);
+                System.out.println("LOL");
                 if (containerProgress.getStatus_code().equals("FINISHED")) {
                     break;
                 } else {
@@ -124,13 +128,16 @@ public class InstagramService {
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             GenericIDDTO res4 = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+            System.out.println("LOL");
 
             url = "https://graph.facebook.com/v19.0/" + res4.getId() + "?fields=media_url&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
+            System.out.println("LOL");
             return mediaURLRes.getMedia_url();
         } catch (Exception e) {
+            System.out.println(e);
             ErrorDTO dto = new ErrorDTO();
             String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);
 

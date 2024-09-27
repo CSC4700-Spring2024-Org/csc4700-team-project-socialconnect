@@ -10,6 +10,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class ContainerProgressDTO {
-    private int id;
     private String status_code;
+    private String id;
 }
