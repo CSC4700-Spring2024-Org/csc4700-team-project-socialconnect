@@ -31,7 +31,10 @@ body {
     align-items: center;
     background-color: white;
     border: 1px solid rgb(0, 0, 0);
-    overflow: auto;
+    overflow: hidden; /* Prevent scrolling */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
   }
  
   .box2 {
