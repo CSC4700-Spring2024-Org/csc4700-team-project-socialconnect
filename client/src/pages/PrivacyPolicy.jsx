@@ -4,8 +4,8 @@ import '../Styles/PrivacyPolicy.css';
 const PrivacyPolicyPage = () => {
   return (
     <>
-      <div className='container'>
-        <div className='content'>
+      <div className='pp-container'>
+        <div className='pp-content'>
           <h1>Privacy Policy</h1>
           <p>This Privacy Policy ("Policy") applies to https://www.danbfrost.com and Social Connect ("Company") and governs data collection and usage. For the purposes of this Privacy Policy, unless otherwise noted, all references to the Company include https://www.danbfrost.com. The Company's website is a social media account management site. By using the Company website, you consent to the data practices described in this statement.</p>
 
@@ -64,7 +64,7 @@ const PrivacyPolicyPage = () => {
 
           <h2>Changes to This Statement</h2>
           <p>The Company reserves the right to change this Policy from time to time. When changes to this Policy are significant, we will inform you by sending a notice via email or placing a prominent notice on our website.</p>
-          <footer className='footer'>
+          <footer className='pp-footer'>
           Effective as of September 30, 2024    |    Contact: socialconnectbiznuz@gmail.com
         </footer>
         </div>
