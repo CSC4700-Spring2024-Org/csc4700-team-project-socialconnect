@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AgCharts } from 'ag-charts-react';
-import '../Styles/Analytics.css';
 import { useSelector } from 'react-redux';
 import NoAccount from '../components/NoAccount';
 import Spinner from '../components/Spinner';
+import { FaInstagram, FaTiktok, FaTwitter, FaYoutube } from 'react-icons/fa';
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
@@ -36,11 +36,11 @@ export default function Analytics() {
         type: 'line',
         xKey: 'date',
         yKey: 'Instagram',
-        stroke: 'pink',
+        stroke: '#FF69B4',
         marker: {
           enabled: true,
-          size: 8,
-          fill: 'black',
+          size: 7,
+          fill: '#FF69B4'
         },
         tooltip: {
           enabled: true,
@@ -53,7 +53,7 @@ export default function Analytics() {
             return {
               title: formattedDate,
               content: `${params.datum.Instagram} likes`,
-              backgroundColor: 'pink'
+              backgroundColor: '#FF69B4'
             };
           }
         }
@@ -62,6 +62,7 @@ export default function Analytics() {
     title: {
       text: 'Instagram Likes',
       fontSize: 18,
+      fontFamily: 'Futura',
       color: 'black',
       style: 'bold'
     }
@@ -98,22 +99,40 @@ export default function Analytics() {
     return <Spinner />;
   }
 
-  const handleDropdownChange = (e) => {
-    setSelectedOption(e.target.value);
-    console.log(`Selected option: ${e.target.value}`);
+  const handlePlatformChange = (platform) => {
+    setSelectedOption(platform);
+    console.log(`Selected option: ${platform}`);
   };
 
   return (
     <div style={{ backgroundColor: 'transparent', position: 'relative' }}>
       <div style={{ backgroundColor: 'transparent', position: 'relative' }}>
-        <select value={selectedOption} onChange={handleDropdownChange} style = {{ backgroundColor: 'transparent', color: 'black' }}>
-          <option value="Instagram">Instagram</option>
-          <option value="TikTok">TikTok</option>
-          <option value="YouTube">YouTube</option>
-        </select>
+        <div style={{ backgroundColor: 'transparent', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <div 
+            onClick={() => handlePlatformChange('Instagram')} 
+            style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+          >
+            <FaInstagram size={20} color="#E1306C" />
+            <span style={{ color: 'black', marginLeft: '5px' }}>Instagram</span>
+          </div>
+          <div 
+            onClick={() => handlePlatformChange('TikTok')} 
+            style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
+          >
+            <FaTiktok size={20} color="#25F4EE" />
+            <span style={{ color: 'black', marginLeft: '5px' }}>TikTok</span>
+          </div>
+          <div 
+            onClick={() => handlePlatformChange('YouTube')} 
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <FaYoutube size={20} color="#FF0000" />
+            <span style={{ color: 'black', marginLeft: '5px' }}>YouTube</span>
+          </div>
+        </div>
       </div>
       <div style={{ backgroundColor: 'transparent' }}>
-        {selectedOption == 'Instagram' && <AgCharts options={instaChartOptions} /> }
+        {selectedOption == 'Instagram' && <AgCharts options={instaChartOptions} />}
       </div>
     </div>
   );
