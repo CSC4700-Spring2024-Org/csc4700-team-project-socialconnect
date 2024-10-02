@@ -25,15 +25,13 @@ function App() {
             <Route path='/post' element={<Post />} />
             <Route path='/analytics' element={<AnalyticsPage />} />
             <Route path='/calendar' element={<CalendarPage />} />
-            <Route path='/privacypolicy' element={<PrivacyPolicyPage />} />
-            <Route path='/termsandconditions' element={<TermsAndConditions />} />
           </Route>
           <Route path='/login' element={<Login />} />
           <Route path='/verifyEmail' element={<CreatedAccount/>} />
           <Route path="/verifySuccess" element={<VerifySuccess />} />
           <Route path="/verifyFailed" element={<VerifyFailed />} />
-
-
+          <Route path='/termsandconditions' element={<TermsAndConditions />} />
+          <Route path='/privacypolicy' element={<PrivacyPolicyPage />} />
         </Routes>
       </Router>
       <ToastContainer />
