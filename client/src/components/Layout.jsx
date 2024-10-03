@@ -4,7 +4,7 @@ import Header from './Header'
 import Sidebar, { SidebarItem } from '../components/Sidebar';
 import { IoHome, IoAnalytics } from "react-icons/io5";
 import { CiSquarePlus } from "react-icons/ci";
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaNewspaper } from "react-icons/fa";
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const Layout = () => {
