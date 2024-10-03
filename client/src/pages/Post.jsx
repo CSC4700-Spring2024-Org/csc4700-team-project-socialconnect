@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 import DragNdrop from '../components/DragNDrop';
 import '../Styles/Post.css'
-import AWS from "aws-sdk"
 import { useSelector } from 'react-redux';
 import PostingProgressBar from '../components/PostingProgressBar';
 import NextButton from '../components/NextButton';
@@ -17,7 +16,6 @@ const Post = () => {
     const [files, setFiles] = useState([]);
     const [currStage, setCurrStage] = useState(1)
     const [postData, setPostData] = useState({caption:'',location:'',mentions:''})
-    const [uploadProgress, setUploadProgress] = useState(0)
     const [selectedPlatforms, setSelectedPlatforms] = useState([]);
     const [postLinks, setPostLinks] = useState([])
 
@@ -25,26 +23,12 @@ const Post = () => {
 
     const navigate = useNavigate();
 
-    let sanitizedFileNames = []
-
     const platforms = [
       { name: 'Instagram', icon: <FaInstagram /> },
       { name: 'TikTok', icon: <FaTiktok /> },
       { name: 'X', icon: <FaTwitter /> },
       { name: 'YouTube', icon: <FaYoutube /> }
     ];
-
-    const S3_BUCKET = "socialconnect-post-storage";
-    const REGION = "us-east-2";
-
-    AWS.config.update({
-      accessKeyId: process.env.REACT_APP_ACCESS_KEY,
-      secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
-    });
-    const s3 = new AWS.S3({
-      params: { Bucket: S3_BUCKET },
-      region: REGION,
-    });
 
     const togglePlatform = (platform) => {
       setSelectedPlatforms((prev) =>
@@ -55,73 +39,21 @@ const Post = () => {
     };
 
     const handlePost = async () => {
-      if (selectedPlatforms.includes('Instagram')) {
-        const res = await instaService.createInstagramPost(user.instaRefresh, {urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})
-        console.log(res)
+      if (selectedPlatforms.includes('Instagram')) {        
+        const formData = new FormData();
+        formData.append('file', files[0]);
+        formData.append('post', new Blob([JSON.stringify({urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})], { type: 'application/json' }));
+
+        const res = await instaService.createInstagramPost(user.instaRefresh, formData)
+
         if (res.data.error) {
           toast(res.data.error)
         } else {
           setPostLinks(prev => [...prev, res.data])
           setCurrStage(prev => prev + 1)
-          deleteFromS3()
         }
       }
     }
-
-    const uploadFile = async () => {    
-        let totalSize = files.reduce((acc, file) => acc + file.size, 0);
-        let totalUploaded = 0;
-
-        const uploadPromises = files.map(file => {
-          const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9_.]/g, "_");
-          sanitizedFileNames.push(sanitizedFileName)
-
-          const params = {
-            Bucket: S3_BUCKET,
-            Key: sanitizedFileName,
-            Body: file,
-          };
-
-          return s3.upload(params)
-            .on("httpUploadProgress", (evt) => {
-              totalUploaded += evt.loaded;
-              const overallProgress = parseInt((totalUploaded) / totalSize);
-              setUploadProgress(overallProgress);
-            })
-            .promise();
-        });
-    
-        try {
-          await Promise.all(uploadPromises)
-      
-          setCurrStage(prev => prev + 1)
-          setUploadProgress(0)
-        } catch (err) {
-          console.error("Error uploading files:", err)
-          alert("Error uploading files.")
-        }
-      };
-
-      const deleteFromS3 = async () => {
-        const uploadPromises = sanitizedFileNames.map(file => {
-          return new Promise((resolve, reject) => {
-            try {
-                var params = { Bucket: S3_BUCKET, Key: file };
-                s3.deleteObject(params, function(err, data) {
-                    if (err) reject(err);
-                    else resolve(data);
-                });
-            } catch (e) {
-                reject(e);
-            }
-        })})
-
-        try {
-          await Promise.all(uploadPromises)
-        } catch (err) {
-          toast.error(err)
-        }
-      }
 
       useEffect(() => {
         if (!isLoading) {
@@ -146,26 +78,15 @@ const Post = () => {
               <DragNdrop onFilesSelected={setFiles} width="50%" height="50%" />
               <div className='buttons-container'>
                 <div className="next-button-container">
-                  <NextButton show={files.length > 0} onClick={() => {setCurrStage(prev => prev + 1);uploadFile()}}/>
+                  <NextButton show={files.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
                 </div>
               </div>
               <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
-
-          <CSSTransition
-            in={currStage === 2}
-            timeout={500}
-            classNames="slide"
-            unmountOnExit
-          >
-            <div className="post-container">
-              <div className='upload-percentage'>PROGRESS: {uploadProgress}%</div>
-            </div>
-          </CSSTransition>
     
           <CSSTransition
-            in={currStage === 3}
+            in={currStage === 2}
             timeout={500}
             classNames="slide"
             unmountOnExit
@@ -184,18 +105,18 @@ const Post = () => {
               </div>
               <div className='buttons-container'>
                 <div className='back-button-container'>
-                  <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 2)}/>
+                  <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
                 </div>
                 <div className='next-button-container-2'>
                   <NextButton show={postData.caption.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
                 </div>
               </div>
-              <PostingProgressBar active={currStage-1} />
+              <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
 
           <CSSTransition
-            in={currStage === 4}
+            in={currStage === 3}
             timeout={500}
             classNames="slide"
             unmountOnExit
@@ -224,12 +145,12 @@ const Post = () => {
                   <NextButton show={selectedPlatforms.length > 0} onClick={() => {setCurrStage(prev => prev + 1);handlePost()}}/>
                 </div>
               </div>
-              <PostingProgressBar active={currStage-1} />
+              <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
 
           <CSSTransition
-            in={currStage === 5}
+            in={currStage === 4}
             timeout={500}
             classNames="slide"
             unmountOnExit
@@ -240,7 +161,7 @@ const Post = () => {
           </CSSTransition>
 
           <CSSTransition
-            in={currStage === 6}
+            in={currStage === 5}
             timeout={500}
             classNames="slide"
             unmountOnExit
@@ -249,12 +170,12 @@ const Post = () => {
               <h2>Success! Here are the links:</h2>
               {postLinks.map((post) => {
                 return (
-                  <div>
-                    {post}
-                  </div>
+                  <a className='post-link' href={post}>
+                    Instagram
+                  </a>
                 )
               })}
-              <PostingProgressBar active={currStage-1} />
+              <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
         </>

@@ -90,7 +90,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
                 response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
             } else {
-                response.sendRedirect("/login");
+                filterChain.doFilter(request, response);
                 return;
             }
         }
@@ -101,14 +101,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } else {
-                response.sendRedirect("/login");
-                return;
             }
-        } else {
-            response.sendRedirect("/login");
-            return;
         }
+
         filterChain.doFilter(request, response);
     }
 }
