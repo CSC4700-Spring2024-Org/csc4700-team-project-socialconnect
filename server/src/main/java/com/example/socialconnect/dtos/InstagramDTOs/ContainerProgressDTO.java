@@ -12,4 +12,5 @@ import lombok.ToString;
 public class ContainerProgressDTO {
     private String status_code;
     private String id;
+    private String status;
 }
