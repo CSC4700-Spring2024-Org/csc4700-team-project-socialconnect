@@ -10,8 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.socialconnect.services.FileUploadService;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @CrossOrigin(origins = {"https://www.danbfrost.com", "http://localhost:3000"}, maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api")

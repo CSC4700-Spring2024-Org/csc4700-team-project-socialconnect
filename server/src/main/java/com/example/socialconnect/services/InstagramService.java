@@ -133,7 +133,7 @@ public class InstagramService {
             uri = builder.build().toUri();
             GenericIDDTO publishPostRes = restTemplate.postForObject(uri, null, GenericIDDTO.class);
             
-            url = "https://graph.facebook.com/v19.0/" + publishPostRes.getId() + "?fields=media_url&access_token=" + accessToken;
+            url = "https://graph.facebook.com/v19.0/" + publishPostRes.getId() + "?fields=permalink&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);

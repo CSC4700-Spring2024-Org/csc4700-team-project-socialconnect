@@ -49,7 +49,7 @@ const Post = () => {
         if (res.data.error) {
           toast(res.data.error)
         } else {
-          setPostLinks(prev => [...prev, res.data])
+          setPostLinks(prev => [...prev, {Instagram:res.data}])
           setCurrStage(prev => prev + 1)
         }
       }
@@ -74,14 +74,20 @@ const Post = () => {
             unmountOnExit
           >
             <div className="post-container">
-              <h2>Upload Content Here</h2>
-              <DragNdrop onFilesSelected={setFiles} width="50%" height="50%" />
-              <div className='buttons-container'>
-                <div className="next-button-container">
-                  <NextButton show={files.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
+              <div className='post-content-container'>
+                <h2 className='post-container-header'>Upload Content Here</h2>
+                <DragNdrop onFilesSelected={setFiles} width="50%" height="60%" />
+              </div>
+              <div className='post-bottom-container'>
+                <div className='buttons-container'>
+                  <div className="next-button-container">
+                    <NextButton show={files.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
+                  </div>
+                </div>
+                <div className='progress-bar-container'>
+                  <PostingProgressBar active={currStage} />
                 </div>
               </div>
-              <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
     
@@ -92,26 +98,32 @@ const Post = () => {
             unmountOnExit
           >
             <div className="post-container">
-              <h2 className='new-post-header'>New Post</h2>
-              <div className="input-container">
-                <label htmlFor="caption">Caption:</label>
-                <textarea id="caption" className="styled-input" placeholder="Write a caption..." value={postData.caption} onChange={(e) => setPostData(prev => ({ ...prev, caption: e.target.value}))}></textarea>
+              <div className='post-content-container'>
+                <h2 className='post-content-header'>New Post</h2>
+                <div className="input-container">
+                  <label htmlFor="caption">Caption:</label>
+                  <textarea id="caption" className="styled-input" placeholder="Write a caption..." value={postData.caption} onChange={(e) => setPostData(prev => ({ ...prev, caption: e.target.value}))}></textarea>
 
-                <label htmlFor="location">Location:</label>
-                <input id="location" className="styled-input" type="text" placeholder="Add location..." value={postData.location} onChange={(e) => setPostData(prev => ({ ...prev, location: e.target.value}))}/>
+                  <label htmlFor="location">Location:</label>
+                  <input id="location" className="styled-input" type="text" placeholder="Add location..." value={postData.location} onChange={(e) => setPostData(prev => ({ ...prev, location: e.target.value}))}/>
 
-                <label htmlFor="tagging">Tag Users:</label>
-                <input id="tagging" className="styled-input" type="text" placeholder="Tag users..." value={postData.mentions} onChange={(e) => setPostData(prev => ({ ...prev, mentions: e.target.value}))}/>
-              </div>
-              <div className='buttons-container'>
-                <div className='back-button-container'>
-                  <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
-                </div>
-                <div className='next-button-container-2'>
-                  <NextButton show={postData.caption.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
+                  <label htmlFor="tagging">Tag Users:</label>
+                  <input id="tagging" className="styled-input" type="text" placeholder="Tag users..." value={postData.mentions} onChange={(e) => setPostData(prev => ({ ...prev, mentions: e.target.value}))}/>
                 </div>
               </div>
-              <PostingProgressBar active={currStage} />
+              <div className='post-bottom-container'>
+                <div className='buttons-container'>
+                    <div className='back-button-container'>
+                      <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
+                    </div>
+                    <div className='next-button-container-2'>
+                      <NextButton show={postData.caption.length > 0} onClick={() => setCurrStage(prev => prev + 1)}/>
+                    </div>
+                  </div>
+                <div className='progress-bar-container'>
+                  <PostingProgressBar active={currStage} />
+                </div>
+              </div>
             </div>
           </CSSTransition>
 
@@ -123,7 +135,7 @@ const Post = () => {
           >
             <div className="post-container">
               <div className='post-content-container'>
-                <h2>Select Platforms to Post To</h2>
+                <h2 className='post-content-header'>Select Platforms to Post To</h2>
                 <div className="platform-options">
                   {platforms.map(({ name, icon }) => (
                     <div
@@ -137,15 +149,19 @@ const Post = () => {
                   ))}
                 </div>
               </div>
-              <div className='buttons-container'>
-                <div className='back-button-container'>
-                  <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
-                </div>
-                <div className='next-button-container-2'>
-                  <NextButton show={selectedPlatforms.length > 0} onClick={() => {setCurrStage(prev => prev + 1);handlePost()}}/>
+              <div className='post-bottom-container'>
+                <div className='buttons-container'>
+                    <div className='back-button-container'>
+                      <BackButton show={currStage > 1} onClick={() => setCurrStage(prev => prev - 1)}/>
+                    </div>
+                    <div className='next-button-container-2'>
+                      <NextButton show={selectedPlatforms.length > 0} onClick={() => {setCurrStage(prev => prev + 1);handlePost()}}/>
+                    </div>
+                  </div>
+                <div className='progress-bar-container'>
+                  <PostingProgressBar active={currStage} />
                 </div>
               </div>
-              <PostingProgressBar active={currStage} />
             </div>
           </CSSTransition>
 
@@ -167,15 +183,33 @@ const Post = () => {
             unmountOnExit
           >
             <div className="post-container">
-              <h2>Success! Here are the links:</h2>
-              {postLinks.map((post) => {
-                return (
-                  <a className='post-link' href={post}>
-                    Instagram
-                  </a>
-                )
-              })}
-              <PostingProgressBar active={currStage} />
+              <div className='post-content-container'>
+                <h2 className='post-content-header'>Success! Here are the links:</h2>
+                <div className='platform-options-container'>
+                  {postLinks.map((post, index) => {
+                    const platformName = Object.keys(post)[0];
+                    const link = post[platformName];
+
+                    const platform = platforms.find(p => p.name === platformName);
+
+                    if (!platform) return null;
+
+                    return (
+                      <div key={index} className={`platform-option ${platform.name}`} onClick={() => window.open(link, '_blank')}>
+                        <div className='platform-name-icon'>
+                          {platform.icon}
+                          <span>{platform.name}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className='post-bottom-container'>
+                <div className='progress-bar-container'>
+                  <PostingProgressBar active={currStage-1} />
+                </div>
+              </div>
             </div>
           </CSSTransition>
         </>
