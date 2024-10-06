@@ -23,7 +23,7 @@ const Header = () => {
             <CgProfile className='profileIcon' onClick={() => setOpen(!open)}/>
         </header>
         <div className={`dropdown-menu ${open ? 'active' : 'inactive'}`}>
-          <ul>
+          <ul className='dropdown-item-list'>
             <li className='dropdownItem'>
               <span onClick={() => {setOpen(!open); navigate('/profile')}}>My profile</span>
             </li>

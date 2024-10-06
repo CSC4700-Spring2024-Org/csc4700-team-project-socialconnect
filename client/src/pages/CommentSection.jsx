@@ -63,8 +63,7 @@ const CommentSection = () => {
                         }
                         {comment.replies ?
                             <>
-                                <footer className='replies-divider'></footer>
-                                <div className='replies-header'>Replies</div>
+                                <hr className='replies-divider' data-content='Replies'/>
                                 {comment.replies.data.map((reply) => {
                                     const replyDate = new Date(reply.timestamp);
                                     const formattedReplyDate = `${replyDate.getMonth() + 1}/${replyDate.getDate()}/${replyDate.getFullYear()}`;

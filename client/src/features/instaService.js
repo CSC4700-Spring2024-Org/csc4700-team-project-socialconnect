@@ -9,7 +9,11 @@ const getInstaProfile = async (token) => {
 }
 
 const createInstagramPost = async(token, postData) => {
-    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData)
+    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
     return res
 }
 

@@ -58,7 +58,7 @@ const DragNdrop = ({
             hidden
             id="browse"
             onChange={handleFileChange}
-            accept=".jpeg,.mov,.mp4,.txt"
+            accept=".jpeg,.mov,.mp4"
             multiple
           />
           <label htmlFor="browse" className="browse-btn">
