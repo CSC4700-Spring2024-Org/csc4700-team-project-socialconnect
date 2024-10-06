@@ -107,16 +107,22 @@ public class InstagramService {
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             GenericIDDTO postContainerRes = restTemplate.postForObject(uri, null, GenericIDDTO.class);
-            
+            System.out.println(postContainerRes.getId());
+
             int count = 0;
             while (count < 5) {
-                url = "https://graph.facebook.com/v19.0/" + postContainerRes.getId() + "?fields=status_code&access_token=" + accessToken;
+                url = "https://graph.facebook.com/v19.0/" + postContainerRes.getId() + "?fields=status_code,status&access_token=" + accessToken;
                 builder = UriComponentsBuilder.fromUriString(url);
                 uri = builder.build().toUri();
                 ContainerProgressDTO containerProgress = restTemplate.getForObject(uri, ContainerProgressDTO.class);
-                
+                System.out.println(containerProgress.getStatus_code());
+
                 if (containerProgress.getStatus_code().equals("FINISHED")) {
                     break;
+                } else if (containerProgress.getStatus_code().equals("ERROR")) {
+                    ErrorDTO dto = new ErrorDTO();
+                    dto.setError(containerProgress.getStatus());
+                    return dto;
                 } else {
                     Thread.sleep(30000);
                 }
@@ -137,6 +143,7 @@ public class InstagramService {
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
+            System.out.println(mediaURLRes.getMedia_url());
 
             fileUploadService.deleteFile(postUrl);
             
@@ -157,6 +164,7 @@ public class InstagramService {
             String errorMessage = jsonNode.path("error").path("message").asText();
             dto.setError(errorMessage);
             dto.setCode(errorCode);
+            System.out.println(dto.getError());
             
             return dto;
         }

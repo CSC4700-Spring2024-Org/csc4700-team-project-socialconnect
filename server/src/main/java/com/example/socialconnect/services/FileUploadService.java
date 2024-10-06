@@ -111,17 +111,21 @@ private List<String> createFFmpegCommand(String inputFilePath, String outputFile
     command.add("ffmpeg");
     command.add("-i");
     command.add(inputFilePath);
+    command.add("-vf");
+    command.add("scale=1920:1080");
     command.add("-c:v");
     command.add("libx264");
     command.add("-c:a");
     command.add("aac");
     command.add("-b:a");
     command.add("128k");
+    command.add("-strict");
+    command.add("experimental");
     command.add("-movflags");
-    command.add("+frag_keyframe+empty_moov");
-    command.add("-ignore_unknown");
-    command.add("-f");
-    command.add("mp4");
+    command.add("+faststart");
+    //command.add("-ignore_unknown");
+    // command.add("-f");
+    // command.add("MP4");
     command.add(outputFilePath);
     return command;
 }
