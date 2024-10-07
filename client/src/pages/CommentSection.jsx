@@ -1,14 +1,16 @@
 // components/CommentSection.js
 import React, {useState} from 'react';
 import '../Styles/Dashboard.css';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Spinner from '../components/Spinner';
 import NoAccount from '../components/NoAccount';
 import { IoSend } from "react-icons/io5";
+import { replyInstagram } from '../features/instaSlice';
 
 const CommentSection = () => {
-    const { comments, isLoadingInsta } = useSelector((state) => state.insta)
+    const { comments, isLoadingInsta, instaCommentsLoading } = useSelector((state) => state.insta)
     const { user, isLoading } = useSelector((state) => state.auth);
+    const dispatch = useDispatch()
 
     const [replyTo, setReplyTo] = useState(null);
     const [replyContent, setReplyContent] = useState('');
@@ -19,7 +21,7 @@ const CommentSection = () => {
 
     const handleSendButtonClick = () => {
         if (replyTo !== null && replyContent.trim() !== '') {
-            console.log(`Replying to ${replyTo}: ${replyContent}`);
+            dispatch(replyInstagram({user: user, replyData:{id:replyTo, text:replyContent.trim()}}))
             setReplyTo(null);
             setReplyContent('');
         }
@@ -29,7 +31,7 @@ const CommentSection = () => {
       return <NoAccount />
     }
 
-    if (isLoadingInsta || !comments) {
+    if (isLoadingInsta || instaCommentsLoading || !comments) {
       return <Spinner />
     }
 
@@ -63,8 +65,7 @@ const CommentSection = () => {
                         }
                         {comment.replies ?
                             <>
-                                <footer className='replies-divider'></footer>
-                                <div className='replies-header'>Replies</div>
+                                <hr className='replies-divider' data-content='Replies'/>
                                 {comment.replies.data.map((reply) => {
                                     const replyDate = new Date(reply.timestamp);
                                     const formattedReplyDate = `${replyDate.getMonth() + 1}/${replyDate.getDate()}/${replyDate.getFullYear()}`;

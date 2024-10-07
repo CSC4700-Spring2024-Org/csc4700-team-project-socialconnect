@@ -9,13 +9,23 @@ const getInstaProfile = async (token) => {
 }
 
 const createInstagramPost = async(token, postData) => {
-    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData)
+    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
     return res
+}
+
+const replyInstagram = async(token, replyData) => {
+    const res = await axios.post(`http://localhost:8080/api/replyInstagram?token=${token}`, replyData)
+    return {oldID: replyData.id, newComment:res.data}
 }
 
 const instaService = {
     getInstaProfile,
-    createInstagramPost
+    createInstagramPost,
+    replyInstagram
 }
 
 export default instaService;

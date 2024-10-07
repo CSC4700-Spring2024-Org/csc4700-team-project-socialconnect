@@ -3,7 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import Spinner from '../components/Spinner';
 import { useSelector } from 'react-redux';
 import NoAccount from '../components/NoAccount';
-
+import '../Styles/Calendar.css'
 function renderEventContent(eventInfo) {
     return (
       <>
@@ -34,12 +34,15 @@ export default function Calendar() {
   }
 
   return (
-    <FullCalendar
-       plugins={[dayGridPlugin]}
-       initialView='dayGridMonth'
-       weekends={true}
-       events={events}
-       eventContent={renderEventContent}
-    /> 
+    <div className="calendar-container"> 
+      <FullCalendar
+        plugins={[dayGridPlugin]}
+        initialView="dayGridMonth"
+        weekends={true}
+        events={events}
+        eventContent={renderEventContent}
+        height="100%"  // This will make the calendar take full height of its container
+      /> 
+    </div>
   );
 }
