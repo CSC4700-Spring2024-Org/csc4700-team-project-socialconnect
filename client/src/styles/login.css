@@ -180,3 +180,22 @@
   margin: 0;
   padding: 0;
 }
+
+.checkbox-group {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-label {
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center items vertically */
+  margin-bottom: 5px; /* Space between checkboxes */
+}
+
+.checkbox-label input {
+  margin-right: 0px; /* Space between checkbox and text */
+  width: 10px; /* Set width */
+  height: 10px; /* Set height */
+}
+

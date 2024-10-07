@@ -153,6 +153,47 @@ const Login = () => {
                               </li>
                            </ul>
                         </div> : <></>}
+   <div className="checkbox-group">
+      <label className="checkbox-label">
+         <input 
+            type="checkbox" 
+            name="privacypolicybox" 
+            // checked={agreeToTerms} 
+            // onChange={onChange} 
+         /> 
+         <span>
+            I agree to the {' '}
+            <span 
+               className="link" 
+               onClick={() => navigate('/privacypolicy')}
+               style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+            >
+            Privacy Policy
+            </span>
+            .
+         </span>
+      </label>
+      <label className="checkbox-label">
+         <input 
+            type="checkbox" 
+            name="termsandconditionsbox" 
+            // checked={subscribeNewsletter} 
+            // onChange={onChange} 
+         /> 
+         <span>
+            I agree to the {' '}
+            <span 
+               className="link" 
+               onClick={() => navigate('/termsandconditions')}
+               style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+            >
+            Terms and Conditions
+            </span>
+            .
+         </span>
+      </label>
+   </div>
+
                         <input type="submit" value="Register"/>
                      </form>
                   </div>
