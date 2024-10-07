@@ -3,7 +3,7 @@ import { AgCharts } from 'ag-charts-react';
 import { useSelector } from 'react-redux';
 import NoAccount from '../components/NoAccount';
 import Spinner from '../components/Spinner';
-import { FaInstagram, FaTiktok, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
