@@ -6,6 +6,8 @@ import Profile from './pages/Profile';
 import Post from './pages/Post';
 import AnalyticsPage from './pages/AnalyticsPage'
 import CalendarPage from './pages/CalendarPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import CreatedAccount from './pages/CreatedAccount';
@@ -28,8 +30,8 @@ function App() {
           <Route path='/verifyEmail' element={<CreatedAccount/>} />
           <Route path="/verifySuccess" element={<VerifySuccess />} />
           <Route path="/verifyFailed" element={<VerifyFailed />} />
-
-
+          <Route path='/termsandconditions' element={<TermsAndConditions />} />
+          <Route path='/privacypolicy' element={<PrivacyPolicyPage />} />
         </Routes>
       </Router>
       <ToastContainer />

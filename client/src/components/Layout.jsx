@@ -1,11 +1,10 @@
-import React,{useState,useEffect} from 'react'
-import { Outlet } from 'react-router-dom'
-import Header from './Header'
+import React,{useState,useEffect} from 'react';
+import Header from './Header';
 import Sidebar, { SidebarItem } from '../components/Sidebar';
 import { IoHome, IoAnalytics } from "react-icons/io5";
 import { CiSquarePlus } from "react-icons/ci";
-import { FaCalendarAlt, FaNewspaper } from "react-icons/fa";
-import { useNavigate, useLocation } from 'react-router-dom'
+import { FaCalendarAlt, FaLock, FaFileAlt } from "react-icons/fa";
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -26,6 +25,12 @@ const Layout = () => {
       case '/calendar':
         setActiveItem('Calendar');
         break;
+      case '/privacypolicy':
+        setActiveItem('Privacy Policy');
+        break;
+      case '/termsandconditions':
+        setActiveItem('Terms and Conditions');
+        break;
       default:
         setActiveItem('');
         break;
@@ -41,11 +46,14 @@ const Layout = () => {
             <SidebarItem icon={<IoAnalytics size={20} />} text="Analytics" active={activeItem === 'Analytics'} onClick={() => {setActiveItem('Analytics');navigate('/analytics');}}/>
             <SidebarItem icon={<CiSquarePlus size={20} />} text="Post" active={activeItem === 'Post'} onClick={() => {navigate('/post');setActiveItem('Post')}}/>
             <SidebarItem icon={<FaCalendarAlt size={20} />} text="Calendar" active={activeItem === 'Calendar'} onClick={() => {navigate('/calendar');setActiveItem('Calendar')}}/>
+            <SidebarItem icon={<FaLock size={20} />} text="Privacy Policy" active={activeItem === 'Privacy Policy'} onClick={() => {navigate('/privacypolicy');setActiveItem('Privacy Policy')}}/>
+            <SidebarItem icon={<FaFileAlt size={20} />} text="Terms and Conditions" active={activeItem === 'Terms and Conditions'} onClick={() => {navigate('/termsandconditions');setActiveItem('Terms and Conditions')}}/>
           </Sidebar>
           <Outlet />
         </div>
     </>
   )
-}
+  
+};
 
 export default Layout
