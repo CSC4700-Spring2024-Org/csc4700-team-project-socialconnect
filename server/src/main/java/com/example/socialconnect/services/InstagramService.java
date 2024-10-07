@@ -164,6 +164,43 @@ public class InstagramService {
             String errorMessage = jsonNode.path("error").path("message").asText();
             dto.setError(errorMessage);
             dto.setCode(errorCode);
+            
+            return dto;
+        }
+    }
+
+    public Object replyComment(String accessToken, CommentDTO commentDTO) {
+        System.out.println(commentDTO.getId() + " " + commentDTO.getText());
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://graph.facebook.com/v19.0/" + commentDTO.getId() + "/replies?message=" + commentDTO.getText() +"&access_token="+accessToken;
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+            URI uri = builder.build().toUri();
+            GenericIDDTO commentID = restTemplate.postForObject(uri, null, GenericIDDTO.class);
+            System.out.println(commentID.getId());
+
+            url = "https://graph.facebook.com/v19.0/" + commentID.getId() + "?fields=username,id,text,timestamp&access_token="+accessToken;
+            builder = UriComponentsBuilder.fromUriString(url);
+            uri = builder.build().toUri();
+            CommentDTO comment = restTemplate.getForObject(uri, CommentDTO.class);
+            System.out.println(comment.getText());
+            return comment;
+        } catch (Exception e) {
+            ErrorDTO dto = new ErrorDTO();
+            String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode;
+            try {
+                 jsonNode = objectMapper.readTree(jsonPart);
+            } catch (Exception e2) {
+                return e2;
+            }
+
+            int errorCode = jsonNode.path("error").path("code").asInt();
+            String errorMessage = jsonNode.path("error").path("message").asText();
+            dto.setError(errorMessage);
+            dto.setCode(errorCode);
             System.out.println(dto.getError());
             
             return dto;

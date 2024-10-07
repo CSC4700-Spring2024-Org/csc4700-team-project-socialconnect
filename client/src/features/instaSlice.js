@@ -8,6 +8,7 @@ const initialState = {
     isErrorInsta: false,
     isSuccessInsta: false,
     isLoadingInsta: false,
+    instaCommentsLoading: false,
     message: '',
 }
 
@@ -15,12 +16,6 @@ export const getInstaProfile = createAsyncThunk(
     'insta/profile',
     async (user, thunkAPI) => {
         try {
-            // const facebookPages = await getFacebookPages(user);
-            // if (facebookPages.error && facebookPages.error.code === 190) {
-            //   thunkAPI.dispatch(setInstagram("None"))
-            //   return thunkAPI.rejectWithValue("Instagram token has expired, please log in again")
-            // }
-            // const instagramAccountId = await getInstagramAccountId(facebookPages.data[0].id, user);
             const res = await instaService.getInstaProfile(user.instaRefresh)
             if (res.error) {
               if (res.code === 190) {
@@ -38,6 +33,25 @@ export const getInstaProfile = createAsyncThunk(
             return thunkAPI.rejectWithValue(message)
         }
     }
+)
+
+export const replyInstagram = createAsyncThunk(
+    'insta/replyComment',
+    async (replyData, thunkAPI) => {
+      try {
+          const res = await instaService.replyInstagram(replyData.user.instaRefresh, replyData.replyData)
+          if (res.error) {
+            return thunkAPI.rejectWithValue(res.error)
+          }
+          return res;
+      } catch (error) {
+          const message =
+              (error.response && error.response.data && error.response.data.message) ||
+              error.message ||
+              error.message.toString()
+          return thunkAPI.rejectWithValue(message)
+      }
+  }
 )
 
 export const instaSlice = createSlice({
@@ -63,6 +77,32 @@ export const instaSlice = createSlice({
           state.isLoadingInsta = false
         })
         .addCase(getInstaProfile.rejected, (state, action) => {
+          state.isErrorInsta = true
+          state.message = action.payload
+          state.isLoadingInsta = false
+        })
+        .addCase(replyInstagram.pending, (state) => {
+          state.instaCommentsLoading = true
+        })
+        .addCase(replyInstagram.fulfilled, (state, action) => {
+          state.isSuccessInsta = true
+          let tempComments = state.comments
+          for (let i = 0; i < tempComments.length; i++) {
+            if (tempComments[i].id === action.payload.oldID) {
+              tempComments[i].replies !== null ? tempComments[i].replies.data.push(action.payload.newComment) : tempComments[i].replies = {data:[action.payload.newComment]}
+            }
+            if (tempComments[i].replies) {
+              for (let j = 0; j < tempComments[i].replies.data.length; j++) {
+                if (tempComments[i].replies.data[j].id === action.payload.oldID) {
+                  tempComments[i].replies.data.splice(j+1, 0, action.payload.newComment)
+                }
+              }
+            }
+          }
+          state.comments = tempComments
+          state.instaCommentsLoading = false
+        })
+        .addCase(replyInstagram.rejected, (state, action) => {
           state.isErrorInsta = true
           state.message = action.payload
           state.isLoadingInsta = false
