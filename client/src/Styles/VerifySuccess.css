@@ -1,0 +1,49 @@
+/* VerifySuccess.module.css */
+
+
+.verify-success-container {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #06ff5d, #738af3); /* Gradient background */
+  height: 100vh; /* Full height of the viewport */
+  display: flex; /* Centering content */
+  justify-content: center; /* Centering content */
+  align-items: center; /* Centering content */
+  overflow: hidden; /* Prevent overflow */
+  flex-direction: column;
+}
+
+
+.success-header {
+  font-size: 2.5rem; /* Font size for h3 */
+  color: #ffffff; /* Color for h3 */
+  margin-bottom: 1.5rem; /* Margin for h3 */
+  font-weight: 700; /* Font weight for h3 */
+}
+
+.h4verify a {
+  font-size: 1.3rem; /* Font size for h4 */
+  color: #636e72; /* Color for h4 */
+  margin-bottom: 2rem; /* Margin for h4 */
+}
+
+.h4verify a {
+  color: #ffffff; /* Link color */
+  background-color: #0984e3; /* Link background */
+  padding: 15px 30px; /* Link padding */
+  font-size: 1.5rem; /* Font size for link */
+  font-weight: 600; /* Font weight for link */
+  text-decoration: none; /* Remove underline */
+  border-radius: 50px; /* Rounded link */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for link */
+  transition: background-color 0.3s, transform 0.3s; /* Transition effects */
+}
+
+.h4verify:hover {
+  background-color: #74b9ff; /* Hover color for link */
+  transform: translateY(-5px); /* Hover effect */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Shadow on hover */
+}
+
+

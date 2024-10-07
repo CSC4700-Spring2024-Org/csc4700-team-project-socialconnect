@@ -13,4 +13,8 @@ public class UserRequest {
     private Long id;
     private String username;
     private String password;
+    private String userAgent;
+    private String email;
+    private String verificationCode;
+    private Boolean enabled;
 }

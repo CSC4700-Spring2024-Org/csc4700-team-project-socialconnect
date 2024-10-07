@@ -7,7 +7,7 @@ body {
   }
   
 .dashboard {
-    background: linear-gradient(to bottom, #1DBED6, #576EE3);
+    background: #f5f5f5;
     display: flex;
     width: 100%;
     height: 100%;
@@ -29,9 +29,12 @@ body {
     width: 40%;
     height: 40%;
     align-items: center;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
-    overflow: auto;
+    overflow: hidden; /* Prevent scrolling */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
   }
  
   .box2 {
@@ -41,7 +44,7 @@ body {
     border-radius: 10px;
     width: 50%;
     height: 40%;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto; 
     z-index: 1;
@@ -51,9 +54,9 @@ body {
     margin-bottom: 2rem;
     border-radius: 10px;
     width: 40%;
-    height: 40%;
+    height: 41%;
     align-items: center;
-    background-color: transparent;
+    background-color: white;
     border: 1px solid rgb(0, 0, 0);
     overflow: auto;
   }
@@ -62,16 +65,22 @@ body {
     margin-bottom: 2rem;
     border-radius: 10px;
     width: 50%;
-    height: 40%;
+    height: 41%;
     align-items: center;
-    background-color: transparent;
+    background-color: rgb(255, 255, 255);
     border: 1px solid rgb(0, 0, 0);
-    overflow: auto;
+    overflow: hidden;
   }
 
   .box1, .box2, .box3, .box4 {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, .1);
+    transition: box-shadow 0.3s ease;
+}
+
+  .box1:hover, .box2:hover, .box3:hover, .box4:hover {
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.7);
   }
+
 
   .comments-dashboard-container {
     background: transparent;
@@ -81,25 +90,23 @@ body {
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   }
 
-  /* Making title more prominent */
   .comments-title {
     font-weight: bolder;
-    color: #fff; /* White text for contrast */
-    margin-left: 1rem;
+    color: #000000;
+    margin-left: 1.5rem;
     padding: 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Adding text shadow for depth */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     margin-top: 1rem;
   }
   .replies-header {
     font-weight: bolder;
-    color: #fff;
-    margin-left: 1rem;
+    color: #000000;
+    margin-left: 1.5rem;
     padding: 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     background: none;
   }
 
-  /* Adding a subtle box shadow for comment containers */
   .comment-container {
     display: flex;
     flex-direction: column;
@@ -107,42 +114,42 @@ body {
     justify-content: center;
     width: 85%;
     margin-top: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Adding a box shadow for depth */
-    border-radius: 10px; /* Rounding corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
   }
 
-  /* Making username more vibrant */
   .comment-username {
-    color: #f7ff79;
+    color: black;
     font-weight: 700;
   }
 
   .comment-date {
-    margin-left: 1rem;
+    margin-left: auto;
+    margin-right: 1.5rem;
   }
 
   .comment-text {
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     margin-right: 1rem;
   }
 
   .reply-button {
-    background: #fff;
+    background: #e0e0e0;
     border: none;
     padding: 0.5rem 1rem;
     margin-top: 0.5rem;
     margin-bottom: 1.5rem;
     margin-left: auto;
-    margin-right: 1rem;
+    margin-right: 1.5rem;
     transition: all 0.3s ease-in-out;
     border-radius: 5px;
-    color: #8179ff;
+    color: black;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
   }
   .reply-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
   }
 
   /* Styling reply input */
@@ -164,13 +171,11 @@ body {
   .name-date-container {
     display: flex;
     flex-direction: row;
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     margin-top: 1rem;
-    margin-bottom: 1rem;
   }
 
   .reply-comment-container {
-    margin-left: 1rem;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -189,9 +194,30 @@ body {
   }
 
   .replies-divider {
-    border: 1px solid #fff;
-    margin-bottom: 1.5rem;
-    width: 80%;
+    border: 0;
+    line-height: 1em;
     position: relative;
-    left: 10%;
+    text-align: center;
+    height: 1.5em;
+    font-size: 1rem;
+    width: 95%;
+  }
+  
+  .replies-divider::before {
+    content: "";
+    background: linear-gradient(to right, transparent, black, transparent);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+  }
+  
+  .replies-divider::after {
+    content: attr(data-content);
+    position: relative;
+    padding: 0 7px;
+    line-height: 1.5em;
+    color: black;
+    background-color: white;
   }

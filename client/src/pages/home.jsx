@@ -44,7 +44,7 @@ const Home = () => {
         navigate('/login');
       }
     }
-  }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted, message, isErrorInsta]);
+  }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted, isErrorInsta]);
  
   return (
     <div className="dashboard">

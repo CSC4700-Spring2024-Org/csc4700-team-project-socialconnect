@@ -1,10 +1,9 @@
 .header {
-    color: rgb(0, 0, 0);
-    background-color: #C7D2FE;
+    color: #C7D2FE;
+    background-color: hsl(200, 100%, 6%, 0.8);
     display: flex;
     align-items: center;
     height: 3em;
-    border: 1px solid rgb(0, 0, 0);
 }
 
 .profileIcon {
@@ -20,7 +19,7 @@
     top: 3em;
     right: 1.5em;
     background-color: #faf9f6;
-    padding: 10px 20px;
+    padding: 10px 0px;
     width: 200px;
     z-index: 999;
     border: 2px solid #f0f0f0;
@@ -50,12 +49,12 @@
     transition: 0.5s ease;
   }
   
-  .dropdown-menu ul li{
+  .dropdown-menu .dropdown-item-list li{
     padding: 10px  0;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
   
-  .dropdown-menu ul li:hover span{
+  .dropdown-menu .dropdown-item-list li:hover span{
     color: rgb(212, 33, 9);
     cursor: pointer;
   }

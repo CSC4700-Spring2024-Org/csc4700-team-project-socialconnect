@@ -120,9 +120,7 @@ export const authSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
-          if (action.payload === 401) {
-            state.message = "Invalid Username/Password"
-          }
+          state.message = action.payload
           state.user = null
         })
         .addCase(refreshToken.pending, (state) => {

@@ -11,9 +11,11 @@ const Login = () => {
    const [formData, setFormData] = useState({
       username: '',
       password: '',
+      email: ''
    })
 
-   const { username, password } = formData
+   const { username, password, email } = formData
+   const userAgent = navigator.userAgent
 
    const [requirements, setRequirements] = useState({
       length: false,
@@ -79,6 +81,7 @@ const Login = () => {
       const userData = {
          username,
          password,
+         userAgent
       }
 
       dispatch(login(userData))
@@ -89,10 +92,13 @@ const Login = () => {
 
       const userData = {
          username,
-         password
+         password,
+         userAgent,
+         email
       }
       
       dispatch(register(userData))
+      navigate('/verifyEmail')
    }
 
    return (
@@ -119,6 +125,7 @@ const Login = () => {
                   <div className="form signupform">
                      <form onSubmit={onRegisterSubmit}>
                         <h3>Sign Up</h3>
+                        <input type="text" placeholder= 'Email' name='email' value={email} onChange={onChange}/>
                         <input type="text" placeholder='Username' name='username' value={username} onChange={onChange}/>
                         <input type="password" placeholder="Password" name='password' value={password} onChange={onChange} onKeyUp={(e) => validateRequirements(e.target.value)} onFocus={() => setShowPasswordRequirements(true)} onBlur={() => setShowPasswordRequirements(false)}/>
                          {showPasswordRequirements ? <div className={`password-content ${showPasswordRequirements ? 'show':''}`}>
