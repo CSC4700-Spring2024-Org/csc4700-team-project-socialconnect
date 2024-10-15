@@ -76,7 +76,7 @@ export default function Analytics() {
       const dates = instaPage.business_discovery.media.data.map(media => media.timestamp);
 
       const dynamicData = likeCounts.map((likeCount, index) => {
-        const dateObject = new Date(dates[likeCounts.length - index - 1]);
+        const dateObject = new Date(dates[index]);
         return {
           Instagram: likeCount,
           date: dateObject,

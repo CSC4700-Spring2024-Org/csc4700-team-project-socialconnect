@@ -143,11 +143,11 @@ public class InstagramService {
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
-            System.out.println(mediaURLRes.getMedia_url());
+            System.out.println(mediaURLRes.getPermalink());
 
             fileUploadService.deleteFile(postUrl);
             
-            return mediaURLRes.getMedia_url();
+            return mediaURLRes.getPermalink();
         } catch (Exception e) {
             ErrorDTO dto = new ErrorDTO();
             String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);

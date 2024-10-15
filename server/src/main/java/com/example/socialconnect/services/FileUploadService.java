@@ -112,7 +112,7 @@ private List<String> createFFmpegCommand(String inputFilePath, String outputFile
     command.add("-i");
     command.add(inputFilePath);
     command.add("-vf");
-    command.add("scale=1920:1080");
+    command.add("scale=1080:1920");
     command.add("-c:v");
     command.add("libx264");
     command.add("-c:a");
