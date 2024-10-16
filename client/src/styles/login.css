@@ -197,16 +197,31 @@
   display: inline-block; 
 }
 
-.individual-checkbox-container label {
-  margin-left: 5px; 
+.individual-checkbox-container span { 
   font-size: 0.9em; 
 }
 
-.input-checkbox {
+.input-checkbox1 {
   margin-left: 10px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  align-items: center;
+}
+
+.input-checkbox2 {
+  margin-left: 10px;
+  margin-right: 5px;
+  margin-bottom: 25px;
   align-items: center;
 }
 
 .label-container {
   padding-bottom: 12px;
+}
+
+a {
+  color: blue;
+  font-size: 0.9em;
+  text-decoration: underline;
+  cursor: pointer;
 }

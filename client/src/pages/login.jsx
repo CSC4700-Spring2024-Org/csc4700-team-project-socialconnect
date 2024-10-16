@@ -156,19 +156,23 @@ const Login = () => {
                      
                         <div className="checkbox-container">
                            <div className="individual-checkbox-container">
-                              <div className="input-checkbox">
+                              <div className="input-checkbox1">
                                  <input type="checkbox" id="privacypolicy" name="privacypolicy" />
                               </div>
                               <div className="label-container">
-                                 <label htmlFor="privacypolicy">Privacy Policy</label>
+                                 <span>I agree to the&nbsp;
+                                    <a onClick={() => {navigate('/privacypolicy');}}>Privacy Policy</a>.
+                                 </span>
                               </div>
                            </div>
                            <div className="individual-checkbox-container">
-                              <div className="input-checkbox">
+                              <div className="input-checkbox2">
                                  <input type="checkbox" id="termsandconditions" name="termsandconditions" />
                               </div>
                               <div className="label-container">
-                                 <label htmlFor="termsandconditions">Terms and Conditions</label>
+                                 <span>I agree to the&nbsp;
+                                    <a onClick={() => {navigate('/termsandconditions');}}>Terms and Conditions</a>.
+                                 </span>
                               </div>
                            </div>
                         </div>
