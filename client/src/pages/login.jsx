@@ -153,47 +153,25 @@ const Login = () => {
                               </li>
                            </ul>
                         </div> : <></>}
-   <div className="checkbox-group">
-      <label className="checkbox-label">
-         <input 
-            type="checkbox" 
-            name="privacypolicybox" 
-            // checked={agreeToTerms} 
-            // onChange={onChange} 
-         /> 
-         <span>
-            I agree to the {' '}
-            <span 
-               className="link" 
-               onClick={() => navigate('/privacypolicy')}
-               style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-            >
-            Privacy Policy
-            </span>
-            .
-         </span>
-      </label>
-      <label className="checkbox-label">
-         <input 
-            type="checkbox" 
-            name="termsandconditionsbox" 
-            // checked={subscribeNewsletter} 
-            // onChange={onChange} 
-         /> 
-         <span>
-            I agree to the {' '}
-            <span 
-               className="link" 
-               onClick={() => navigate('/termsandconditions')}
-               style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-            >
-            Terms and Conditions
-            </span>
-            .
-         </span>
-      </label>
-   </div>
-
+                     
+                        <div className="checkbox-container">
+                           <div className="individual-checkbox-container">
+                              <div className="input-checkbox">
+                                 <input type="checkbox" id="privacypolicy" name="privacypolicy" />
+                              </div>
+                              <div className="label-container">
+                                 <label htmlFor="privacypolicy">Privacy Policy</label>
+                              </div>
+                           </div>
+                           <div className="individual-checkbox-container">
+                              <div className="input-checkbox">
+                                 <input type="checkbox" id="termsandconditions" name="termsandconditions" />
+                              </div>
+                              <div className="label-container">
+                                 <label htmlFor="termsandconditions">Terms and Conditions</label>
+                              </div>
+                           </div>
+                        </div>
                         <input type="submit" value="Register"/>
                      </form>
                   </div>
