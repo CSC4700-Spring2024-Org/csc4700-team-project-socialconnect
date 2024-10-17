@@ -219,7 +219,7 @@
   padding-bottom: 12px;
 }
 
-a {
+.checkbox-link {
   color: blue;
   font-size: 0.9em;
   text-decoration: underline;
