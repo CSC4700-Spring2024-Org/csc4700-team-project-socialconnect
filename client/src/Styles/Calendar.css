@@ -9,7 +9,7 @@
   
   .fc {
     height: 100% !important;
-    font-size: 0.85em; /* Reduce overall font size */
+    font-size: 0.85em; 
   }
   
   .fc-scroller {

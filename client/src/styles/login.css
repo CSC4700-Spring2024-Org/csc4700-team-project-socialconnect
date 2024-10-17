@@ -180,3 +180,48 @@
   margin: 0;
   padding: 0;
 }
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column; 
+}
+
+.individual-checkbox-container {
+  display: flex;
+  align-items: center; 
+}
+
+.individual-checkbox-container input[type="checkbox"] {
+  margin: 0; 
+  padding: 0; 
+  display: inline-block; 
+}
+
+.individual-checkbox-container span { 
+  font-size: 0.9em; 
+}
+
+.input-checkbox1 {
+  margin-left: 10px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  align-items: center;
+}
+
+.input-checkbox2 {
+  margin-left: 10px;
+  margin-right: 5px;
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.label-container {
+  padding-bottom: 12px;
+}
+
+.checkbox-link {
+  color: blue;
+  font-size: 0.9em;
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -41,7 +41,7 @@ export default function Calendar() {
         weekends={true}
         events={events}
         eventContent={renderEventContent}
-        height="100%"  // This will make the calendar take full height of its container
+        height="100%"  
       /> 
     </div>
   );
