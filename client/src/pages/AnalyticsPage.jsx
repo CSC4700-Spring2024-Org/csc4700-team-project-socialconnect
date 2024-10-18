@@ -67,6 +67,7 @@ const AnalyticsPage = () => {
     ],
     title: {
       text: 'Instagram Likes',
+      textAlign: 'left',
       fontSize: 18,
       fontFamily: 'Futura',
       color: 'black',
