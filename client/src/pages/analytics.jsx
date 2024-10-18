@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import NoAccount from '../components/NoAccount';
 import Spinner from '../components/Spinner';
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaSquareXTwitter } from "react-icons/fa6";
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
@@ -119,15 +120,22 @@ export default function Analytics() {
             onClick={() => handlePlatformChange('TikTok')} 
             style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
           >
-            <FaTiktok size={20} color="#25F4EE" />
+            <FaTiktok size={20} />
             <span style={{ color: 'black', marginLeft: '5px' }}>TikTok</span>
           </div>
           <div 
             onClick={() => handlePlatformChange('YouTube')} 
-            style={{ display: 'flex', alignItems: 'center' }}
+            style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}
           >
             <FaYoutube size={20} color="#FF0000" />
             <span style={{ color: 'black', marginLeft: '5px' }}>YouTube</span>
+          </div>
+          <div 
+            onClick={() => handlePlatformChange('X')} 
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <FaSquareXTwitter size={20} />
+            <span style={{ color: 'black', marginLeft: '5px' }}>X</span>
           </div>
         </div>
       </div>
