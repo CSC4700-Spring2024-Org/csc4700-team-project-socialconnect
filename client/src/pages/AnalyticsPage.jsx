@@ -113,15 +113,15 @@ const AnalyticsPage = () => {
       </header>
 
       <div className="social-media-platforms">
-        <PlatformCard
-          icon={<FaTiktok size={20}/>} 
-          isSelected={selectedPlatform === "TikTok"}
-          onClick={() => handlePlatformClick("TikTok")} 
-        />
         <PlatformCard 
           icon={<FaInstagram size={20} color="#E1306C" />} 
           isSelected={selectedPlatform === "Instagram"}
           onClick={() => handlePlatformClick("Instagram")} 
+        />
+        <PlatformCard
+          icon={<FaTiktok size={20}/>} 
+          isSelected={selectedPlatform === "TikTok"}
+          onClick={() => handlePlatformClick("TikTok")} 
         />
         <PlatformCard
           icon={<FaYoutube size={20} color="#FF0000"/>} 
