@@ -10,6 +10,8 @@ export default function Analytics() {
   const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
 
+  
+
   const [instaChartOptions, setInstaChartOptions] = useState({
     background: {
       fill: 'transparent'
@@ -18,9 +20,9 @@ export default function Analytics() {
       {
         type: 'time',
         position: 'bottom',
-        label: {
-          format: '%b'
-        }
+        // label: {
+        //   format: '%b'
+        // }
       },
       {
         type: 'number',
@@ -80,9 +82,7 @@ export default function Analytics() {
         const dateObject = new Date(dates[index]);
         return {
           Instagram: likeCount,
-          date: dateObject,
-          TikTok: 0, 
-          Youtube: 0 
+          date: dateObject
         };
       });
 

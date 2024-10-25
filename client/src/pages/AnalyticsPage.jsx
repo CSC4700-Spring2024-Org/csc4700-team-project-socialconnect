@@ -12,20 +12,21 @@ const AnalyticsPage = () => {
   const { user, isLoading } = useSelector((state) => state.auth);
 
 
-  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [selectedPlatform, setSelectedPlatform] = useState("Instagram");
 
   const handlePlatformClick = (platform) => {
     setSelectedPlatform(platform);
   };
 
-  const [instaChartOptions, setInstaChartOptions] = useState({
+  // Instagram Likes Graph
+  const [instaLikesOptions, setInstaLikesOptions] = useState({
     axes: [
       {
         type: 'time',
         position: 'bottom',
-        label: {
-          format: '%b'
-        }
+        // label: {
+        //   format: '%b'
+        // }
       },
       {
         type: 'number',
@@ -75,6 +76,64 @@ const AnalyticsPage = () => {
     }
   });
 
+  // Instagram Views Graph
+  const [instaViewsOptions, setInstaViewsOptions] = useState({
+    axes: [
+      {
+        type: 'time',
+        position: 'bottom',
+        // label: {
+        //   format: '%b'
+        // }
+      },
+      {
+        type: 'number',
+        position: 'left',
+        title: { 
+          text: 'Views',
+          color: 'black'
+        }, 
+      }
+    ],
+    data: [], 
+    series: [
+      {
+        type: 'line',
+        xKey: 'date',
+        yKey: 'Instagram',
+        stroke: '#FF69B4',
+        marker: {
+          enabled: true,
+          size: 7,
+          fill: '#FF69B4'
+        },
+        tooltip: {
+          enabled: true,
+          renderer: (params) => {
+            const formattedDate = new Date(params.datum.date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+            return {
+              title: formattedDate,
+              content: `${params.datum.Instagram} views`,
+              backgroundColor: '#FF69B4'
+            };
+          }
+        }
+      }
+    ],
+    title: {
+      text: 'Instagram Views',
+      textAlign: 'left',
+      fontSize: 18,
+      fontFamily: 'Futura',
+      color: 'black',
+      style: 'bold'
+    }
+  });
+
 
 
   useEffect(() => {
@@ -86,13 +145,11 @@ const AnalyticsPage = () => {
         const dateObject = new Date(dates[index]);
         return {
           Instagram: likeCount,
-          date: dateObject,
-          TikTok: 0, 
-          Youtube: 0 
+          date: dateObject
         };
       });
 
-      setInstaChartOptions((prevOptions) => ({
+      setInstaLikesOptions((prevOptions) => ({
         ...prevOptions,
         data: dynamicData
       }));
@@ -106,43 +163,41 @@ const AnalyticsPage = () => {
     return <Spinner />;
   }
 
-
   return (
     <div className="analytics-container">
       <header className="analytics-header">
         <h1>Analytics</h1>
-      </header>
-
-      <div className="social-media-platforms">
-        <PlatformCard 
-          icon={<FaInstagram size={20} color="#E1306C" />} 
-          isSelected={selectedPlatform === "Instagram"}
-          onClick={() => handlePlatformClick("Instagram")} 
-        />
-        <PlatformCard
-          icon={<FaTiktok size={20}/>} 
-          isSelected={selectedPlatform === "TikTok"}
-          onClick={() => handlePlatformClick("TikTok")} 
-        />
-        <PlatformCard
-          icon={<FaYoutube size={20} color="#FF0000"/>} 
-          isSelected={selectedPlatform === "YouTube"}
-          onClick={() => handlePlatformClick("YouTube")} 
-        />
-        <PlatformCard  
-          icon={<FaSquareXTwitter size={20} />} 
-          isSelected={selectedPlatform === "X"}
-          onClick={() => handlePlatformClick("X")} 
-        />
+        <div className="social-media-platforms">
+          <PlatformCard 
+            icon={<FaInstagram size={20} color="#E1306C" />} 
+            isSelected={selectedPlatform === "Instagram"}
+            onClick={() => handlePlatformClick("Instagram")} 
+          />
+          <PlatformCard
+            icon={<FaTiktok size={20}/>} 
+            isSelected={selectedPlatform === "TikTok"}
+            onClick={() => handlePlatformClick("TikTok")} 
+          />
+          <PlatformCard
+            icon={<FaYoutube size={20} color="#FF0000"/>} 
+            isSelected={selectedPlatform === "YouTube"}
+            onClick={() => handlePlatformClick("YouTube")} 
+          />
+          <PlatformCard  
+            icon={<FaSquareXTwitter size={20} />} 
+            isSelected={selectedPlatform === "X"}
+            onClick={() => handlePlatformClick("X")} 
+          />
+        </div>
+        </header>
+      <div className = "nonHeader">
+        <div className="analytics-charts">
+          {selectedPlatform == "Instagram" && <AgCharts options={instaLikesOptions} />}
+        </div>
+        <div className="analytics-charts">
+          {selectedPlatform == "Instagram" && <AgCharts options={instaViewsOptions} />}
+        </div>
       </div>
-
-      <div className="analytics-charts">
-            <AgCharts options={instaChartOptions} />
-      </div>
-
-      {/* <div className="demographics">
-        <h3>Demographics</h3>
-      </div> */}
     </div>
   );
 };
@@ -154,7 +209,6 @@ const PlatformCard = ({ icon, isSelected, onClick }) => {
       onClick={onClick}
     >
       {icon}
-      {/* <h3>{platform}</h3> */}
     </div>
   );
 };
