@@ -8,6 +8,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getUser } from '../features/authSlice';
 import { setInstagram } from '../features/authSlice';
+import sha256 from 'crypto-js/sha256'
+import hex from 'crypto-js/enc-hex'
+import instaService from '../features/instaService';
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -56,6 +59,36 @@ const Profile = () => {
       });
     };
 
+    function generateRandomString(length) {
+      var result = '';
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+    
+    const buildURL = async() => {
+      // const csrfState = `${Math.random().toString(36).substring(2)}-${user.id}`;
+      // document.cookie = `csrfState=${csrfState}; HttpOnly; path=/; secure; samesite=strict`;
+
+      // const code_challenge = sha256(generateRandomString(Math.random()*85 + 43)).toString(hex)
+      
+      // let url = 'https://www.tiktok.com/v2/auth/authorize/?';
+      // const redirect_uri = 'https://api.danbfrost.com:443/api/tiktokCallback/'
+      // url += `client_key=${process.env.REACT_APP_TIKTOK_CLIENT_KEY}`
+      // url += '&scope=user.info.basic,user.info.profile,user.info.stats,video.publish'
+      // url += '&response_type=code'
+      // url += `&redirect_uri=${redirect_uri}`
+      // url += `&state=${csrfState}`
+      // url += `&code_challenge=${code_challenge}`
+      // url += '&code_challenge_method=S256'
+      // return url
+      const url = await instaService.tiktokInitializeLogin()
+      window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
+    }
+
     return (
         <>
             {!isLoading ? <div className="account-page">
@@ -75,7 +108,7 @@ const Profile = () => {
                         <div className='tiktok-connect'>
                             <FaTiktok className='tiktok-icon'/>
                             <span>Tiktok</span>
-                            <button>Connect</button>
+                            <button onClick={buildURL}>Connect</button>
                         </div>
                         <div className='youtube-connect'>
                             <FaYoutube className='youtube-icon' color='red'/>

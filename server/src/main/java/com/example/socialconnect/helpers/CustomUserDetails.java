@@ -36,7 +36,7 @@ public class CustomUserDetails implements UserDetails {
     public String getEmail() {
         return email;
     }
-
+    
     public User getUser() {
         return user;
     }

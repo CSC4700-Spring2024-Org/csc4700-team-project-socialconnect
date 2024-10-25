@@ -1,11 +1,19 @@
 package com.example.socialconnect.services;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,6 +29,7 @@ import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.GenericIDDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
 import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.AccessTokenRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,6 +37,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class InstagramService {
     @Autowired
     FileUploadService fileUploadService;
+
+    @Autowired
+    UserService userService;
+
+    @Value("${tiktok.key}")
+    private String tiktokClientKey;
+
+    @Value("${tiktok.secret}")
+    private String tiktokClientSecret;
+
+    @Value("${tiktok.tokenURL}")
+    private String tiktokTokenURL;
+
+    @Value("${tiktok.redirect.uri}")
+    private String tiktokRedirectURI;
 
     public Object getInstagramInfo(String accessToken) {
         try {
@@ -203,6 +227,57 @@ public class InstagramService {
             dto.setCode(errorCode);
             System.out.println(dto.getError());
             
+            return dto;
+        }
+    }
+
+    public Object tiktokCallback(String code, String state) {
+        System.out.println("CODE:" + code);
+        try {
+            String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8.name());
+            RestTemplate restTemplate = new RestTemplate();
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("client_key", tiktokClientKey);
+            params.add("client_secret", tiktokClientSecret);
+            params.add("code", decodedCode);
+            params.add("grant_type", "authorization_code");
+            params.add("redirect_uri", tiktokRedirectURI);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
+            System.out.println(headers);
+            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
+            System.out.println(entity);
+
+            AccessTokenRequestDTO accessTokenResponse = restTemplate.postForObject(tiktokTokenURL, entity, AccessTokenRequestDTO.class);
+            System.out.println(accessTokenResponse);
+            if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
+                userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), Long.parseLong(state.split("-")[1]));
+            } else {
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error getting TikTok access token");
+                return dto;
+            }
+
+            if (accessTokenResponse.getError_description() != null) {
+                return accessTokenResponse.getError_description();
+            }
+            return accessTokenResponse;
+        } catch (Exception e) {
+            ErrorDTO dto = new ErrorDTO();
+            String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode;
+            try {
+                 jsonNode = objectMapper.readTree(jsonPart);
+            } catch (Exception e2) {
+                return e2;
+            }
+
+            String errorMessage = jsonNode.path("error_description").asText();
+            dto.setError(errorMessage);
             return dto;
         }
     }

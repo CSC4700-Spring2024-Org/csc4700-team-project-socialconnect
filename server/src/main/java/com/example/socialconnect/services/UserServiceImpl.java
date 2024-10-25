@@ -91,6 +91,12 @@ public class UserServiceImpl implements UserService {
         }
         
     }
+
+    @Override
+    public void updateTiktok(String accessToken, String refreshToken, Long id) {
+        userRepository.updateTiktok(accessToken, refreshToken, id);
+    }
+
     @Override
     public void sendVerificationEmail(User user, String siteURL)
         throws MessagingException, UnsupportedEncodingException {
