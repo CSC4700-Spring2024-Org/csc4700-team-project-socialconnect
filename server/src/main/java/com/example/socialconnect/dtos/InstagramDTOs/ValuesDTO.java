@@ -1,7 +1,5 @@
 package com.example.socialconnect.dtos.InstagramDTOs;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BusinessWithCommentsDTO {
-    private List<InsightsDTO> insights;
-    private BusinessDiscoveryListDTO business_discovery;
-    private List<CommentDTO> comments;
+public class ValuesDTO 
+{
+    private int value;
 }

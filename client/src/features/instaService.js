@@ -5,7 +5,7 @@ const getInstaProfile = async (token) => {
     if (res.data.error) {
         return res.data
     }
-    return {page: res.data.business_discovery, comments: res.data.comments}
+    return {page: res.data.business_discovery, comments: res.data.comments, insights: res.data.insights}
 }
 
 const createInstagramPost = async(token, postData) => {

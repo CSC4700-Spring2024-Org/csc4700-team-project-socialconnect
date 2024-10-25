@@ -5,6 +5,7 @@ import { setInstagram } from './authSlice';
 const initialState = {
     instaPage: null,
     comments: null,
+    insights: null,
     isErrorInsta: false,
     isSuccessInsta: false,
     isLoadingInsta: false,
@@ -74,6 +75,7 @@ export const instaSlice = createSlice({
           state.isSuccessInsta = true
           state.instaPage = action.payload.page
           state.comments = action.payload.comments
+          state.insights = action.payload.insights
           state.isLoadingInsta = false
         })
         .addCase(getInstaProfile.rejected, (state, action) => {

@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BusinessWithCommentsDTO {
-    private List<InsightsDTO> insights;
-    private BusinessDiscoveryListDTO business_discovery;
-    private List<CommentDTO> comments;
+public class InsightsResponseDTO {
+    private List<InsightsDTO> data; 
 }
