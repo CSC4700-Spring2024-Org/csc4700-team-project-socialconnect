@@ -55,7 +55,9 @@ html, body {
 }
 
 .nonHeader {
+  flex-grow: 1;
   overflow-y: auto; 
   overflow-x: hidden; 
   scrollbar-width: none;
+  padding-bottom: 80px;
 }
