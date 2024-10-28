@@ -12,7 +12,14 @@ const AnalyticsPage = () => {
   const { user, isLoading } = useSelector((state) => state.auth);
 
 
-  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [selectedPlatforms, setSelectedPlatforms] = useState(["Instagram"]);
+  
+  const platformColors = {
+    Instagram: '#FF69B4', 
+    TikTok: 'black',      
+    YouTube: 'red',       
+    X: '#1DA1F2'          
+  };
 
   const handlePlatformClick = (platform) => {
     setSelectedPlatforms((prevSelected) => {
