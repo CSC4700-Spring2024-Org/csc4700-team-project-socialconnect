@@ -37,15 +37,18 @@ const AnalyticsPage = () => {
 
   const generateLikesData = () => {
     if (!isLoadingInsta && instaPage) {
-      const likeCounts = instaPage.business_discovery.media.data.map((media) => media.like_count);
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const last25InstaLikeCounts = instaPage.business_discovery.media.data.map((media) => media.like_count);
+      const last25InstaDates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
 
-      return likeCounts.map((likeCount, index) => ({
+      const instaLikeCounts = last25InstaLikeCounts.slice(0, 10);
+      const instaDates = last25InstaDates.slice(0, 10);
+
+      return instaLikeCounts.map((likeCount, index) => ({
         Instagram: likeCount,
         TikTok: likeCount * 2,
         YouTube: likeCount * 0.75,
         X: likeCount * 0.5,
-        date: new Date(dates[index])
+        date: new Date(instaDates[index])
       }));
     }
     return [];
