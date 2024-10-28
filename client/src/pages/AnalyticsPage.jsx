@@ -8,17 +8,11 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import '../Styles/AnalyticsPage.css';
 
 const AnalyticsPage = () => {
-  const { instaPage, isLoadingInsta } = useSelector((state) => state.insta);
+  const { instaPage, isLoadingInsta, insights } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
 
-  const [selectedPlatforms, setSelectedPlatforms] = useState(["Instagram"]);
-  
-  const platformColors = {
-    Instagram: '#FF69B4',
-    TikTok: 'black',
-    YouTube: 'red',
-    X: '#1DA1F2'
-  };
+
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
 
   const handlePlatformClick = (platform) => {
     setSelectedPlatforms((prevSelected) => {
