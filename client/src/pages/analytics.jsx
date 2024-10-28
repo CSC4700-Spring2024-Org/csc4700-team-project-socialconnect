@@ -75,24 +75,33 @@ export default function Analytics() {
   const [selectedOption, setSelectedOption] = useState('Instagram'); 
 
   useEffect(() => {
-    if (!isLoadingInsta && instaPage) {
-      const likeCounts = instaPage.business_discovery.media.data.map(media => media.like_count);
+    console.log("Insights Data:", insights); // Check if insights contains expected data structure
+    
+    if (!isLoadingInsta && insights) {
+      const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_aggregated_all_plays_count')
+      console.log(filteredArr)
+      const likeCounts = filteredArr.map(
+        media => media.values[0].value
+      );
       const dates = instaPage.business_discovery.media.data.map(media => media.timestamp);
-
+  
       const dynamicData = likeCounts.map((likeCount, index) => {
         const dateObject = new Date(dates[index]);
         return {
           Instagram: likeCount,
-          date: dateObject
+          date: dateObject,
+          TikTok: 0, 
+          Youtube: 0 
         };
       });
-
+  
       setInstaChartOptions((prevOptions) => ({
         ...prevOptions,
-        data: dynamicData
+        data: dynamicData.length ? dynamicData : [{ Instagram: 0, date: new Date(), TikTok: 0, Youtube: 0 }]
       }));
     }
-  }, [isLoadingInsta, instaPage]); 
+  }, [isLoadingInsta, insights]);
+  
 
   if (!isLoading && (user && !user.instaRefresh)) {
     return <NoAccount />;

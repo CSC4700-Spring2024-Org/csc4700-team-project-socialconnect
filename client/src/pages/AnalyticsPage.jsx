@@ -35,7 +35,7 @@ const AnalyticsPage = () => {
     });
   };
 
-  const generateGraphData = () => {
+  const generateLikesData = () => {
     if (!isLoadingInsta && instaPage) {
       const likeCounts = instaPage.business_discovery.media.data.map((media) => media.like_count);
       const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
@@ -51,7 +51,104 @@ const AnalyticsPage = () => {
     return [];
   };
 
-  const generateSeries = (platforms) => {
+  const generateViewsData = () => {
+    if (!isLoadingInsta && insights) {
+      const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_aggregated_all_plays_count')
+      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      console.log(filteredArr)
+      const likeCounts = filteredArr.map(
+        media => media.values[0].value
+      );
+      return likeCounts.map((likeCount, index) => ({
+        Instagram: likeCount,
+        TikTok: likeCount * 2,
+        YouTube: likeCount * 0.75,
+        X: likeCount * 0.5,
+        date: new Date(dates[index])
+      }));
+    }
+    return [];
+  };
+
+  const generateSharesData = () => {
+    if (!isLoadingInsta && insights) {
+      const filteredArr = insights.filter((metric) => metric.name === 'shares')
+      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      console.log(filteredArr)
+      const likeCounts = filteredArr.map(
+        media => media.values[0].value
+      );
+      return likeCounts.map((likeCount, index) => ({
+        Instagram: likeCount,
+        TikTok: likeCount * 2,
+        YouTube: likeCount * 0.75,
+        X: likeCount * 0.5,
+        date: new Date(dates[index])
+      }));
+    }
+    return [];
+  };
+
+
+  const generateLikesSeries = (platforms) => {
+    return platforms.map((platform) => ({
+      type: 'line',
+      xKey: 'date',
+      yKey: platform,
+      stroke: platformColors[platform],
+      marker: {
+        enabled: true,
+        size: 5,
+        fill: platformColors[platform]
+      },
+      tooltip: {
+        enabled: true,
+        renderer: (params) => {
+          const formattedDate = new Date(params.datum.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          return {
+            title: formattedDate,
+            content: `${params.datum[platform]} likes`,
+            backgroundColor: platformColors[platform]
+          };
+        }
+      }
+    }));
+  };
+
+  const generateViewsSeries = (platforms) => {
+    return platforms.map((platform) => ({
+      type: 'line',
+      xKey: 'date',
+      yKey: platform,
+      stroke: platformColors[platform],
+      marker: {
+        enabled: true,
+        size: 5,
+        fill: platformColors[platform]
+      },
+      tooltip: {
+        enabled: true,
+        renderer: (params) => {
+          const formattedDate = new Date(params.datum.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          return {
+            title: formattedDate,
+            content: `${params.datum[platform]} likes`,
+            backgroundColor: platformColors[platform]
+          };
+        }
+      }
+    }));
+  };
+
+  const generateSharesSeries = (platforms) => {
     return platforms.map((platform) => ({
       type: 'line',
       xKey: 'date',
@@ -87,7 +184,21 @@ const AnalyticsPage = () => {
     return <Spinner />;
   }
 
-  const graphData = generateGraphData();
+  const viewsData = generateViewsData();
+  const likesData = generateLikesData();
+  const sharesData = generateSharesData();
+
+  const graphDataMap = {
+    Likes: likesData,
+    Views: viewsData,
+    Shares: sharesData,
+  };
+
+  const graphSeriesMap = {
+    Likes: generateLikesData,
+    Views: generateViewsData,
+    Shares: generateSharesData
+  };
 
   const GraphComponent = ({ title, data, series }) => (
     <div className="analytics-charts">
@@ -156,16 +267,16 @@ const AnalyticsPage = () => {
         </div>
       </header>
       <div className="nonHeader">
-        {/* Render multiple graphs by mapping through graph types */}
-        {['Likes', 'Views', 'Shares'].map((graphType) => (
-          <GraphComponent
-            key={graphType}
-            title={graphType}
-            data={graphData}
-            series={generateSeries(selectedPlatforms)}
-          />
-        ))}
-      </div>
+  {/* Render multiple graphs by mapping through graph types */}
+  {['Likes', 'Views', 'Shares'].map((graphType) => (
+    <GraphComponent
+      key={graphType}
+      title={graphType}
+      data={graphDataMap[graphType]} 
+      series={graphSeriesMap(selectedPlatforms)}
+    />
+  ))}
+</div>
     </div>
   );
 };
