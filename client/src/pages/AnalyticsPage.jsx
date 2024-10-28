@@ -74,7 +74,7 @@ const AnalyticsPage = () => {
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'shares')
       const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
-      console.log(filteredArr)
+  
       const likeCounts = filteredArr.map(
         media => media.values[0].value
       );
@@ -140,7 +140,7 @@ const AnalyticsPage = () => {
           });
           return {
             title: formattedDate,
-            content: `${params.datum[platform]} likes`,
+            content: `${params.datum[platform]} views`,
             backgroundColor: platformColors[platform]
           };
         }
@@ -169,7 +169,7 @@ const AnalyticsPage = () => {
           });
           return {
             title: formattedDate,
-            content: `${params.datum[platform]} likes`,
+            content: `${params.datum[platform]} shares`,
             backgroundColor: platformColors[platform]
           };
         }
@@ -194,10 +194,14 @@ const AnalyticsPage = () => {
     Shares: sharesData,
   };
 
+  const likesSeries = generateLikesSeries(selectedPlatforms);
+  const viewsSeries = generateViewsSeries(selectedPlatforms);
+  const sharesSeries = generateSharesSeries(selectedPlatforms);
+
   const graphSeriesMap = {
-    Likes: generateLikesData,
-    Views: generateViewsData,
-    Shares: generateSharesData
+    Likes: likesSeries,
+    Views: viewsSeries,
+    Shares: sharesSeries
   };
 
   const GraphComponent = ({ title, data, series }) => (
@@ -267,16 +271,16 @@ const AnalyticsPage = () => {
         </div>
       </header>
       <div className="nonHeader">
-  {/* Render multiple graphs by mapping through graph types */}
-  {['Likes', 'Views', 'Shares'].map((graphType) => (
-    <GraphComponent
-      key={graphType}
-      title={graphType}
-      data={graphDataMap[graphType]} 
-      series={graphSeriesMap(selectedPlatforms)}
-    />
-  ))}
-</div>
+        {/* Render multiple graphs by mapping through graph types */}
+        {['Likes', 'Views', 'Shares'].map((graphType) => (
+          <GraphComponent
+            key={graphType}
+            title={graphType}
+            data={graphDataMap[graphType]} 
+            series={graphSeriesMap[graphType]}
+          />
+        ))}
+      </div>
     </div>
   );
 };
