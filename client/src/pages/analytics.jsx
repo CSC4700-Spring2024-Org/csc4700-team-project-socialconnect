@@ -64,7 +64,7 @@ export default function Analytics() {
       }
     ],
     title: {
-      text: 'Instagram Likes',
+      text: 'Instagram Views',
       fontSize: 18,
       fontFamily: 'Futura',
       color: 'black',
