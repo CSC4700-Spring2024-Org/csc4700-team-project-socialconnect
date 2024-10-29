@@ -94,9 +94,9 @@ const AnalyticsPage = () => {
       const watchTimeValues = filteredArr.map(media => media.values[0].value);
       return watchTimeValues.map((watchTime, index) => ({
         Instagram: watchTime/1000,
-        TikTok: watchTime * 1.2,
-        YouTube: watchTime * 1.5,
-        X: watchTime * 0.8,
+        TikTok: watchTime/1000 * 1.2,
+        YouTube: watchTime/1000 * 1.5,
+        X: watchTime/1000 * 0.8,
         date: new Date(dates[index])
       }));
     }
@@ -260,7 +260,7 @@ const AnalyticsPage = () => {
           });
           return {
             title: formattedDate,
-            content: `${params.datum[platform]} sec AvgWatchTime`,
+            content: `${params.datum[platform]} secs`,
             backgroundColor: platformColors[platform]
           };
         }
@@ -427,11 +427,14 @@ const AnalyticsPage = () => {
     </div>
   );
 
-  const PlatformCard = ({ icon, isSelected, onClick }) => {
+  const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
+    const color = platformColors[platform];
+    
     return (
       <div 
         className={`platform-card ${isSelected ? 'selected' : ''}`} 
         onClick={onClick}
+        style = {{color}}
       >
         {icon}
       </div>
@@ -443,10 +446,10 @@ const AnalyticsPage = () => {
       <header className="analytics-header">
         <h1>Analytics</h1>
         <div className="social-media-platforms">
-          <PlatformCard icon={<FaInstagram />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-          <PlatformCard icon={<FaTiktok />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard icon={<FaYoutube />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard icon={<FaSquareXTwitter />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20}/>} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+          <PlatformCard icon={<FaSquareXTwitter size={20}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
         </div>
       </header>
       <div className="nonHeader">

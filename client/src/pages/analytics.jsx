@@ -21,15 +21,12 @@ export default function Analytics() {
       {
         type: 'time',
         position: 'bottom',
-        // label: {
-        //   format: '%b'
-        // }
       },
       {
         type: 'number',
         position: 'left',
         title: { 
-          text: 'Likes',
+          text: 'Views',
           color: 'black'
         }, 
       }
@@ -56,7 +53,7 @@ export default function Analytics() {
             });
             return {
               title: formattedDate,
-              content: `${params.datum.Instagram} likes`,
+              content: `${params.datum.Instagram} views`,
               backgroundColor: '#FF69B4'
             };
           }
