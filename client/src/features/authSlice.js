@@ -42,18 +42,6 @@ export const getUser = createAsyncThunk('auth/getUser', async (thunkAPI) => {
     }
 })
 
-export const refreshToken = createAsyncThunk('auth/refreshToken', async (thunkAPI) => {
-    try {
-        return await authService.refreshToken();
-    } catch (error) {
-        const message =
-            (error.response && error.response.data && error.response.data.message) ||
-            error.message ||
-            error.message.toString()
-        return thunkAPI.rejectWithValue(message)
-    }
-})
-
 export const logout = createAsyncThunk('auth/logout', async (thunkAPI) => {
   try {
     return await authService.logout();
@@ -122,18 +110,6 @@ export const authSlice = createSlice({
           state.isError = true
           state.message = action.payload
           state.user = null
-        })
-        .addCase(refreshToken.pending, (state) => {
-          state.isLoading = true
-        })
-        .addCase(refreshToken.fulfilled, (state, action) => {
-          state.isLoading = false
-          state.isSuccess = true
-        })
-        .addCase(refreshToken.rejected, (state, action) => {
-          state.isLoading = false
-          state.isError = true
-          state.message = action.payload
         })
         .addCase(getUser.pending, (state) => {
           state.isLoading = true

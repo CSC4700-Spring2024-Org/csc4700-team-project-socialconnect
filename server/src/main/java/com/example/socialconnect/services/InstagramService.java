@@ -6,14 +6,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -232,26 +237,30 @@ public class InstagramService {
     }
 
     public Object tiktokCallback(String code, String state) {
-        System.out.println("CODE:" + code);
         try {
             String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8.name());
-            RestTemplate restTemplate = new RestTemplate();
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("client_key", tiktokClientKey);
-            params.add("client_secret", tiktokClientSecret);
-            params.add("code", decodedCode);
-            params.add("grant_type", "authorization_code");
-            params.add("redirect_uri", tiktokRedirectURI);
+            URIBuilder builder = new URIBuilder(tiktokTokenURL); 
+            HttpPost post = new HttpPost(builder.build());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
-            System.out.println(headers);
-            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
-            System.out.println(entity);
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("code", decodedCode));
+            urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            urlParameters.add(new BasicNameValuePair("client_key", tiktokClientKey));
+            urlParameters.add(new BasicNameValuePair("client_secret", tiktokClientSecret));
+            urlParameters.add(new BasicNameValuePair("redirect_uri", tiktokRedirectURI));
 
-            AccessTokenRequestDTO accessTokenResponse = restTemplate.postForObject(tiktokTokenURL, entity, AccessTokenRequestDTO.class);
-            System.out.println(accessTokenResponse);
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+            System.out.println(httpResponse);
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            AccessTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, AccessTokenRequestDTO.class);
+
             if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
                 userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), Long.parseLong(state.split("-")[1]));
             } else {
@@ -265,19 +274,52 @@ public class InstagramService {
             }
             return accessTokenResponse;
         } catch (Exception e) {
+            System.out.println(e);
             ErrorDTO dto = new ErrorDTO();
-            String jsonPart = e.getMessage().substring(e.getMessage().indexOf("{"), e.getMessage().lastIndexOf("}") + 1);
+            dto.setError("Something went wrong logging in. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object refreshTiktokToken(String refreshToken, Long userID) {
+        try {
+            URIBuilder builder = new URIBuilder(tiktokTokenURL); 
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            urlParameters.add(new BasicNameValuePair("client_key", tiktokClientKey));
+            urlParameters.add(new BasicNameValuePair("client_secret", tiktokClientSecret));
+            urlParameters.add(new BasicNameValuePair("refresh_token", refreshToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+            System.out.println(httpResponse);
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode;
-            try {
-                 jsonNode = objectMapper.readTree(jsonPart);
-            } catch (Exception e2) {
-                return e2;
+            AccessTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, AccessTokenRequestDTO.class);
+
+            if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
+                userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), userID);
+            } else {
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error getting TikTok access token");
+                return dto;
             }
 
-            String errorMessage = jsonNode.path("error_description").asText();
-            dto.setError(errorMessage);
+            if (accessTokenResponse.getError_description() != null) {
+                return accessTokenResponse.getError_description();
+            }
+            return accessTokenResponse;
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging in. Please try again later");
             return dto;
         }
     }

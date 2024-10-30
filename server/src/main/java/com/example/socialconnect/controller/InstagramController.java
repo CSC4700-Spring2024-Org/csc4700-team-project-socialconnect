@@ -1,6 +1,8 @@
 package com.example.socialconnect.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.socialconnect.dtos.InstagramDTOs.CommentDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
@@ -72,17 +75,19 @@ public class InstagramController {
         for (int i = 0; i < characters.length(); i++) {
             result += characters.charAt((int)(Math.floor(Math.random() * characters.length())));
         }
+        try {
+            String url = UriComponentsBuilder.fromHttpUrl("https://www.tiktok.com/v2/auth/authorize/")
+            .queryParam("client_key", URLEncoder.encode(tiktokClientKey, StandardCharsets.UTF_8.toString()))
+            .queryParam("scope", URLEncoder.encode("user.info.basic,user.info.profile,user.info.stats,video.publish,video.list", StandardCharsets.UTF_8.toString()))
+            .queryParam("response_type", URLEncoder.encode("code", StandardCharsets.UTF_8.toString()))
+            .queryParam("redirect_uri", URLEncoder.encode(tiktokRedirectURI, StandardCharsets.UTF_8.toString()))
+            .queryParam("state", URLEncoder.encode(csrfState, StandardCharsets.UTF_8.toString()))
+            .queryParam("code_challenge", URLEncoder.encode(result, StandardCharsets.UTF_8.toString()))
+            .queryParam("code_challenge_method", URLEncoder.encode("S256", StandardCharsets.UTF_8.toString()))
+            .build(false)
+            .toUriString();
 
-        String url = "https://www.tiktok.com/v2/auth/authorize/?";
-        url += "client_key=" + tiktokClientKey;
-        url += "&scope=user.info.basic,user.info.profile,user.info.stats,video.publish";
-        url += "&response_type=code";
-        url += "&redirect_uri=" + tiktokRedirectURI;
-        url += "&state=" + csrfState;
-        url += "&code_challenge=" + result;
-        url += "&code_challenge_method=S256";
-
-        ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("csrfState", csrfState)
+            ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("csrfState", csrfState)
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")
@@ -94,13 +99,14 @@ public class InstagramController {
         }
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
         return ResponseEntity.ok(url);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error generating login URL");
+        }
     }
 
     @GetMapping("/tiktokCallback/")
     public ResponseEntity<?> tiktokCallback(@RequestParam("code") String code, @RequestParam("state") String state, HttpServletRequest request, HttpServletResponse response) throws IOException{
-        System.out.println("HELLO!!!!!!!!!");
         String csrfStateFromCookie = getCSRFStateFromCookie(request);
-        System.out.println(csrfStateFromCookie);
 
         if (csrfStateFromCookie != null && csrfStateFromCookie.equals(state)) {
             response.sendRedirect("https://danbfrost.com/profile");
