@@ -49,18 +49,18 @@ public class InstagramController {
     private String cookieDomain;
 
     @GetMapping("/instagramProfile")
-    public ResponseEntity<?> getInstagramProfile(@RequestParam String token) {
-        return ResponseEntity.ok(instagramService.getInstagramInfo(token));
+    public ResponseEntity<?> getInstagramProfile() {
+        return ResponseEntity.ok(instagramService.getSocialsInfo());
     }
 
     @PostMapping("/createInstagramPost")
-    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile file, @RequestParam String token) {
-        return ResponseEntity.ok(instagramService.createInstagramPost(postDTO, file, token));
+    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(instagramService.createInstagramPost(postDTO, file));
     }
 
     @PostMapping("/replyInstagram")
-    public ResponseEntity<?> replyInstagram(@RequestBody CommentDTO commentDTO, @RequestParam String token) {
-        return ResponseEntity.ok(instagramService.replyComment(token, commentDTO));
+    public ResponseEntity<?> replyInstagram(@RequestBody CommentDTO commentDTO) {
+        return ResponseEntity.ok(instagramService.replyComment(commentDTO));
     }
 
     @GetMapping("/tiktokInitializeLogin")

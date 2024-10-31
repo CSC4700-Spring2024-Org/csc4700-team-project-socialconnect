@@ -4,6 +4,7 @@ import { setInstagram } from './authSlice';
 
 const initialState = {
     instaPage: null,
+    tiktokPage: null,
     comments: null,
     isErrorInsta: false,
     isSuccessInsta: false,
@@ -16,7 +17,7 @@ export const getInstaProfile = createAsyncThunk(
     'insta/profile',
     async (user, thunkAPI) => {
         try {
-            const res = await instaService.getInstaProfile(user.instaRefresh)
+            const res = await instaService.getInstaProfile()
             if (res.error) {
               if (res.code === 190) {
                 thunkAPI.dispatch(setInstagram("None"))
@@ -39,7 +40,7 @@ export const replyInstagram = createAsyncThunk(
     'insta/replyComment',
     async (replyData, thunkAPI) => {
       try {
-          const res = await instaService.replyInstagram(replyData.user.instaRefresh, replyData.replyData)
+          const res = await instaService.replyInstagram(replyData.replyData)
           if (res.error) {
             return thunkAPI.rejectWithValue(res.error)
           }
@@ -72,7 +73,8 @@ export const instaSlice = createSlice({
         })
         .addCase(getInstaProfile.fulfilled, (state, action) => {
           state.isSuccessInsta = true
-          state.instaPage = action.payload.page
+          state.instaPage = action.payload.instaPage
+          state.tiktokPage = action.payload.tiktokPage
           state.comments = action.payload.comments
           state.isLoadingInsta = false
         })

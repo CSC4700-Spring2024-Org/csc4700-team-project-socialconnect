@@ -4,7 +4,9 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -18,12 +20,18 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.socialconnect.dtos.ErrorDTO;
+import com.example.socialconnect.dtos.SocialsResponse;
 import com.example.socialconnect.dtos.InstagramDTOs.AccountDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessDiscoveryListDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessWithCommentsDTO;
@@ -35,6 +43,8 @@ import com.example.socialconnect.dtos.InstagramDTOs.GenericIDDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
 import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.AccessTokenRequestDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.VideosListDTO;
+import com.example.socialconnect.helpers.CustomUserDetails;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,7 +68,39 @@ public class InstagramService {
     @Value("${tiktok.redirect.uri}")
     private String tiktokRedirectURI;
 
-    public Object getInstagramInfo(String accessToken) {
+    public Object getSocialsInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        String instaAccessToken = userDetail.getUser().getInstaRefresh();
+        String tiktokAccessToken = userDetail.getUser().getTiktokAccess(); 
+
+        if (tiktokAccessToken == null && instaAccessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your social media accounts");
+            return dto;
+        }
+
+        SocialsResponse socialsRes = new SocialsResponse();
+        if (instaAccessToken != null) {
+            Object instaInfo = getInstagramInfo(instaAccessToken);
+            if (instaInfo.getClass() == ErrorDTO.class) {
+                System.out.println("Something went wrong getting Instagram information");
+            } else {
+                socialsRes.setInstaResponse((BusinessWithCommentsDTO)instaInfo);
+            }
+        }
+        if (tiktokAccessToken != null) {
+            Object tiktokInfo = getTiktokInfo(tiktokAccessToken);
+            if (tiktokInfo.getClass() == ErrorDTO.class) {
+                System.out.println("Something went wrong getting TikTok information");
+            } else {
+                socialsRes.setTiktokResponse((VideosListDTO)tiktokInfo);
+            }
+        }
+        return socialsRes;
+    }
+
+    private Object getInstagramInfo(String accessToken) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://graph.facebook.com/v19.0/me/accounts?access_token="+accessToken;
@@ -117,7 +159,41 @@ public class InstagramService {
         }
     }
 
-    public Object createInstagramPost(CreatePostDTO postDTO, MultipartFile file, String accessToken) {
+    private Object getTiktokInfo(String accessToken) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://open.tiktokapis.com/v2/video/list/?fields=video_description,embed_link,like_count,comment_count,share_count,view_count,id,create_time";
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+            URI uri = builder.build().toUri();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            
+            Map<String, Object> bodyParams = new HashMap<>();
+            bodyParams.put("max_count", 20);
+            org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
+
+            ResponseEntity<VideosListDTO> response = restTemplate.exchange(uri, HttpMethod.POST, entity, VideosListDTO.class);
+            VideosListDTO tiktokVideos = response.getBody();
+
+            return tiktokVideos;
+        } catch(Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong fetching tiktok videos");
+            return dto;
+        }
+    }
+
+    public Object createInstagramPost(CreatePostDTO postDTO, MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = userDetail.getUser().getInstaRefresh();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your Instagram account");
+            return dto;
+        }
         try {
             String postUrl = "https://posts.danbfrost.com/" + fileUploadService.uploadFile(file);
 
@@ -198,8 +274,15 @@ public class InstagramService {
         }
     }
 
-    public Object replyComment(String accessToken, CommentDTO commentDTO) {
-        System.out.println(commentDTO.getId() + " " + commentDTO.getText());
+    public Object replyComment(CommentDTO commentDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = userDetail.getUser().getInstaRefresh();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your Instagram account");
+            return dto;
+        }
         try {
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://graph.facebook.com/v19.0/" + commentDTO.getId() + "/replies?message=" + commentDTO.getText() +"&access_token="+accessToken;

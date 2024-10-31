@@ -1,7 +1,5 @@
 package com.example.socialconnect.dtos;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,10 +12,9 @@ import lombok.ToString;
 public class UserResponse {
     private Long id;
     private String username;
-    private Date instaDate;
-    private String instaRefresh;
+    private Boolean instagramConnected;
     private String email;
     private String verificationCode;
     private Boolean enabled;
-
+    private Boolean tiktokConnected;
 }

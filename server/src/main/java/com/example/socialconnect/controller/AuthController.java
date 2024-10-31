@@ -129,32 +129,6 @@ public class AuthController {
         }
         return ResponseEntity.ok().body(null);
         
-        // RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
-        // String accessToken = jwtService.generateToken(userRequest.getUsername());
-        // // set accessToken to cookie header
-        // ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
-        //     .httpOnly(true)
-        //     .secure(true)
-        //     .sameSite("None")
-        //     .path("/")
-        //     .maxAge(cookieExpiry);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-
-        // response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
-        // ResponseCookie.ResponseCookieBuilder refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
-        //         .httpOnly(true)
-        //         .secure(true)
-        //         .sameSite("None")
-        //         .path("/")
-        //         .maxAge(cookieExpiry * 12 * 24 * 30);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-        // response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
-        // userRequest.setPassword(null);
-        // return ResponseEntity.ok(userResponse);
     }
 
     @GetMapping("/verify")

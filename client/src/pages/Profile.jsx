@@ -61,14 +61,24 @@ const Profile = () => {
       const url = await instaService.tiktokInitializeLogin()
       const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
 
-      window.addEventListener("message", (event) => {
-        console.log(event)
-        console.log(event.data)
-        if (event.origin === "https://danbfrost.com" && !event.data.error) {
-          console.log("HELLO")
-          loginWindow.close()
-        }
-    });
+      
+      // window.addEventListener("message", (event) => {
+      //   console.log(event)
+      //   console.log(event.data)
+      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
+      //     console.log("HELLO")
+      //     loginWindow.close()
+      //   }
+      // });
+
+      // loginWindow.addEventListener("message", (event) => {
+      //   console.log(event)
+      //   console.log(event.data)
+      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
+      //     console.log("HELLO")
+      //     loginWindow.close()
+      //   }
+      // });
     }
 
     return (
@@ -84,7 +94,7 @@ const Profile = () => {
                         <div className='instagram-connect'>
                             <FaInstagram className='insta-icon' color='#ff00ff'/>
                             <span>Instagram</span>
-                            {!user || (user && !user.instaRefresh) ? <button onClick={logInToFB}>Connect</button> :
+                            {!user || (user && !user.instagramConnected) ? <button onClick={logInToFB}>Connect</button> :
                               <button onClick={logOutOfFB}>Logout</button>}
                         </div>
                         <div className='tiktok-connect'>
