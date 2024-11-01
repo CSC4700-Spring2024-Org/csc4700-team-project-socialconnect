@@ -90,7 +90,7 @@ public class InstagramService {
             }
         }
         if (tiktokAccessToken != null) {
-            Object tiktokInfo = getTiktokInfo(tiktokAccessToken);
+            Object tiktokInfo = getTiktokInfo(tiktokAccessToken, userDetail.getUser().getTiktokRefresh(), userDetail.getUser().getId());
             if (tiktokInfo.getClass() == ErrorDTO.class) {
                 System.out.println("Something went wrong getting TikTok information");
             } else {
@@ -159,30 +159,46 @@ public class InstagramService {
         }
     }
 
-    private Object getTiktokInfo(String accessToken) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://open.tiktokapis.com/v2/video/list/?fields=video_description,embed_link,like_count,comment_count,share_count,view_count,id,create_time";
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
-            URI uri = builder.build().toUri();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + accessToken);
-            
-            Map<String, Object> bodyParams = new HashMap<>();
-            bodyParams.put("max_count", 20);
-            org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
-
-            ResponseEntity<VideosListDTO> response = restTemplate.exchange(uri, HttpMethod.POST, entity, VideosListDTO.class);
-            VideosListDTO tiktokVideos = response.getBody();
-
-            return tiktokVideos;
-        } catch(Exception e) {
-            System.out.println(e);
-            ErrorDTO dto = new ErrorDTO();
-            dto.setError("Something went wrong fetching tiktok videos");
-            return dto;
+    private Object getTiktokInfo(String accessToken, String refreshToken, Long id) {
+        String url = "https://open.tiktokapis.com/v2/video/list/?fields=video_description,embed_link,like_count,comment_count,share_count,view_count,id,create_time";
+        URI uri = UriComponentsBuilder.fromUriString(url).build().toUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+    
+        Map<String, Object> bodyParams = new HashMap<>();
+        bodyParams.put("max_count", 20);
+        org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
+    
+        // Attempt to fetch TikTok videos
+        Object result = fetchTiktokVideos(uri, entity);
+        if (result instanceof VideosListDTO && ((VideosListDTO)result).getData() != null) {
+            return result;
         }
+    
+
+        if (result instanceof ErrorDTO || "access_token_invalid".equals(((VideosListDTO)result).getError().getCode())) {
+            refreshTiktokToken(refreshToken, id);
+            result = fetchTiktokVideos(uri, entity);
+        }
+    
+        return result instanceof VideosListDTO ? result : handleError("Something went wrong fetching TikTok page");
+    }
+    
+    private Object fetchTiktokVideos(URI uri, org.springframework.http.HttpEntity<Map<String, Object>> entity) {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            ResponseEntity<VideosListDTO> response = restTemplate.exchange(uri, HttpMethod.POST, entity, VideosListDTO.class);
+            return response.getBody();
+        } catch (Exception e) {
+            System.out.println(e);
+            return handleError("Something went wrong fetching TikTok page");
+        }
+    }
+    
+    private ErrorDTO handleError(String message) {
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setError(message);
+        return errorDTO;
     }
 
     public Object createInstagramPost(CreatePostDTO postDTO, MultipartFile file) {

@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VideosListDTO {
-    private DataDTO data;
-    private TiktokErrorDTO error;
+public class TiktokErrorDTO {
+    private String code;
+    private String message;
+    private String log_id;
 }
