@@ -44,7 +44,7 @@ const Post = () => {
         formData.append('file', files[0]);
         formData.append('post', new Blob([JSON.stringify({urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})], { type: 'application/json' }));
 
-        const res = await instaService.createInstagramPost(user.instaRefresh, formData)
+        const res = await instaService.createInstagramPost(formData)
 
         if (res.data.error) {
           toast(res.data.error)

@@ -15,6 +15,8 @@ public interface UserService {
 
     String updateInstagram(String token);
 
+    void updateTiktok(String accessToken, String refreshToken, Long id);
+
     void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
     boolean verify(String verificationCode);

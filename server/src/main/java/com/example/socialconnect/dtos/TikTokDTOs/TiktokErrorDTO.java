@@ -1,4 +1,4 @@
-package com.example.socialconnect.dtos;
+package com.example.socialconnect.dtos.TikTokDTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ErrorDTO {
-    private String error;
-    private String error_description;
-    private int code;
+public class TiktokErrorDTO {
+    private String code;
+    private String message;
+    private String log_id;
 }

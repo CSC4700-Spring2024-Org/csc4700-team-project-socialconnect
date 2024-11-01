@@ -9,7 +9,9 @@ import com.example.socialconnect.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -69,6 +71,12 @@ public class UserServiceImpl implements UserService {
         UserDetails userDetail = (UserDetails) authentication.getPrincipal();
         String usernameFromAccessToken = userDetail.getUsername();
         User user = userRepository.findByUsername(usernameFromAccessToken);
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+        modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+            mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+            mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+        });
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return userResponse;
     }
@@ -91,6 +99,12 @@ public class UserServiceImpl implements UserService {
         }
         
     }
+
+    @Override
+    public void updateTiktok(String accessToken, String refreshToken, Long id) {
+        userRepository.updateTiktok(accessToken, refreshToken, id);
+    }
+
     @Override
     public void sendVerificationEmail(User user, String siteURL)
         throws MessagingException, UnsupportedEncodingException {

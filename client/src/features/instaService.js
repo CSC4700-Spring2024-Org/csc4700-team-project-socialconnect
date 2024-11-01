@@ -1,15 +1,15 @@
 import axios from 'axios'
 
-const getInstaProfile = async (token) => {
-    const res = await axios.get(`http://localhost:8080/api/instagramProfile?token=${token}`)
+const getInstaProfile = async () => {
+    const res = await axios.get(`http://localhost:8080/api/instagramProfile`)
     if (res.data.error) {
         return res.data
     }
-    return {page: res.data.business_discovery, comments: res.data.comments}
+    return {instaPage: res.data.instaResponse.business_discovery, comments: res.data.instaResponse.comments, tiktokPage: res.data.tiktokResponse.data.videos}
 }
 
-const createInstagramPost = async(token, postData) => {
-    const res = await axios.post(`http://localhost:8080/api/createInstagramPost?token=${token}`, postData, {
+const createInstagramPost = async(postData) => {
+    const res = await axios.post(`http://localhost:8080/api/createInstagramPost`, postData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -17,15 +17,21 @@ const createInstagramPost = async(token, postData) => {
     return res
 }
 
-const replyInstagram = async(token, replyData) => {
-    const res = await axios.post(`http://localhost:8080/api/replyInstagram?token=${token}`, replyData)
+const replyInstagram = async(replyData) => {
+    const res = await axios.post(`http://localhost:8080/api/replyInstagram`, replyData)
     return {oldID: replyData.id, newComment:res.data}
+}
+
+const tiktokInitializeLogin = async() => {
+    const res = await axios.get('http://localhost:8080/api/tiktokInitializeLogin')
+    return res.data
 }
 
 const instaService = {
     getInstaProfile,
     createInstagramPost,
-    replyInstagram
+    replyInstagram,
+    tiktokInitializeLogin
 }
 
 export default instaService;

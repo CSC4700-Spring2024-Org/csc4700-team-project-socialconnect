@@ -40,4 +40,9 @@ public class User {
     @Column(name="ENABLED")
     private boolean enabled;
 
+    @Column(name="TIKTOK_ACCESS")
+    private String tiktokAccess;
+
+    @Column(name="TIKTOK_REFRESH")
+    private String tiktokRefresh;
 }

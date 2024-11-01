@@ -7,10 +7,10 @@ import './instaFeeds.css'
 import Spinner from '../components/Spinner'
 
 const Chart = () => {
-  const { instaPage, isLoadingInsta } = useSelector((state) => state.insta)
+  const { instaPage, isLoadingInsta, tiktokPage } = useSelector((state) => state.insta)
   const { user, isLoading } = useSelector((state) => state.auth);
   
-  if (!isLoading && (user && !user.instaRefresh)) {
+  if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
     return <NoAccount />
   }
 

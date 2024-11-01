@@ -64,9 +64,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response){
-        System.out.println("hello");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
-        System.out.println("AUTHENTICATION DONE");
         if(authentication.isAuthenticated()){
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             if(!userDetails.isEnabled())
@@ -78,7 +76,6 @@ public class AuthController {
             User user = userDetails.getUser();
             RefreshToken refreshToken = refreshTokenService.updateRefreshToken(user, authRequestDTO.getUserAgent());
             String accessToken = jwtService.generateToken(authRequestDTO.getUsername());
-            System.out.println("HERE 2");
             ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
                     .httpOnly(true)
                     .secure(true)
@@ -97,7 +94,7 @@ public class AuthController {
                     .path("/")
                     .maxAge(cookieExpiry * 12 * 24 * 30);
             if (!cookieDomain.equals("localhost")) {
-                cookie.domain(cookieDomain);
+                refreshCookie.domain(cookieDomain);
             }
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
             user.setPassword(null);
@@ -132,32 +129,6 @@ public class AuthController {
         }
         return ResponseEntity.ok().body(null);
         
-        // RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
-        // String accessToken = jwtService.generateToken(userRequest.getUsername());
-        // // set accessToken to cookie header
-        // ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
-        //     .httpOnly(true)
-        //     .secure(true)
-        //     .sameSite("None")
-        //     .path("/")
-        //     .maxAge(cookieExpiry);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-
-        // response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
-        // ResponseCookie.ResponseCookieBuilder refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
-        //         .httpOnly(true)
-        //         .secure(true)
-        //         .sameSite("None")
-        //         .path("/")
-        //         .maxAge(cookieExpiry * 12 * 24 * 30);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-        // response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
-        // userRequest.setPassword(null);
-        // return ResponseEntity.ok(userResponse);
     }
 
     @GetMapping("/verify")

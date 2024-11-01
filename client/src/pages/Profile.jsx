@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getUser } from '../features/authSlice';
 import { setInstagram } from '../features/authSlice';
+import instaService from '../features/instaService';
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -55,6 +56,30 @@ const Profile = () => {
         dispatch(setInstagram(null));
       });
     };
+    
+    const buildURL = async() => {
+      const url = await instaService.tiktokInitializeLogin()
+      const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
+
+      
+      // window.addEventListener("message", (event) => {
+      //   console.log(event)
+      //   console.log(event.data)
+      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
+      //     console.log("HELLO")
+      //     loginWindow.close()
+      //   }
+      // });
+
+      // loginWindow.addEventListener("message", (event) => {
+      //   console.log(event)
+      //   console.log(event.data)
+      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
+      //     console.log("HELLO")
+      //     loginWindow.close()
+      //   }
+      // });
+    }
 
     return (
         <>
@@ -69,13 +94,13 @@ const Profile = () => {
                         <div className='instagram-connect'>
                             <FaInstagram className='insta-icon' color='#ff00ff'/>
                             <span>Instagram</span>
-                            {!user || (user && !user.instaRefresh) ? <button onClick={logInToFB}>Connect</button> :
+                            {!user || (user && !user.instagramConnected) ? <button onClick={logInToFB}>Connect</button> :
                               <button onClick={logOutOfFB}>Logout</button>}
                         </div>
                         <div className='tiktok-connect'>
                             <FaTiktok className='tiktok-icon'/>
                             <span>Tiktok</span>
-                            <button>Connect</button>
+                            <button onClick={buildURL}>Connect</button>
                         </div>
                         <div className='youtube-connect'>
                             <FaYoutube className='youtube-icon' color='red'/>
