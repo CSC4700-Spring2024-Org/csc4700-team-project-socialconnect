@@ -53,18 +53,36 @@ const AnalyticsPage = () => {
   };
 
   const generateViewsData = () => {
-    if (!isLoadingInsta && insights) {
+    let res = [];
+    if (!isLoadingInsta && insights) 
+    {
       const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_aggregated_all_plays_count');
       const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
       
       const viewCounts = filteredArr.map(media => media.values[0].value);
-      return viewCounts.map((viewCount, index) => ({
+      res.push(...viewCounts.map((viewCount, index) => ({
         Instagram: viewCount,
-        TikTok: viewCount * 2,
-        YouTube: viewCount * 0.75,
-        X: viewCount * 0.5,
+        TikTok: null,
+        YouTube: null,
+        X: null,
         date: new Date(dates[index])
-      }));
+      })));
+    }
+    if(!isLoadingInsta && tiktokPage)
+    {
+      const tiktokViews = tiktokPage.map((video) => video.view_count)
+      const tiktokDates = tiktokPage.map((video) => video.create_time)
+      res.push(...tiktokViews.map((viewCount, index) => ({
+        Instagram: null,
+        TikTok: viewCount,
+        YouTube: null,
+        X: null,
+        date: new Date(tiktokDates[index] * 1000)
+      })));
+    } if(res.length > 0)
+    {
+      console.log(res)
+      return res
     }
     return [];
   };
