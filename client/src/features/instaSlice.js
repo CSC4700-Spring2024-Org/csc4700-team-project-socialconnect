@@ -6,6 +6,7 @@ const initialState = {
     instaPage: null,
     tiktokPage: null,
     comments: null,
+    insights: null,
     isErrorInsta: false,
     isSuccessInsta: false,
     isLoadingInsta: false,
@@ -76,6 +77,7 @@ export const instaSlice = createSlice({
           state.instaPage = action.payload.instaPage
           state.tiktokPage = action.payload.tiktokPage
           state.comments = action.payload.comments
+          state.insights = action.payload.insights
           state.isLoadingInsta = false
         })
         .addCase(getInstaProfile.rejected, (state, action) => {

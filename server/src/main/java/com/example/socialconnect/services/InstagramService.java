@@ -40,6 +40,8 @@ import com.example.socialconnect.dtos.InstagramDTOs.CommentResponseDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.ContainerProgressDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.GenericIDDTO;
+import com.example.socialconnect.dtos.InstagramDTOs.InsightsDTO;
+import com.example.socialconnect.dtos.InstagramDTOs.InsightsResponseDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
 import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.AccessTokenRequestDTO;
@@ -132,9 +134,19 @@ public class InstagramService {
                 commentsRes.addAll(commentRes.getData());
             }
 
+            List<InsightsDTO> insightsRes = new ArrayList<InsightsDTO>();
+            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 10); i++) {
+                url = "https://graph.facebook.com/v19.0/"+res4.getBusiness_discovery().getMedia().getData().get(i).getId()+"/insights?metric=,ig_reels_avg_watch_time,reach,saved,comments,shares,ig_reels_aggregated_all_plays_count&access_token="+accessToken;
+                builder = UriComponentsBuilder.fromUriString(url);
+                uri = builder.build().toUri();
+                InsightsResponseDTO insightRes = restTemplate.getForObject(uri, InsightsResponseDTO.class);
+                insightsRes.addAll(insightRes.getData());
+            }
+
             BusinessWithCommentsDTO overallResponse = new BusinessWithCommentsDTO();
             overallResponse.setBusiness_discovery(res4);
             overallResponse.setComments(commentsRes);
+            overallResponse.setInsights(insightsRes);
             
             return overallResponse;
         } catch (Exception e) {

@@ -42,7 +42,7 @@
 }
 
 .sidebar-toggle.expanded {
-    left: 17.25rem;
+    left: 13.25rem; /* This needs to line up with the .sidebar-span.expanded width */
     padding: 0 0.1rem 0 0;
 }
 
@@ -90,7 +90,7 @@
 
 /* Expanded State */
 .sidebar-span.expanded {
-    width: 13rem; /* Equivalent to w-52 */
+    width: 9rem; /* Equivalent to w-52 */
     margin-left: 0.75rem; /* Equivalent to ml-3 */
 }
 

@@ -1,8 +1,9 @@
 import React from 'react'
+import Calendar from './calendar.jsx';
 
 const CalendarPage = () => {
   return (
-    <div>CalendarPage</div>
+    <Calendar />
   )
 }
 
