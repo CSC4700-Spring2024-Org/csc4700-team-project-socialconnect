@@ -16,6 +16,6 @@ public class VideoDTO {
     private int view_count;
     private int comment_count;
     private int create_time;
-    private String embed_link;
+    private String share_url;
     private String id;
 }

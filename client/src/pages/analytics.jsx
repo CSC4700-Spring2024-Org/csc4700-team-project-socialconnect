@@ -11,7 +11,6 @@ import '../Styles/carousel.min.css';
 export default function Analytics() {
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
-
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');
   const [chartOptions, setChartOptions] = useState({});
@@ -25,20 +24,27 @@ export default function Analytics() {
   }, [isLoadingInsta, insights, selectedPlatform, selectedDataType]);
 
   const updateChartData = () => {
-    let filteredData, yKey, color;
+    let filteredData, yKey, color, counts, dates;
 
     switch (selectedPlatform) {
       case 'Instagram':
         filteredData = insights.filter((metric) => {
           if (selectedDataType === 'Views') return metric.name === 'ig_reels_aggregated_all_plays_count';
-          if (selectedDataType === 'Likes') return metric.name === 'likes';
           if (selectedDataType === 'Shares') return metric.name === 'shares';
         });
+        if (selectedDataType === 'Likes') {
+          counts = instaPage?.business_discovery?.media?.data.map(post => post.like_count) || []
+        } else {
+          counts = filteredData.map(item => item.values[0].value);
+        }
+        dates = instaPage?.business_discovery?.media?.data.map(media => media.timestamp) || [];
         yKey = 'Instagram';
         color = '#FF69B4';
         break;
       case 'TikTok':
-        filteredData = [];
+        const metric = selectedDataType.slice(0,selectedDataType.length-1).toLowerCase() + "_count"
+        counts = tiktokPage.map(post => post[metric])
+        dates = tiktokPage.map(post => new Date(post.create_time*1000))
         yKey = 'TikTok';
         color = '#000000';
         break;
@@ -53,9 +59,6 @@ export default function Analytics() {
         color = '#1DA1F2';
         break;
     }
-
-    const counts = filteredData.map(item => item.values[0].value);
-    const dates = instaPage?.business_discovery?.media?.data.map(media => media.timestamp) || [];
 
     const dynamicData = counts.map((count, index) => ({
       [yKey]: count,

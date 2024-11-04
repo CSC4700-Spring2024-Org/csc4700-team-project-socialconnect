@@ -34,140 +34,178 @@ const AnalyticsPage = () => {
   };
 
   const generateLikesData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && instaPage) {
-      const last25InstaLikeCounts = instaPage.business_discovery.media.data.map((media) => media.like_count);
-      const last25InstaDates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const instaLikeCounts = instaPage.business_discovery.media.data.map((media) => media.like_count);
+      const instaDates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
 
-      const instaLikeCounts = last25InstaLikeCounts.slice(0, 10);
-      const instaDates = last25InstaDates.slice(0, 10);
 
-      return instaLikeCounts.map((likeCount, index) => ({
-        Instagram: likeCount,
-        TikTok: likeCount * 2,
-        YouTube: likeCount * 0.75,
-        X: likeCount * 0.5,
-        date: new Date(instaDates[index])
-      }));
+      instaLikeCounts.forEach((likeCount, index) => {
+        const date = new Date(instaDates[index]);
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).Instagram = likeCount;
+      });
     }
-    return [];
+
+    if (!isLoadingInsta && tiktokPage) {
+      const tiktokLikes = tiktokPage.map((video) => video.like_count);
+      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+  
+      tiktokLikes.forEach((likeCount, index) => {
+        const date = tiktokDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).TikTok = likeCount;
+      });
+    }
+  
+    res = Array.from(dateMap.values());
+  
+    return res;
   };
 
   const generateViewsData = () => {
     let res = [];
-    if (!isLoadingInsta && insights) 
-    {
+    const dateMap = new Map();
+  
+    if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_aggregated_all_plays_count');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
-      
-      const viewCounts = filteredArr.map(media => media.values[0].value);
-      res.push(...viewCounts.map((viewCount, index) => ({
-        Instagram: viewCount,
-        TikTok: null,
-        YouTube: null,
-        X: null,
-        date: new Date(dates[index])
-      })));
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
+      const viewCounts = filteredArr.map((media) => media.values[0].value);
+  
+      viewCounts.forEach((viewCount, index) => {
+        const date = dates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).Instagram = viewCount;
+      });
     }
-    if(!isLoadingInsta && tiktokPage)
-    {
-      const tiktokViews = tiktokPage.map((video) => video.view_count)
-      const tiktokDates = tiktokPage.map((video) => video.create_time)
-      res.push(...tiktokViews.map((viewCount, index) => ({
-        Instagram: null,
-        TikTok: viewCount,
-        YouTube: null,
-        X: null,
-        date: new Date(tiktokDates[index] * 1000)
-      })));
-    } if(res.length > 0)
-    {
-      console.log(res)
-      return res
+  
+    if (!isLoadingInsta && tiktokPage) {
+      const tiktokViews = tiktokPage.map((video) => video.view_count);
+      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+  
+      tiktokViews.forEach((viewCount, index) => {
+        const date = tiktokDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).TikTok = viewCount;
+      });
     }
-    return [];
+  
+    res = Array.from(dateMap.values());
+  
+    return res;
   };
 
   const generateSharesData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'shares');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
       const shareCounts = filteredArr.map(media => media.values[0].value);
-      return shareCounts.map((shareCount, index) => ({
-        Instagram: shareCount,
-        TikTok: shareCount * 2,
-        YouTube: shareCount * 0.75,
-        X: shareCount * 0.5,
-        date: new Date(dates[index])
-      }));
+      shareCounts.forEach((shareCount, index) => {
+        const date = dates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).Instagram = shareCount;
+      });
     }
-    return [];
+
+    if (!isLoadingInsta && tiktokPage) {
+      const tiktokShares = tiktokPage.map((video) => video.share_count);
+      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+  
+      tiktokShares.forEach((shareCount, index) => {
+        const date = tiktokDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).TikTok = shareCount;
+      });
+    }
+  
+    res = Array.from(dateMap.values())
+    return res
   };
 
   const generateWatchTimeData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_avg_watch_time');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
       const watchTimeValues = filteredArr.map(media => media.values[0].value);
-      return watchTimeValues.map((watchTime, index) => ({
-        Instagram: watchTime/1000,
-        TikTok: watchTime/1000 * 1.2,
-        YouTube: watchTime/1000 * 1.5,
-        X: watchTime/1000 * 0.8,
-        date: new Date(dates[index])
-      }));
+      watchTimeValues.forEach((watchCount, index) => {
+        const date = dates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).Instagram = watchCount;
+      });
     }
-    return [];
+
+    res = Array.from(dateMap.values())
+    return res
   };
   const generateReachData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'reach');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
-      const watchTimeValues = filteredArr.map(media => media.values[0].value);
-      return watchTimeValues.map((watchTime, index) => ({
-        Instagram: watchTime,
-        TikTok: watchTime * 1.2,
-        YouTube: watchTime * 1.5,
-        X: watchTime * 0.8,
-        date: new Date(dates[index])
-      }));
+      const reachValues = filteredArr.map(media => media.values[0].value);
+      reachValues.forEach((reachCount, index) => {
+        const date = dates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).Instagram = reachCount;
+      });
     }
-    return [];
+    res = Array.from(dateMap.values())
+    return res
   };
   const generateSavedData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'saved');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
-      const watchTimeValues = filteredArr.map(media => media.values[0].value);
-      return watchTimeValues.map((watchTime, index) => ({
-        Instagram: watchTime,
-        TikTok: watchTime * 1.2,
-        YouTube: watchTime * 1.5,
-        X: watchTime * 0.8,
-        date: new Date(dates[index])
-      }));
+      const savesValues = filteredArr.map(media => media.values[0].value)
+      savesValues.forEach((saveCount, index) => {
+        const date = dates[index]
+        if (!dateMap.has(date)) dateMap.set(date, { date })
+        dateMap.get(date).Instagram = saveCount
+      })
     }
-    return [];
+    res = Array.from(dateMap.values())
+    return res
   };
 
   const generateCommentsData = () => {
+    let res = [];
+    const dateMap = new Map();
     if (!isLoadingInsta && insights) {
       const filteredArr = insights.filter((metric) => metric.name === 'comments');
-      const dates = instaPage.business_discovery.media.data.map((media) => media.timestamp);
+      const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
-      const watchTimeValues = filteredArr.map(media => media.values[0].value);
-      return watchTimeValues.map((watchTime, index) => ({
-        Instagram: watchTime,
-        TikTok: watchTime * 1.2,
-        YouTube: watchTime * 1.5,
-        X: watchTime * 0.8,
-        date: new Date(dates[index])
-      }));
+      const commentsValues = filteredArr.map(media => media.values[0].value);
+      commentsValues.forEach((commentCount, index) => {
+        const date = dates[index]
+        if (!dateMap.has(date)) dateMap.set(date, { date })
+        dateMap.get(date).Instagram = commentCount
+      })
     }
-    return [];
+
+    if (!isLoadingInsta && tiktokPage) {
+      const tiktokComments = tiktokPage.map((video) => video.comment_count);
+      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+  
+      tiktokComments.forEach((commentCount, index) => {
+        const date = tiktokDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).TikTok = commentCount;
+      });
+    }
+    res = Array.from(dateMap.values())
+    return res
   };
 
   const generateLikesSeries = (platforms) => {

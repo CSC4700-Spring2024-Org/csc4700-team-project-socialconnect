@@ -1,20 +1,25 @@
-/* .feedContainer {
-    width: 200px;
-    justify-content: space-around;
-    gap: 5px;
-    padding: 0px;
-    
-  } */
+.feedContainer {
+  position: relative;
+  width: 30%;
+  height: 100%;
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: hidden;
+  margin: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
 
-  .feedContainer {
-    position: relative;
-    width: 30%;
-    height: 100%;
-    display:flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: hidden; /* Enable vertical scrolling */
-    margin: 0.5rem;
+.sourceText {
+  margin: 0;
+  margin-top: 0.25rem;
+  font-family: 'Futura';
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .caption {
@@ -22,12 +27,16 @@
   bottom: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   padding: 5px;
   box-sizing: border-box;
-  pointer-events: none; /* Allows click events to pass through */
-  z-index: 1; /* Ensure the caption is above the video */
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tiktok-embed iframe {
+  height: 100%;
 }
 
 .captionButton {
@@ -39,24 +48,21 @@
   cursor: pointer;
 }
 
-
- 
-
-  .recentposts-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-  }
+.recentposts-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
   
-  .img {
-    width: 100%;
-    height: auto;
-    transition: all 100ms ease-out;
-  }
-  
-  .caption:hover {
-    transform: scale(1.24);
-  }
+.img {
+  width: 100%;
+  height: auto;
+  transition: all 100ms ease-out;
+}
+
+.caption:hover {
+  transform: scale(1.24);
+}

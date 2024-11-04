@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -70,84 +73,113 @@ public class InstagramService {
     @Value("${tiktok.redirect.uri}")
     private String tiktokRedirectURI;
 
+    private static final RestTemplate restTemplate = new RestTemplate();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(4);
+
     public Object getSocialsInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
         String instaAccessToken = userDetail.getUser().getInstaRefresh();
         String tiktokAccessToken = userDetail.getUser().getTiktokAccess(); 
-
+    
         if (tiktokAccessToken == null && instaAccessToken == null) {
-            ErrorDTO dto = new ErrorDTO();
-            dto.setError("Please connect your social media accounts");
-            return dto;
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError("Please connect your social media accounts");
+            return errorDTO;
         }
-
+    
         SocialsResponse socialsRes = new SocialsResponse();
-        if (instaAccessToken != null) {
-            Object instaInfo = getInstagramInfo(instaAccessToken);
-            if (instaInfo.getClass() == ErrorDTO.class) {
-                System.out.println("Something went wrong getting Instagram information");
-            } else {
-                socialsRes.setInstaResponse((BusinessWithCommentsDTO)instaInfo);
+    
+        CompletableFuture<Void> instaFuture = CompletableFuture.runAsync(() -> {
+            if (instaAccessToken != null) {
+                Object instaInfo = getInstagramInfo(instaAccessToken);
+                if (instaInfo instanceof ErrorDTO) {
+                    System.out.println("Error fetching Instagram data");
+                } else {
+                    socialsRes.setInstaResponse((BusinessWithCommentsDTO) instaInfo);
+                }
             }
-        }
-        if (tiktokAccessToken != null) {
-            Object tiktokInfo = getTiktokInfo(tiktokAccessToken, userDetail.getUser().getTiktokRefresh(), userDetail.getUser().getId());
-            if (tiktokInfo.getClass() == ErrorDTO.class) {
-                System.out.println("Something went wrong getting TikTok information");
-            } else {
-                socialsRes.setTiktokResponse((VideosListDTO)tiktokInfo);
+        }, executor);
+    
+        CompletableFuture<Void> tiktokFuture = CompletableFuture.runAsync(() -> {
+            if (tiktokAccessToken != null) {
+                Object tiktokInfo = getTiktokInfo(tiktokAccessToken, userDetail.getUser().getTiktokRefresh(), userDetail.getUser().getId());
+                if (tiktokInfo instanceof ErrorDTO) {
+                    System.out.println("Error fetching TikTok data");
+                } else {
+                    socialsRes.setTiktokResponse((VideosListDTO) tiktokInfo);
+                }
             }
-        }
+        }, executor);
+    
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(instaFuture, tiktokFuture);
+        combinedFuture.join();
+    
         return socialsRes;
     }
 
     private Object getInstagramInfo(String accessToken) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://graph.facebook.com/v19.0/me/accounts?access_token="+accessToken;
+            String url = "https://graph.facebook.com/v19.0/me/accounts?access_token=" + accessToken;
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             URI uri = builder.build().toUri();
             AccountDTO response = restTemplate.getForObject(uri, AccountDTO.class);
-
+    
             url = "https://graph.facebook.com/v19.0/" + response.getData().get(0).getId() + "?access_token=" + accessToken + "&fields=instagram_business_account";
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             InstaBusinessAcct res2 = restTemplate.getForObject(uri, InstaBusinessAcct.class);
-
-            url = "https://graph.facebook.com/v19.0/"+res2.getInstagram_business_account().getId()+"?fields=username&access_token="+accessToken;
+    
+            url = "https://graph.facebook.com/v19.0/" + res2.getInstagram_business_account().getId() + "?fields=username&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             CommentDTO res3 = restTemplate.getForObject(uri, CommentDTO.class);
-            
-            url = "https://graph.facebook.com/v19.0/"+res3.getId()+"?fields=business_discovery.username("+res3.getUsername()+"){username,website,name,ig_id,id,profile_picture_url,biography,follows_count,followers_count,media_count,media{id,caption,like_count,comments_count,timestamp,username,media_product_type,media_type,owner,permalink,media_url,children{media_url}}}&access_token="+accessToken;
+    
+            url = "https://graph.facebook.com/v19.0/" + res3.getId() + "?fields=business_discovery.username(" + res3.getUsername() + "){username,website,name,ig_id,id,profile_picture_url,biography,follows_count,followers_count,media_count,media{id,caption,like_count,comments_count,timestamp,username,media_product_type,media_type,owner,permalink,media_url,children{media_url}}}&access_token=" + accessToken;
             builder = UriComponentsBuilder.fromUriString(url);
             uri = builder.build().toUri();
             BusinessDiscoveryListDTO res4 = restTemplate.getForObject(uri, BusinessDiscoveryListDTO.class);
-            
-            List<CommentDTO> commentsRes = new ArrayList<CommentDTO>();
+    
+            List<CompletableFuture<List<CommentDTO>>> commentFutures = new ArrayList<>();
+            List<CompletableFuture<List<InsightsDTO>>> insightsFutures = new ArrayList<>();
+    
             for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 10); i++) {
-                url = "https://graph.facebook.com/v19.0/"+res4.getBusiness_discovery().getMedia().getData().get(i).getId()+"/comments?fields=username,text,timestamp,replies{username,text,timestamp}&access_token="+accessToken;
-                builder = UriComponentsBuilder.fromUriString(url);
-                uri = builder.build().toUri();
-                CommentResponseDTO commentRes = restTemplate.getForObject(uri, CommentResponseDTO.class);
-                commentsRes.addAll(commentRes.getData());
+                String mediaId = res4.getBusiness_discovery().getMedia().getData().get(i).getId();
+    
+                CompletableFuture<List<CommentDTO>> commentFuture = CompletableFuture.supplyAsync(() -> {
+                    String commentUrl = "https://graph.facebook.com/v19.0/" + mediaId + "/comments?fields=username,text,timestamp,replies{username,text,timestamp}&access_token=" + accessToken;
+                    UriComponentsBuilder commentBuilder = UriComponentsBuilder.fromUriString(commentUrl);
+                    URI commentUri = commentBuilder.build().toUri();
+                    CommentResponseDTO commentRes = restTemplate.getForObject(commentUri, CommentResponseDTO.class);
+                    return commentRes != null ? commentRes.getData() : new ArrayList<>();
+                });
+                commentFutures.add(commentFuture);
+    
+                CompletableFuture<List<InsightsDTO>> insightsFuture = CompletableFuture.supplyAsync(() -> {
+                    String insightsUrl = "https://graph.facebook.com/v19.0/" + mediaId + "/insights?metric=ig_reels_avg_watch_time,reach,saved,comments,shares,ig_reels_aggregated_all_plays_count&access_token=" + accessToken;
+                    UriComponentsBuilder insightsBuilder = UriComponentsBuilder.fromUriString(insightsUrl);
+                    URI insightsUri = insightsBuilder.build().toUri();
+                    InsightsResponseDTO insightRes = restTemplate.getForObject(insightsUri, InsightsResponseDTO.class);
+                    return insightRes != null ? insightRes.getData() : new ArrayList<>();
+                });
+                insightsFutures.add(insightsFuture);
             }
-
-            List<InsightsDTO> insightsRes = new ArrayList<InsightsDTO>();
-            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 10); i++) {
-                url = "https://graph.facebook.com/v19.0/"+res4.getBusiness_discovery().getMedia().getData().get(i).getId()+"/insights?metric=,ig_reels_avg_watch_time,reach,saved,comments,shares,ig_reels_aggregated_all_plays_count&access_token="+accessToken;
-                builder = UriComponentsBuilder.fromUriString(url);
-                uri = builder.build().toUri();
-                InsightsResponseDTO insightRes = restTemplate.getForObject(uri, InsightsResponseDTO.class);
-                insightsRes.addAll(insightRes.getData());
+    
+            List<CommentDTO> commentsRes = new ArrayList<>();
+            List<InsightsDTO> insightsRes = new ArrayList<>();
+    
+            for (CompletableFuture<List<CommentDTO>> commentFuture : commentFutures) {
+                commentsRes.addAll(commentFuture.join());
             }
-
+            for (CompletableFuture<List<InsightsDTO>> insightsFuture : insightsFutures) {
+                insightsRes.addAll(insightsFuture.join());
+            }
+    
             BusinessWithCommentsDTO overallResponse = new BusinessWithCommentsDTO();
             overallResponse.setBusiness_discovery(res4);
             overallResponse.setComments(commentsRes);
             overallResponse.setInsights(insightsRes);
-            
+    
             return overallResponse;
         } catch (Exception e) {
             ErrorDTO dto = new ErrorDTO();
@@ -172,7 +204,7 @@ public class InstagramService {
     }
 
     private Object getTiktokInfo(String accessToken, String refreshToken, Long id) {
-        String url = "https://open.tiktokapis.com/v2/video/list/?fields=video_description,embed_link,like_count,comment_count,share_count,view_count,id,create_time";
+        String url = "https://open.tiktokapis.com/v2/video/list/?fields=video_description,share_url,like_count,comment_count,share_count,view_count,id,create_time";
         URI uri = UriComponentsBuilder.fromUriString(url).build().toUri();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -181,23 +213,23 @@ public class InstagramService {
         bodyParams.put("max_count", 20);
         org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
     
-        // Attempt to fetch TikTok videos
         Object result = fetchTiktokVideos(uri, entity);
         if (result instanceof VideosListDTO && ((VideosListDTO)result).getData() != null) {
             return result;
         }
     
 
+        System.out.println(result instanceof ErrorDTO);
         if (result instanceof ErrorDTO || "access_token_invalid".equals(((VideosListDTO)result).getError().getCode())) {
             refreshTiktokToken(refreshToken, id);
             result = fetchTiktokVideos(uri, entity);
+            System.out.println("RESULT AFTER REFRESH: " + result);
         }
     
         return result instanceof VideosListDTO ? result : handleError("Something went wrong fetching TikTok page");
     }
     
     private Object fetchTiktokVideos(URI uri, org.springframework.http.HttpEntity<Map<String, Object>> entity) {
-        RestTemplate restTemplate = new RestTemplate();
         try {
             ResponseEntity<VideosListDTO> response = restTemplate.exchange(uri, HttpMethod.POST, entity, VideosListDTO.class);
             return response.getBody();
@@ -225,7 +257,6 @@ public class InstagramService {
         try {
             String postUrl = "https://posts.danbfrost.com/" + fileUploadService.uploadFile(file);
 
-            RestTemplate restTemplate = new RestTemplate();
             String url = "https://graph.facebook.com/v19.0/me/accounts?access_token="+accessToken;
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             URI uri = builder.build().toUri();
@@ -302,6 +333,36 @@ public class InstagramService {
         }
     }
 
+    private Object createTiktokPost(String accessToken, CreatePostDTO postDTO, String postURL) {
+        try {
+            String url = "https://open.tiktokapis.com/v2/post/publish/video/init/";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            headers.set("Content-Type","application/json; charset=UTF-8");
+        
+            Map<String, Object> postInfo = new HashMap<>();
+            postInfo.put("title", postDTO.getCaption());
+            postInfo.put("privacy_level", "MUTUAL_FOLLOW_FRIEND");
+
+            Map<String, Object> sourceInfo = new HashMap<>();
+            sourceInfo.put("source", "FILE_UPLOAD");
+
+            Map<String, Object> bodyParams = new HashMap<>();
+            bodyParams.put("post_info", postInfo);
+            bodyParams.put("source_info", sourceInfo);
+
+            org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
+            //TODO: Find return format from Postman
+            return null;
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong posting to TikTok. Please try again later");
+            return dto;
+        }
+    }
+
     public Object replyComment(CommentDTO commentDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
@@ -312,7 +373,6 @@ public class InstagramService {
             return dto;
         }
         try {
-            RestTemplate restTemplate = new RestTemplate();
             String url = "https://graph.facebook.com/v19.0/" + commentDTO.getId() + "/replies?message=" + commentDTO.getText() +"&access_token="+accessToken;
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             URI uri = builder.build().toUri();
@@ -407,7 +467,7 @@ public class InstagramService {
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
             CloseableHttpClient httpclient = HttpClients.createDefault();
             CloseableHttpResponse httpResponse = httpclient.execute(post);
-            System.out.println(httpResponse);
+            System.out.println("TIKTOK REFRESH RESPONSE:" + httpResponse);
 
             HttpEntity entity = httpResponse.getEntity();
             String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
