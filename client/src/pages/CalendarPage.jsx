@@ -3,7 +3,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import '../Styles/CalendarPage.css';
 import { useSelector } from 'react-redux';
-import '../Styles/Calendar.css'
 import Spinner from '../components/Spinner';
 import NoAccount from '../components/NoAccount';
 
@@ -20,7 +19,7 @@ const CalendarPage = ({ posts }) => {
   // Convert posts to calendar events
   const { instaPage, isLoadingInsta, tiktokPage } = useSelector((state) => state.insta)
 
-const { user, isLoading } = useSelector((state) => state.auth);
+  const { user, isLoading } = useSelector((state) => state.auth);
 
 if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
   return <NoAccount />
@@ -40,21 +39,33 @@ for (let i = 0; i < datesPosted.length; i++) {
 
 
   return (
-    <div className="calendar-page">
-      <div className="feed">
-        <h1>Calendar</h1>
-        <p>View your posts on a calendar View your posts on a calendar View your posts on a calendar View your posts on a calendar</p>
+    <div className="calendar-page-container">
+      <div className='cp-header-and-feed-container'>
+        <h1>Posts Summary</h1>
+        <div className="cp-feed-container">
+          <div className='cp-post-container'>Post 1</div>
+          <div className='cp-post-container'>Post 2</div>
+          <div className='cp-post-container'>Post 3</div>
+          <div className='cp-post-container'>Post 4</div>
+          <div className='cp-post-container'>Post 5</div>
+          <div className='cp-post-container'>Post 6</div>
+          <div className='cp-post-container'>Post 7</div>
+          <div className='cp-post-container'>Post 8</div>
+          <div className='cp-post-container'>Post 9</div>
+          <div className='cp-post-container'>Post 10</div>
+          <div className='cp-post-container'>Post 11</div>
+          <div className='cp-post-container'>Post 12</div>
+        </div>
       </div>
-      <div className="calendar-container"> 
-      <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
-        weekends={true}
-        events={events}
-        eventContent={renderEventContent}
-        height="100%"  
-      /> 
-    </div>
+      <div className="cp-calendar-container"> 
+        <FullCalendar
+          plugins={[dayGridPlugin]}
+          initialView="dayGridMonth"
+          weekends={true}
+          events={events}
+          eventContent={renderEventContent} 
+        /> 
+      </div>
     </div>
   );
 };
