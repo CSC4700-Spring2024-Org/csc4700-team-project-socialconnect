@@ -1,33 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
 
 const Feed = (props) => {
     const { id, caption, media_type, media_url, source } = props.feed;
     const [showCaption, setShowCaption] = useState(false);
-    const [embedHTML, setEmbedHTML] = useState("");
-    const [tiktokScriptLoaded, setTiktokScriptLoaded] = useState(false);
-    
-    useEffect(() => {
-        if (source === 'TikTok') {
-            getTikTokEmbedHTML().then(html => setEmbedHTML(html));
-        }
-    }, [props.feed]);
-
-    useEffect(() => {
-        if (embedHTML && source === 'TikTok') {
-          const script = document.createElement('script');
-          script.src = 'https://www.tiktok.com/embed.js';
-          script.async = true;
-          script.onload = () => setTiktokScriptLoaded(true);
-          document.body.appendChild(script);
-          
-          return () => {
-            document.body.removeChild(script);
-            setTiktokScriptLoaded(false);
-          };
-        }
-    }, [embedHTML, source]);
+    const [isVisible, setIsVisible] = useState(false);
+    const feedRef = useRef(null);
 
     const sourceToIconMap = {
         'Instagram' : <FaInstagram size={20} color="#E1306C" />,
@@ -36,20 +15,30 @@ const Feed = (props) => {
         'X' : <FaSquareXTwitter size={20} />
     }
 
-    
-    async function getTikTokEmbedHTML() {
-        try {
-            const response = await fetch(media_url);
-            const data = await response.json();
-            
-            let embedHTML = data.html;
-            embedHTML = data.html.replace('style=\"max-width:605px; min-width:325px;\"', "");
-            return embedHTML;
-        } catch (error) {
-            console.error("Failed to fetch TikTok embed HTML:", error);
-            return "<p>Video not available</p>";
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true)
+                }
+            },
+            {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            }
+        );
+
+        if (feedRef.current) {
+            observer.observe(feedRef.current);
         }
-    }
+
+        return () => {
+            if (feedRef.current) {
+                observer.unobserve(feedRef.current);
+            }
+        };
+    }, []);
 
     let post;
 
@@ -57,22 +46,18 @@ const Feed = (props) => {
         case "VIDEO":
             if (source === "TikTok") {
                 post = (
-                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)}>
+                    <div className="feedContainer" ref={feedRef}>
                         <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
-                        {tiktokScriptLoaded && embedHTML ? (
-                            <div dangerouslySetInnerHTML={{ __html: embedHTML }}/>
-                        ) : (
-                            <p className="notAvailable">Video not available</p>
-                        )}
-                        {showCaption && <p className='caption'>{caption}</p>}
+                        {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://www.tiktok.com/player/v1/${media_url}?description=1`} allow="fullscreen"></iframe> : <p>Video Not Available</p>}
+                        <br />
                     </div>
                 );
             } else {
                 // Use video tag for other platforms
                 post = (
-                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)}>
+                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef}>
                         <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
-                        {media_url ? (
+                        {isVisible && media_url ? (
                             <video
                                 src={media_url}
                                 type="video/mp4"

@@ -55,7 +55,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://api.danbfrost.com",
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "autoprefixer": "^10.4.19",
