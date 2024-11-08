@@ -18,7 +18,7 @@
 }
 
 .cp-post-container {
-  height: 50px;
+  height: 100px;
   width: 90%;
   background-color: #f9f9f9; 
   border: 2px solid #ddd;  
@@ -31,6 +31,10 @@
   padding: 10px 15px; 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
   transition: transform 0.2s ease-in-out; 
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
 }
 
 .cp-post-container:hover {
@@ -39,6 +43,12 @@
   background-color: #f1f1f1; 
 }
 
+.cp-post-mini-container {
+  height: 50px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+}
 
 .cp-calendar-container {
   height: 50%;

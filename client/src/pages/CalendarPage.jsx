@@ -5,6 +5,9 @@ import '../Styles/CalendarPage.css';
 import { useSelector } from 'react-redux';
 import Spinner from '../components/Spinner';
 import NoAccount from '../components/NoAccount';
+import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaSquareXTwitter } from "react-icons/fa6";
+import { FaHeart, FaPlay, FaPaperPlane, FaRegFileAlt } from 'react-icons/fa';
 
 function renderEventContent(eventInfo) {
   return (
@@ -21,8 +24,14 @@ const platformColors = {
   X: '#1DA1F2'          
 };
 
+const platformSymbols = {
+  Instagram: <FaInstagram size = {30}/>,
+  TikTok: <FaTiktok size = {30}/>,
+  YouTube: <FaYoutube/>,
+  X: <FaSquareXTwitter/>
+}
+
 const CalendarPage = ({ posts }) => {
-  // Convert posts to calendar events
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta)
 
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -65,12 +74,21 @@ const combinedPosts = [
     source: 'Instagram'
   }))
 ];
-// console.log(combinedPosts);
+
 const PostSummary = ({ source, post, likes, shares, views }) => (
   <div className="cp-post-container" style={{ borderColor: platformColors[source] }}>
-    <div>likes: {likes}</div>
-    {shares ? <div>shares:{shares}</div>:<></>}
-    {views ? <div>views:{views}</div>:<></>}
+    <div className="cp-post-mini-container">
+      <div style={{ color: platformColors[source] }}>{platformSymbols[source]}</div>
+    </div>
+    <div className="cp-post-mini-container">
+      {views ? <div><FaPlay/> {views}</div>:<></>}
+    </div>
+    <div className="cp-post-mini-container">
+      <div><FaHeart style={{ color: "red"}}/> {likes}</div>
+    </div>
+    <div className="cp-post-mini-container">
+      {shares ? <div><FaPaperPlane style={{ color: '#1877F2'}}/> {shares}</div>:<></>}
+    </div>
   </div>
 );
 
@@ -79,8 +97,6 @@ const PostSummary = ({ source, post, likes, shares, views }) => (
       <div className='cp-header-and-feed-container'>
         <h1>Posts Summary</h1>
         <div className="cp-feed-container">
-          {/* <PostSummary platform="Instagram"/>
-          <PostSummary platform="TikTok"/> */}
           {combinedPosts.map((post) => {
             return <PostSummary source={post.source} post={post.media_url} likes = {post.likes} shares={post.shares} views={post.views}/>
           })}
