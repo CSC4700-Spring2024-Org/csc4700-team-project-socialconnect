@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import '../Styles/CalendarPage.css';
@@ -31,7 +31,38 @@ const platformSymbols = {
   X: <FaSquareXTwitter/>
 }
 
+
 const CalendarPage = ({ posts }) => {
+
+  const [selectedPlatforms, setSelectedPlatforms] = useState(["Instagram"]);
+
+const handlePlatformClick = (platform) => {
+  setSelectedPlatforms((prevSelected) => {
+    if (prevSelected.includes(platform)) {
+      if (prevSelected.length > 1) {
+        return prevSelected.filter((p) => p !== platform);
+      }
+      return prevSelected;
+    } else {
+      return [...prevSelected, platform];
+    }
+  });
+};
+
+const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
+  const color = platformColors[platform];
+  
+  return (
+    <div 
+      className={`platform-card ${isSelected ? 'selected' : ''}`} 
+      onClick={onClick}
+      style = {{color}}
+    >
+      {icon}
+    </div>
+  );
+};
+
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta)
 
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -102,14 +133,22 @@ const PostSummary = ({ source, post, likes, shares, views }) => (
           })}
         </div>
       </div>
-      <div className="cp-calendar-container"> 
-        <FullCalendar
-          plugins={[dayGridPlugin]}
-          initialView="dayGridMonth"
-          weekends={true}
-          events={events}
-          eventContent={renderEventContent} 
-        /> 
+      <div className="cp-calendar-and-platforms-container">
+        <div className="cp-calendar-container"> 
+          <FullCalendar
+            plugins={[dayGridPlugin]}
+            initialView="dayGridMonth"
+            weekends={true}
+            events={events}
+            eventContent={renderEventContent} 
+          /> 
+        </div>
+        <div className="cp-platforms-container">
+          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20}/>} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+          <PlatformCard icon={<FaSquareXTwitter size={20}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+        </div>
       </div>
     </div>
   );

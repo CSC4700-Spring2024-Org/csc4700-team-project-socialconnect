@@ -32,7 +32,7 @@ html, body {
   justify-content: space-between;
   margin-bottom: 1rem;
   padding-top: 10px;
-  flex-shrink: 0; /* Keep social media icons static */
+  flex-shrink: 0; 
 }
 
 .platform-card {
