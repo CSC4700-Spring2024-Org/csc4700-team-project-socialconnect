@@ -129,7 +129,9 @@ const PostSummary = ({ source, post, likes, shares, views }) => (
         <h1>Posts Summary</h1>
         <div className="cp-feed-container">
           {combinedPosts.map((post) => {
-            return <PostSummary source={post.source} post={post.media_url} likes = {post.likes} shares={post.shares} views={post.views}/>
+            if(selectedPlatforms.includes(post.source)) {
+              return <PostSummary source={post.source} post={post.media_url} likes = {post.likes} shares={post.shares} views={post.views}/>
+            }
           })}
         </div>
       </div>
