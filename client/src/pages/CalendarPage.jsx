@@ -118,7 +118,7 @@ const PostSummary = ({ source, post, likes, shares, views }) => (
       <div><FaHeart style={{ color: "red"}}/> {likes}</div>
     </div>
     <div className="cp-post-mini-container">
-      {shares ? <div><FaPaperPlane style={{ color: '#1877F2'}}/> {shares}</div>:<></>}
+      {views ? <div><FaPaperPlane style={{ color: '#1877F2'}}/> {shares}</div>:<></>}
     </div>
   </div>
 );
