@@ -63,6 +63,11 @@ public class InstagramController {
         return ResponseEntity.ok(instagramService.replyComment(commentDTO));
     }
 
+    @PostMapping("/tiktokLogout")
+    public ResponseEntity<?> tiktokLogout() {
+        return ResponseEntity.ok(instagramService.tiktokLogout());
+    }
+
     @GetMapping("/tiktokInitializeLogin")
     public ResponseEntity<?> tiktokInitializeLogin(HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

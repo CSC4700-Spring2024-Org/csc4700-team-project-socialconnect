@@ -3,6 +3,7 @@ package com.example.socialconnect.controller;
 import com.example.socialconnect.dtos.AuthRequestDTO;
 import com.example.socialconnect.dtos.ErrorDTO;
 import com.example.socialconnect.dtos.UserRequest;
+import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.helpers.CustomUserDetails;
 import com.example.socialconnect.models.RefreshToken;
 import com.example.socialconnect.models.User;
@@ -15,7 +16,9 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,7 +101,14 @@ public class AuthController {
             }
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
             user.setPassword(null);
-            return ResponseEntity.ok(user);
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+            modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+                mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+            });
+            UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+            return ResponseEntity.ok(userResponse);
 
         } else {
             ErrorDTO errorDTO = new ErrorDTO();

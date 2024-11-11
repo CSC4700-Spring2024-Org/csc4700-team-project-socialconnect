@@ -33,7 +33,7 @@ const Home = () => {
   useEffect(() => {
     if (initialRenderCompleted && !isLoading) {
       if (isSuccess && user) {
-        navigate('/');
+        // navigate('/');
         if (isErrorInsta) {
           toast.error(message)
         }

@@ -21,6 +21,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.socialconnect.dtos.ErrorDTO;
 import com.example.socialconnect.dtos.SocialsResponse;
+import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.dtos.InstagramDTOs.AccountDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessDiscoveryListDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessWithCommentsDTO;
@@ -48,8 +52,10 @@ import com.example.socialconnect.dtos.InstagramDTOs.InsightsResponseDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
 import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.AccessTokenRequestDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.TiktokErrorDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.VideosListDTO;
 import com.example.socialconnect.helpers.CustomUserDetails;
+import com.example.socialconnect.models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -60,6 +66,8 @@ public class InstagramService {
 
     @Autowired
     UserService userService;
+
+    ModelMapper modelMapper = new ModelMapper();
 
     @Value("${tiktok.key}")
     private String tiktokClientKey;
@@ -214,6 +222,7 @@ public class InstagramService {
         org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
     
         Object result = fetchTiktokVideos(uri, entity);
+        System.out.println(result.getClass());
         if (result instanceof VideosListDTO && ((VideosListDTO)result).getData() != null) {
             return result;
         }
@@ -226,6 +235,7 @@ public class InstagramService {
             System.out.println("RESULT AFTER REFRESH: " + result);
         }
     
+        System.out.println(result instanceof VideosListDTO);
         return result instanceof VideosListDTO ? result : handleError("Something went wrong fetching TikTok page");
     }
     
@@ -476,6 +486,7 @@ public class InstagramService {
             AccessTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, AccessTokenRequestDTO.class);
 
             if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
+                System.out.println(accessTokenResponse.getAccess_token());
                 userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), userID);
             } else {
                 ErrorDTO dto = new ErrorDTO();
@@ -491,6 +502,64 @@ public class InstagramService {
             System.out.println(e);
             ErrorDTO dto = new ErrorDTO();
             dto.setError("Something went wrong logging in. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object tiktokLogout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetail.getUser();
+        String accessToken = user.getTiktokAccess();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your TikTok account");
+            return dto;
+        }
+
+        try {
+            URIBuilder builder = new URIBuilder("https://open.tiktokapis.com/v2/oauth/revoke/"); 
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("client_key", tiktokClientKey));
+            urlParameters.add(new BasicNameValuePair("client_secret", tiktokClientSecret));
+            urlParameters.add(new BasicNameValuePair("token", accessToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+            if (responseString != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                TiktokErrorDTO tiktokLogoutResponse = objectMapper.readValue(responseString, TiktokErrorDTO.class);    
+                System.out.println(tiktokLogoutResponse.getMessage());
+
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error logging out of TikTok");
+                return dto;
+            } else {
+                userService.updateTiktok(null, null, userDetail.getUser().getId());
+                user.setPassword(null);
+                user.setTiktokAccess(null);
+                user.setTiktokRefresh(null);
+                modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+                Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+                modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                    mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+                });
+                UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+                return userResponse;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging out. Please try again later");
             return dto;
         }
     }

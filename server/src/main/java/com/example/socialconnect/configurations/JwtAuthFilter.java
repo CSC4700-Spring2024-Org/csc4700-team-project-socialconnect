@@ -45,15 +45,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+    
         String token = null;
-        String username = null;
         String refreshTokenStr = null;
+        UserDetails userDetails = null;
         RefreshToken refreshToken = null;
-
-        if(request.getCookies() != null){
-            for(Cookie cookie: request.getCookies()){
-                if(cookie.getName().equals("accessToken")){
+    
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("accessToken")) {
                     token = cookie.getValue();
                 }
                 if (cookie.getName().equals("token")) {
@@ -62,48 +62,57 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        if (token != null) {
-            username = jwtService.extractUsername(token);
+        if (token != null && jwtService.isTokenExpired(token)) {
+            token = null;
         }
-
-        if (refreshTokenStr != null) {
+    
+        if (token == null && refreshTokenStr != null) {
             Optional<RefreshToken> optionalObj = refreshTokenService.findByToken(refreshTokenStr);
             if (optionalObj.isPresent()) {
                 refreshToken = optionalObj.get();
-            }
-        }
-
-        if (token == null || (username != null && jwtService.isTokenExpired(token))) {
-            if (refreshToken != null && refreshTokenService.verifyExpiration(refreshToken) != null) {
-                User user = refreshToken.getUserInfo();
-                token = jwtService.generateToken(user.getUsername());
-
-                ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", token)
-                    .httpOnly(true)
-                    .secure(true)
-                    .sameSite("None")
-                    .path("/")
-                    .maxAge(cookieExpiry);
-
-                if (!cookieDomain.equals("localhost")) {
-                    cookie.domain(cookieDomain);
+    
+                if (refreshTokenService.verifyExpiration(refreshToken) != null) {
+                    User user = refreshToken.getUserInfo();
+                    token = jwtService.generateToken(user.getUsername());
+    
+                    ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", token)
+                        .httpOnly(true)
+                        .secure(true)
+                        .sameSite("None")
+                        .path("/")
+                        .maxAge(cookieExpiry);
+    
+                    if (!cookieDomain.equals("localhost")) {
+                        cookie.domain(cookieDomain);
+                    }
+                    response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
+    
+                    userDetails = userDetailsServiceImpl.loadUserByUsername(user.getUsername());
+                    UsernamePasswordAuthenticationToken authenticationToken = 
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                } else {
+                    filterChain.doFilter(request, response);
                 }
-                response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
-            } else {
-                filterChain.doFilter(request, response);
-                return;
             }
         }
-
-        if(username != null){
-            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
-            if(jwtService.validateToken(token, userDetails)){
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    
+        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            String username = jwtService.extractUsername(token);
+            
+            if (userDetails == null) {
+                userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+            }
+    
+            if (jwtService.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authenticationToken = 
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
-
+    
         filterChain.doFilter(request, response);
-    }
+    }    
 }

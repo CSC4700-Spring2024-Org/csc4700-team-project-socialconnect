@@ -70,6 +70,7 @@ const Login = () => {
    useEffect(() => {
       if (isError && message) {
          toast.error(message);
+         dispatch(reset())
       }
 
       if (initialRenderCompleted && !isLoading) {

@@ -10,6 +10,8 @@ import '../Styles/carousel.min.css';
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
+  console.log(insights)
+  console.log(instaPage)
   const { user, isLoading } = useSelector((state) => state.auth);
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');
@@ -114,8 +116,8 @@ export default function Analytics() {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px', height:'10%' }}>
         <div onClick={() => handlePlatformChange('Instagram')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
           <FaInstagram size={20} color="#E1306C" />
           <span style={{ color: 'black', marginLeft: '5px' }}>Instagram </span>
@@ -133,7 +135,7 @@ export default function Analytics() {
           <span style={{ color: 'black', marginLeft: '5px' }}>X </span>
         </div>
       </div>
-      <div style={{marginRight: '25px', marginBottom: '100px'}}>
+      <div style={{ flexGrow: 1, overflowY: 'hidden' }}>
       <Carousel
         showArrows={true}
         showStatus={true}
@@ -142,8 +144,8 @@ export default function Analytics() {
         onChange={(index) => setSelectedDataType(dataTypes[index])}
       >
         {dataTypes.map((dataType, index) => (
-          <div key={index}>
-            <AgCharts options={chartOptions} />
+          <div key={index} style={{ height: '100%' }}>
+            <AgCharts options={chartOptions} style={{ height: '90%' }}/>
           </div>
         ))}
       </Carousel>
