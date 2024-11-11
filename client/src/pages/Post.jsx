@@ -11,6 +11,8 @@ import { FaInstagram, FaTiktok, FaTwitter, FaYoutube } from 'react-icons/fa';
 import instaService from '../features/instaService';
 import { toast } from 'react-toastify';
 import Loading from '../components/Loading';
+import { FaSquareXTwitter } from "react-icons/fa6";
+
 
 const Post = () => {
     const [files, setFiles] = useState([]);
@@ -23,11 +25,17 @@ const Post = () => {
 
     const navigate = useNavigate();
 
+    const platformColors = {
+      Instagram: '#FF69B4', 
+      TikTok: 'black',      
+      YouTube: 'red',       
+      X: 'black'          
+    };
     const platforms = [
-      { name: 'Instagram', icon: <FaInstagram /> },
-      { name: 'TikTok', icon: <FaTiktok /> },
-      { name: 'X', icon: <FaTwitter /> },
-      { name: 'YouTube', icon: <FaYoutube /> }
+      { name: 'Instagram', icon: <FaInstagram style={{color: platformColors["Instagram"]}} /> },
+      { name: 'TikTok', icon: <FaTiktok style={{color: platformColors["TikTok"]}} /> },
+      { name: 'YouTube', icon: <FaYoutube style={{color: platformColors["YouTube"]}} /> },
+      { name: 'X', icon: <FaSquareXTwitter style={{color: platformColors["X"]}} /> }
     ];
 
     const togglePlatform = (platform) => {
