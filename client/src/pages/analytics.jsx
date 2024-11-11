@@ -10,6 +10,8 @@ import '../Styles/carousel.min.css';
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
+  console.log(insights)
+  console.log(instaPage)
   const { user, isLoading } = useSelector((state) => state.auth);
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');

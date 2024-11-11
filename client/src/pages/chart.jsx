@@ -8,6 +8,7 @@ import Spinner from '../components/Spinner'
 
 const Chart = () => {
   const { instaPage, isLoadingInsta, tiktokPage } = useSelector((state) => state.insta)
+  console.log(tiktokPage)
   const { user, isLoading } = useSelector((state) => state.auth);
 
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
