@@ -46,7 +46,7 @@ const Feed = (props) => {
         case "VIDEO":
             if (source === "TikTok") {
                 post = (
-                    <div className="feedContainer" ref={feedRef}>
+                    <div className="feedContainer" ref={feedRef} style= {{border:'1px solid black'}}>
                         <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
                         {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://www.tiktok.com/player/v1/${media_url}?description=1`} allow="fullscreen"></iframe> : <p>Video Not Available</p>}
                         <br />
@@ -55,7 +55,7 @@ const Feed = (props) => {
             } else {
                 // Use video tag for other platforms
                 post = (
-                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef}>
+                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef} style= {{border:'1px solid #E1306C'}}>
                         <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
                         {isVisible && media_url ? (
                             <video

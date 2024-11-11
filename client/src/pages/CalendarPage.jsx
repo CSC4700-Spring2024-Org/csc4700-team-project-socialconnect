@@ -22,6 +22,13 @@ const CalendarPage = ({ posts }) => {
   const handleDateClick = (info) => {
     setSelectedDate(info.dateStr);
     setShowTimePicker(true);
+    
+    // Remove highlight from previously selected date
+    const prevSelected = document.querySelector('.fc-day-selected');
+    if (prevSelected) prevSelected.classList.remove('fc-day-selected');
+    
+    // Add highlight to newly selected date
+    info.dayEl.classList.add('fc-day-selected');
   };
 
   const handleTimeChange = (time) => {
@@ -58,7 +65,7 @@ const CalendarPage = ({ posts }) => {
     Instagram: '#FF69B4', 
     TikTok: 'black',      
     YouTube: 'red',       
-    X: '#1DA1F2'          
+    X: '#black'          
   };
 
   const platformSymbols = {
@@ -84,7 +91,7 @@ const CalendarPage = ({ posts }) => {
     const color = platformColors[platform];
     return (
       <div 
-        className={`platform-card ${isSelected ? 'selected' : ''}`} 
+        className={`cp-platform-card ${isSelected ? 'selected' : ''}`} 
         onClick={onClick}
         style={{ color }}
       >
@@ -211,7 +218,14 @@ const CalendarPage = ({ posts }) => {
   return (
     <div className="calendar-page-container">
       <div className='cp-header-and-feed-container'>
-        <h1>Posts Summary</h1>
+        <h1 style={{height: "10px"}}> Posts Summary</h1>
+        <h1 className="cp-header">Select Platforms:</h1>
+        <div className="cp-platforms-container">
+          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20} />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+        </div>
         <div className="cp-feed-container">
           {combinedPosts.map((post) => 
             selectedPlatforms.includes(post.source) && (
@@ -263,13 +277,7 @@ const CalendarPage = ({ posts }) => {
         <button className="cp-button" onClick={handleScheduleClick}>
           Schedule Post
         </button>
-        <h1 className="cp-header">Select Platforms:</h1>
-        <div className="cp-platforms-container">
-          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20} />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
-        </div>
+       
       </div>
     </div>
   );
