@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import '../Styles/CalendarPage.css';
@@ -9,13 +9,37 @@ import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaHeart, FaPlay, FaPaperPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import TimePicker from 'react-time-picker'; // Install this component if not already installed
+import interactionPlugin from '@fullcalendar/interaction';
+
 
 const CalendarPage = ({ posts }) => {
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState("12:00"); // Default time
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const handleDateClick = (info) => {
+    setSelectedDate(info.dateStr);
+    setShowTimePicker(true);
+  };
+
+  const handleTimeChange = (time) => {
+    setSelectedTime(time);
+  };
+
+  const handleScheduleClick = () => {
+    if (selectedDate && selectedTime) {
+      const urlEncodedDateTime = `${selectedDate}T${selectedTime}`;
+      navigate(`/post?datetime=${encodeURIComponent(urlEncodedDateTime)}`);
+    }
+  };
 
   const handleClick = () => {
-    navigate('/post'); 
+    navigate('/post');
   };
+
+ 
 
   function renderEventContent(eventInfo) {
     return (
@@ -119,18 +143,50 @@ const CalendarPage = ({ posts }) => {
   ];
 
   const PostSummary = ({ source, post, caption, likes, shares, views }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const feedRef = useRef(null);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+          ([entry]) => {
+              if (entry.isIntersecting) {
+                  setIsVisible(true)
+              }
+          },
+          {
+              root: null,
+              rootMargin: '0px',
+              threshold: 0.1
+          }
+      );
+  
+      if (feedRef.current) {
+          observer.observe(feedRef.current);
+      }
+  
+      return () => {
+          if (feedRef.current) {
+              observer.unobserve(feedRef.current);
+          }
+      };
+  }, []);
+
   return (
     <div 
       className="cp-post-container" 
       style={{ borderColor: platformColors[source] }}
     >
-      <div className="cp-post-media-container">
-        {(source === 'Instagram' || source === 'TikTok') ? (
-          <video src={post} controls className="cp-post-media" />
+     <div className="cp-post-media-container" ref={feedRef}>
+      {(source === 'Instagram' || source === 'TikTok') ? (
+        isVisible && post ? (
+          <iframe className="cp-post-media" height="100%" width="100%" src={post} allow="fullscreen"></iframe>
         ) : (
-          <img src={post} alt={caption} className="cp-post-media" />
-        )}
-      </div>
+          <p className="cp-post-media">Video Not Available</p>
+        )
+      ) : (
+        <img src={post} alt={caption} className="cp-post-media" />
+      )}
+    </div>
       <div className="cp-post-caption">
         <p>{caption}</p>
       </div>
@@ -175,14 +231,36 @@ const CalendarPage = ({ posts }) => {
       <div className="cp-calendar-and-platforms-container">
         <div className="cp-calendar-container">
           <FullCalendar
-            plugins={[dayGridPlugin]}
+            plugins={[dayGridPlugin,interactionPlugin]}
             initialView="dayGridMonth"
             weekends={true}
             events={events}
             eventContent={renderEventContent}
+            dateClick={handleDateClick} // Handle date clicks
+          />
+        {showTimePicker && (
+          <div className="time-picker-container">
+            <TimePicker
+              onChange={handleTimeChange}
+              value={selectedTime}
+              clearIcon={null}
+            />
+            <button onClick={handleScheduleClick} className="schedule-post-button">
+              Schedule Post
+            </button>
+          </div>
+        )}
+        </div>
+        {selectedDate && (
+        <div className="time-picker-container">
+          <p>Selected Date: {selectedDate}</p>
+          <TimePicker
+            onChange={setSelectedTime} // Update selected time
+            value={selectedTime}
           />
         </div>
-        <button className="cp-button" onClick={handleClick}>
+      )}
+        <button className="cp-button" onClick={handleScheduleClick}>
           Schedule Post
         </button>
         <h1 className="cp-header">Select Platforms:</h1>
