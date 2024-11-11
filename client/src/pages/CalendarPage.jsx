@@ -20,7 +20,12 @@ const CalendarPage = ({ posts }) => {
   function renderEventContent(eventInfo) {
     return (
       <>
-        <i>{eventInfo.event.title}</i>
+        {eventInfo.event.extendedProps.source === 'Instagram' && (
+          <FaInstagram style={{ fontSize: '14px', color: '#FF69B4' }} />
+        )}
+        {eventInfo.event.extendedProps.source === 'TikTok' && (
+          <FaTiktok style={{ fontSize: '13px', color: 'black' }} />
+        )}
       </>
     );
   }
@@ -67,6 +72,7 @@ const CalendarPage = ({ posts }) => {
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
 
+  
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
     return <NoAccount />;
   }
@@ -75,11 +81,19 @@ const CalendarPage = ({ posts }) => {
     return <Spinner />;
   }
 
-  const datesPosted = instaPage.business_discovery.media.data.map(media => media.timestamp);
-  const events = datesPosted.map((date, i) => ({
-    title: 'Posted',
-    start: datesPosted[datesPosted.length - i - 1]
+  const instaEvents = instaPage.business_discovery.media.data.map((media, i) => ({
+    title: 'Instagram Post',
+    start: media.timestamp,
+    source: 'Instagram',
   }));
+
+  const tiktokEvents = tiktokPage.map((post, i) => ({
+    title: 'TikTok Post',
+    start: new Date(post.create_time * 1000).toISOString(),
+    source: 'TikTok',
+  }));
+
+  const events = [...instaEvents, ...tiktokEvents];
 
   const combinedPosts = [
     ...tiktokPage.map(post => ({
