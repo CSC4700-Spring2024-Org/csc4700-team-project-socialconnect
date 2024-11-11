@@ -21,10 +21,10 @@ const CalendarPage = ({ posts }) => {
     return (
       <>
         {eventInfo.event.extendedProps.source === 'Instagram' && (
-          <FaInstagram style={{ fontSize: '14px', color: '#FF69B4' }} />
+          <FaInstagram style={{ fontSize: '11px', color: '#FF69B4' }} />
         )}
         {eventInfo.event.extendedProps.source === 'TikTok' && (
-          <FaTiktok style={{ fontSize: '13px', color: 'black' }} />
+          <FaTiktok style={{ fontSize: '12px', color: 'black' }} />
         )}
       </>
     );
@@ -118,22 +118,39 @@ const CalendarPage = ({ posts }) => {
     }))
   ];
 
-  const PostSummary = ({ source, post, likes, shares, views }) => (
-    <div className="cp-post-container" style={{ borderColor: platformColors[source] }}>
-      <div className="cp-post-mini-container">
-        <div style={{ color: platformColors[source] }}>{platformSymbols[source]}</div>
+  const PostSummary = ({ source, post, caption, likes, shares, views }) => {
+  return (
+    <div 
+      className="cp-post-container" 
+      style={{ borderColor: platformColors[source] }}
+    >
+      <div className="cp-post-media-container">
+        {(source === 'Instagram' || source === 'TikTok') ? (
+          <video src={post} controls className="cp-post-media" />
+        ) : (
+          <img src={post} alt={caption} className="cp-post-media" />
+        )}
       </div>
-      <div className="cp-post-mini-container">
-        {views ? <div><FaPlay /> {views}</div> : null}
+      <div className="cp-post-caption">
+        <p>{caption}</p>
       </div>
-      <div className="cp-post-mini-container">
-        <div><FaHeart style={{ color: "red" }} /> {likes}</div>
-      </div>
-      <div className="cp-post-mini-container">
-        {shares ? <div><FaPaperPlane style={{ color: '#1877F2' }} /> {shares}</div> : null}
+      <div className="cp-post-stats-container">
+        <div className="cp-post-mini-container">
+          <div style={{ color: platformColors[source] }}>{platformSymbols[source]}</div>
+        </div>
+        <div className="cp-post-mini-container">
+          {views ? <div><FaPlay /> {views}</div> : null}
+        </div>
+        <div className="cp-post-mini-container">
+          <div><FaHeart style={{ color: "red" }} /> {likes}</div>
+        </div>
+        <div className="cp-post-mini-container">
+          {shares ? <div><FaPaperPlane style={{ color: '#1877F2' }} /> {shares}</div> : null}
+        </div>
       </div>
     </div>
   );
+};
 
   return (
     <div className="calendar-page-container">
@@ -142,7 +159,15 @@ const CalendarPage = ({ posts }) => {
         <div className="cp-feed-container">
           {combinedPosts.map((post) => 
             selectedPlatforms.includes(post.source) && (
-              <PostSummary key={post.timestamp} source={post.source} post={post.media_url} likes={post.likes} shares={post.shares} views={post.views} />
+              <PostSummary 
+                key={post.timestamp} 
+                source={post.source} 
+                post={post.media_url} 
+                caption={post.caption} 
+                likes={post.likes} 
+                shares={post.shares} 
+                views={post.views} 
+              />
             )
           )}
         </div>
