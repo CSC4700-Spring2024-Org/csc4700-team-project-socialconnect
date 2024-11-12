@@ -183,7 +183,7 @@ const CalendarPage = ({ posts }) => {
       className="cp-post-container" 
       style={{ borderColor: platformColors[source] }}
     >
-     <div className="cp-post-media-container" ref={feedRef}>
+     <div className="cp-post-media" ref={feedRef}>
       {(source === 'Instagram' || source === 'TikTok') ? (
         isVisible && post ? (
           <iframe className="cp-post-media" height="100%" width="100%" src={post} allow="fullscreen"></iframe>
@@ -218,7 +218,7 @@ const CalendarPage = ({ posts }) => {
   return (
     <div className="calendar-page-container">
       <div className='cp-header-and-feed-container'>
-        <h1 style={{height: "10px"}}> Posts Summary</h1>
+        <h1 style={{height: "0px"}}> Posts Summary</h1>
         <h1 className="cp-header">Select Platforms:</h1>
         <div className="cp-platforms-container">
           <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
