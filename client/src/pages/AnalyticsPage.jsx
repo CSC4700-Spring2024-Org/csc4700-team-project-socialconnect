@@ -17,10 +17,10 @@ const AnalyticsPage = () => {
     Instagram: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%)',
     TikTok: 'black',      
     YouTube: 'white',       
-    X: '#1DA1F2'          
+    X: 'white'          
   };
 
-  const platformColors = {
+  const platformLineColors = {
     Instagram: '#FF69B4', 
     TikTok: 'black',      
     YouTube: 'red',       
@@ -220,11 +220,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -237,7 +237,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} likes`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -249,11 +249,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -266,7 +266,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} views`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -278,11 +278,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -295,7 +295,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} shares`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -307,11 +307,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -324,7 +324,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} secs`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -336,11 +336,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -353,7 +353,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Reach`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -365,11 +365,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -382,7 +382,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Saved`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -394,11 +394,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -411,7 +411,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Comments`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -510,10 +510,10 @@ return (
     <header className="analytics-header">
       <h1>Analytics</h1>
       <div className="ap-social-media-platforms">
-        <PlatformCard platform={"Instagram"} icon={<FaInstagram size={22}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-        <PlatformCard platform={"TikTok"} icon={<FaTiktok size={22}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-        <PlatformCard platform={"YouTube"} icon={<FaYoutube size={22} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-        <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={22}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+        <PlatformCard platform={"Instagram"} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+        <PlatformCard platform={"TikTok"} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+        <PlatformCard platform={"YouTube"} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+        <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
       </div>
     </header>
     <div className="nonHeader">

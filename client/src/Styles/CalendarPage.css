@@ -9,7 +9,7 @@
   width: 100%;
   display: grid;
   justify-content: space-around;
-  grid-template-columns: 30% 30% 30%;
+  grid-template-columns: 32% 32% 32%;
   border-color: rgb(64, 69, 224);
   padding-left: 0;
   border-width: thick;
@@ -51,10 +51,9 @@
   font-size: large;
   font-weight: bold;
   margin-top: 20px; 
-  margin-right: 20px;
   margin-left: 0px;
   margin-bottom: 0px;
-  padding: 10px 15px; 
+  padding: 10px 5px; 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
   transition: transform 0.2s ease-in-out; 
   display: flex;

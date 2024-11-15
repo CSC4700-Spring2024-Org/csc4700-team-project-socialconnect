@@ -61,11 +61,18 @@ const CalendarPage = ({ posts }) => {
     );
   }
 
-  const platformColors = {
+  const platformCardColors = { 
+    Instagram: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%)',
+    TikTok: 'black',      
+    YouTube: 'white',       
+    X: 'white'          
+  };
+
+  const platformBorderColors = {
     Instagram: '#FF69B4', 
     TikTok: 'black',      
     YouTube: 'red',       
-    X: '#black'          
+    X: '#1DA1F2'          
   };
 
   const platformSymbols = {
@@ -87,15 +94,30 @@ const CalendarPage = ({ posts }) => {
     });
   };
 
-  const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
-    const color = platformColors[platform];
+  // const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
+  //   const color = platformBorderColors[platform];
+  //   return (
+  //     <div 
+  //       className={`cp-platform-card ${isSelected ? 'selected' : ''}`} 
+  //       onClick={onClick}
+  //       style={{ color }}
+  //     >
+  //       {icon}
+  //     </div>
+  //   );
+  // };
+
+  const PlatformCard = ({ platform, icon, pfp, isSelected, onClick }) => {
+    const color = "white";
+    
     return (
-      <div 
-        className={`cp-platform-card ${isSelected ? 'selected' : ''}`} 
-        onClick={onClick}
-        style={{ color }}
-      >
-        {icon}
+      <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
+        <div className="profile-container">
+          <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
+            {icon}
+          </div>
+          <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
+        </div>
       </div>
     );
   };
@@ -181,7 +203,7 @@ const CalendarPage = ({ posts }) => {
   return (
     <div 
       className="cp-post-container" 
-      style={{ borderColor: platformColors[source] }}
+      style={{ borderColor: platformBorderColors[source] }}
     >
      <div className="cp-post-media" ref={feedRef}>
       {(source === 'Instagram' || source === 'TikTok') ? (
@@ -199,7 +221,7 @@ const CalendarPage = ({ posts }) => {
       </div>
       <div className="cp-post-stats-container">
         <div className="cp-post-mini-container">
-          <div style={{ color: platformColors[source] }}>{platformSymbols[source]}</div>
+          <div style={{ color: platformBorderColors[source] }}>{platformSymbols[source]}</div>
         </div>
         <div className="cp-post-mini-container">
           {views ? <div><FaPlay /> {views}</div> : null}
@@ -221,10 +243,10 @@ const CalendarPage = ({ posts }) => {
         <h1 style={{height: "0px"}}> Posts Summary</h1>
         <h1 className="cp-header">Select Platforms:</h1>
         <div className="cp-platforms-container">
-          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
           <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20} />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={22} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
         </div>
         <div className="cp-feed-container">
           {combinedPosts.map((post) => 
