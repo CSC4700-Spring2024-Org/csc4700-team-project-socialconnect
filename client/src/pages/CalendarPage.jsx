@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import '../Styles/CalendarPage.css';
@@ -9,13 +9,44 @@ import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaHeart, FaPlay, FaPaperPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import TimePicker from 'react-time-picker'; // Install this component if not already installed
+import interactionPlugin from '@fullcalendar/interaction';
+
 
 const CalendarPage = ({ posts }) => {
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState("12:00"); // Default time
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const handleDateClick = (info) => {
+    setSelectedDate(info.dateStr);
+    setShowTimePicker(true);
+    
+    // Remove highlight from previously selected date
+    const prevSelected = document.querySelector('.fc-day-selected');
+    if (prevSelected) prevSelected.classList.remove('fc-day-selected');
+    
+    // Add highlight to newly selected date
+    info.dayEl.classList.add('fc-day-selected');
+  };
+
+  const handleTimeChange = (time) => {
+    setSelectedTime(time);
+  };
+
+  const handleScheduleClick = () => {
+    if (selectedDate && selectedTime) {
+      const urlEncodedDateTime = `${selectedDate}T${selectedTime}`;
+      navigate(`/post?datetime=${encodeURIComponent(urlEncodedDateTime)}`);
+    }
+  };
 
   const handleClick = () => {
-    navigate('/post'); 
+    navigate('/post');
   };
+
+ 
 
   function renderEventContent(eventInfo) {
     return (
@@ -34,7 +65,7 @@ const CalendarPage = ({ posts }) => {
     Instagram: '#FF69B4', 
     TikTok: 'black',      
     YouTube: 'red',       
-    X: '#1DA1F2'          
+    X: '#black'          
   };
 
   const platformSymbols = {
@@ -60,7 +91,7 @@ const CalendarPage = ({ posts }) => {
     const color = platformColors[platform];
     return (
       <div 
-        className={`platform-card ${isSelected ? 'selected' : ''}`} 
+        className={`cp-platform-card ${isSelected ? 'selected' : ''}`} 
         onClick={onClick}
         style={{ color }}
       >
@@ -119,18 +150,50 @@ const CalendarPage = ({ posts }) => {
   ];
 
   const PostSummary = ({ source, post, caption, likes, shares, views }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const feedRef = useRef(null);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+          ([entry]) => {
+              if (entry.isIntersecting) {
+                  setIsVisible(true)
+              }
+          },
+          {
+              root: null,
+              rootMargin: '0px',
+              threshold: 0.1
+          }
+      );
+  
+      if (feedRef.current) {
+          observer.observe(feedRef.current);
+      }
+  
+      return () => {
+          if (feedRef.current) {
+              observer.unobserve(feedRef.current);
+          }
+      };
+  }, []);
+
   return (
     <div 
       className="cp-post-container" 
       style={{ borderColor: platformColors[source] }}
     >
-      <div className="cp-post-media-container">
-        {(source === 'Instagram' || source === 'TikTok') ? (
-          <video src={post} controls className="cp-post-media" />
+     <div className="cp-post-media" ref={feedRef}>
+      {(source === 'Instagram' || source === 'TikTok') ? (
+        isVisible && post ? (
+          <iframe className="cp-post-media" height="100%" width="100%" src={post} allow="fullscreen"></iframe>
         ) : (
-          <img src={post} alt={caption} className="cp-post-media" />
-        )}
-      </div>
+          <p className="cp-post-media">Video Not Available</p>
+        )
+      ) : (
+        <img src={post} alt={caption} className="cp-post-media" />
+      )}
+    </div>
       <div className="cp-post-caption">
         <p>{caption}</p>
       </div>
@@ -155,7 +218,14 @@ const CalendarPage = ({ posts }) => {
   return (
     <div className="calendar-page-container">
       <div className='cp-header-and-feed-container'>
-        <h1>Posts Summary</h1>
+        <h1 style={{height: "0px"}}> Posts Summary</h1>
+        <h1 className="cp-header">Select Platforms:</h1>
+        <div className="cp-platforms-container">
+          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20} />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+        </div>
         <div className="cp-feed-container">
           {combinedPosts.map((post) => 
             selectedPlatforms.includes(post.source) && (
@@ -175,23 +245,39 @@ const CalendarPage = ({ posts }) => {
       <div className="cp-calendar-and-platforms-container">
         <div className="cp-calendar-container">
           <FullCalendar
-            plugins={[dayGridPlugin]}
+            plugins={[dayGridPlugin,interactionPlugin]}
             initialView="dayGridMonth"
             weekends={true}
             events={events}
             eventContent={renderEventContent}
+            dateClick={handleDateClick} // Handle date clicks
+          />
+        {showTimePicker && (
+          <div className="time-picker-container">
+            <TimePicker
+              onChange={handleTimeChange}
+              value={selectedTime}
+              clearIcon={null}
+            />
+            <button onClick={handleScheduleClick} className="schedule-post-button">
+              Schedule Post
+            </button>
+          </div>
+        )}
+        </div>
+        {selectedDate && (
+        <div className="time-picker-container">
+          <p>Selected Date: {selectedDate}</p>
+          <TimePicker
+            onChange={setSelectedTime} // Update selected time
+            value={selectedTime}
           />
         </div>
-        <button className="cp-button" onClick={handleClick}>
+      )}
+        <button className="cp-button" onClick={handleScheduleClick}>
           Schedule Post
         </button>
-        <h1 className="cp-header">Select Platforms:</h1>
-        <div className="cp-platforms-container">
-          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20} />} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} />} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
-        </div>
+       
       </div>
     </div>
   );

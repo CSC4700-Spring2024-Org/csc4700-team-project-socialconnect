@@ -3,7 +3,7 @@ import Feed from './Feed'
 import { useSelector } from 'react-redux'
 import NoAccount from '../components/NoAccount';
 
-import './instaFeeds.css'
+import '../Styles/instaFeeds.css'
 import Spinner from '../components/Spinner'
 
 const Chart = () => {

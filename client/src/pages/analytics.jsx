@@ -145,7 +145,7 @@ export default function Analytics() {
         onChange={(index) => setSelectedDataType(dataTypes[index])}
       >
         {dataTypes.map((dataType, index) => (
-          <div key={index} style={{ height: '100%' }}>
+          <div key={index} style={{ height: '100%', backgroundColor: 'white' }}>
             <AgCharts options={chartOptions} style={{ height: '90%' }}/>
           </div>
         ))}
