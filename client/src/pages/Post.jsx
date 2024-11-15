@@ -55,7 +55,7 @@ const Post = () => {
         const res = await instaService.createInstagramPost(formData)
 
         if (res.data.error) {
-          toast(res.data.error)
+          toast.error(res.data.error)
         } else {
           setPostLinks(prev => [...prev, {Instagram:res.data}])
           setCurrStage(prev => prev + 1)

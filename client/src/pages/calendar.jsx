@@ -38,13 +38,13 @@ export default function Calendar() {
     source: 'Instagram',
   }));
 
-  const tiktokEvents = tiktokPage.map((post, i) => ({
+  const tiktokEvents = tiktokPage?.map((post, i) => ({
     title: 'TikTok Post',
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
   }));
 
-  const events = [...instaEvents, ...tiktokEvents];
+  const events = [...(instaEvents || []), ...(tiktokEvents || [])]
 
   return (
     <div className="calendar-container">

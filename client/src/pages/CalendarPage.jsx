@@ -87,16 +87,16 @@ const CalendarPage = ({ posts }) => {
     source: 'Instagram',
   }));
 
-  const tiktokEvents = tiktokPage.map((post, i) => ({
+  const tiktokEvents = tiktokPage?.map((post, i) => ({
     title: 'TikTok Post',
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
   }));
 
-  const events = [...instaEvents, ...tiktokEvents];
+  const events = [...(instaEvents || []), ...(tiktokEvents || [])]
 
   const combinedPosts = [
-    ...tiktokPage.map(post => ({
+    ...(tiktokPage ? tiktokPage.map(post => ({
       timestamp: post.create_time * 1000,
       source: 'TikTok',
       caption: post.video_description,
@@ -105,7 +105,7 @@ const CalendarPage = ({ posts }) => {
       views: post.view_count,
       likes: post.like_count,
       shares: post.share_count
-    })),
+    })) : []),
     ...instaPage.business_discovery.media.data.map(post => ({
       timestamp: post.timestamp,
       media_url: post.media_url,

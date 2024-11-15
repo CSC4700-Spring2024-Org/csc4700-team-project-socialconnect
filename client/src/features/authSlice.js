@@ -68,6 +68,25 @@ export const setInstagram = createAsyncThunk(
   }
 )
 
+export const tiktokLogout = createAsyncThunk(
+  'auth/tiktokLogout',
+  async (thunkAPI) => {
+    try {
+        const res = await authService.tiktokLogout()
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -135,6 +154,20 @@ export const authSlice = createSlice({
         })
         .addCase(setInstagram.fulfilled, (state, action) => {
           state.user.instaRefresh = action.payload
+        })
+        .addCase(tiktokLogout.pending, (state) => {
+          state.isLoading = true
+        })
+        .addCase(tiktokLogout.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.user = action.payload
+
+        })
+        .addCase(tiktokLogout.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
         })
     },
   })

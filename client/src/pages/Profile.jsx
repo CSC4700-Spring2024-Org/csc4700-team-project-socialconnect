@@ -7,7 +7,7 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getUser } from '../features/authSlice';
-import { setInstagram } from '../features/authSlice';
+import { setInstagram, tiktokLogout } from '../features/authSlice';
 import instaService from '../features/instaService';
 
 const Profile = () => {
@@ -100,7 +100,8 @@ const Profile = () => {
                         <div className='tiktok-connect'>
                             <FaTiktok className='tiktok-icon'/>
                             <span>Tiktok</span>
-                            <button onClick={buildURL}>Connect</button>
+                            {!user || (user && !user.tiktokConnected) ? <button onClick={buildURL}>Connect</button> :
+                              <button onClick={() => dispatch(tiktokLogout())}>Logout</button>}
                         </div>
                         <div className='youtube-connect'>
                             <FaYoutube className='youtube-icon' color='red'/>

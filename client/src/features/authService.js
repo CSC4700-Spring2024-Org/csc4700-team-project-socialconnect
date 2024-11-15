@@ -40,6 +40,11 @@ const setInstagram = async (instaToken) => {
     return response.data;
 }
 
+const tiktokLogout = async() => {
+    const res = await axios.post(API_URL + 'tiktokLogout')
+    return res.data
+}
+
 
 const authService = {
     register,
@@ -47,7 +52,8 @@ const authService = {
     refreshToken,
     getUser,
     logout,
-    setInstagram
+    setInstagram,
+    tiktokLogout
 }
 
 export default authService;

@@ -54,7 +54,7 @@ public class InstagramController {
     }
 
     @PostMapping("/createInstagramPost")
-    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile[] file) {
         return ResponseEntity.ok(instagramService.createInstagramPost(postDTO, file));
     }
 
@@ -83,7 +83,7 @@ public class InstagramController {
         try {
             String url = UriComponentsBuilder.fromHttpUrl("https://www.tiktok.com/v2/auth/authorize/")
             .queryParam("client_key", URLEncoder.encode(tiktokClientKey, StandardCharsets.UTF_8.toString()))
-            .queryParam("scope", URLEncoder.encode("user.info.basic,user.info.profile,user.info.stats,video.publish,video.list", StandardCharsets.UTF_8.toString()))
+            .queryParam("scope", URLEncoder.encode("user.info.basic,user.info.profile,user.info.stats,video.publish,video.upload,video.list", StandardCharsets.UTF_8.toString()))
             .queryParam("response_type", URLEncoder.encode("code", StandardCharsets.UTF_8.toString()))
             .queryParam("redirect_uri", URLEncoder.encode(tiktokRedirectURI, StandardCharsets.UTF_8.toString()))
             .queryParam("state", URLEncoder.encode(csrfState, StandardCharsets.UTF_8.toString()))

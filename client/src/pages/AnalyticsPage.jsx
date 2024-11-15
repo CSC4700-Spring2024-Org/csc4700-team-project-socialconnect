@@ -411,8 +411,6 @@ const AnalyticsPage = () => {
     }));
   };
 
-
-  console.log(tiktokPage)
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
     return <NoAccount />;
   }
