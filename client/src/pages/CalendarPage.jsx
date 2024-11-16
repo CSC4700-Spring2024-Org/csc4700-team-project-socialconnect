@@ -11,6 +11,11 @@ import { FaHeart, FaPlay, FaPaperPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import TimePicker from 'react-time-picker'; // Install this component if not already installed
 import interactionPlugin from '@fullcalendar/interaction';
+import { DesktopTimePicker } from '@mui/x-date-pickers/DesktopTimePicker';
+import dayjs from 'dayjs';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 
 const CalendarPage = ({ posts }) => {
@@ -237,72 +242,80 @@ const CalendarPage = ({ posts }) => {
   );
 };
 
-  return (
-    <div className="calendar-page-container">
-      <div className='cp-header-and-feed-container'>
-        <h1 style={{height: "0px"}}> Posts Summary</h1>
-        <h1 className="cp-header">Select Platforms:</h1>
-        <div className="cp-platforms-container">
-          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20} />} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20} />} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={22} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={20} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
-        </div>
-        <div className="cp-feed-container">
-          {combinedPosts.map((post) => 
-            selectedPlatforms.includes(post.source) && (
-              <PostSummary 
-                key={post.timestamp} 
-                source={post.source} 
-                post={post.media_url} 
-                caption={post.caption} 
-                likes={post.likes} 
-                shares={post.shares} 
-                views={post.views} 
-              />
-            )
-          )}
-        </div>
+return (
+  <div className="calendar-page-container">
+    <div className='cp-header-and-feed-container'>
+      <h1 style={{ height: "0px" }}>Posts Summary</h1>
+      <h1 className="cp-header">Select Platforms:</h1>
+      <div className="cp-platforms-container">
+        <PlatformCard
+          platform={"Instagram"}
+          icon={<FaInstagram size={20} />}
+          pfp={instaPage.business_discovery.profile_picture_url}
+          isSelected={selectedPlatforms.includes("Instagram")}
+          onClick={() => handlePlatformClick("Instagram")}
+        />
+        <PlatformCard
+          platform={"TikTok"}
+          icon={<FaTiktok size={20} />}
+          isSelected={selectedPlatforms.includes("TikTok")}
+          onClick={() => handlePlatformClick("TikTok")}
+        />
+        <PlatformCard
+          platform={"YouTube"}
+          icon={<FaYoutube size={22} color={"red"} />}
+          isSelected={selectedPlatforms.includes("YouTube")}
+          onClick={() => handlePlatformClick("YouTube")}
+        />
+        <PlatformCard
+          platform={"X"}
+          icon={<FaSquareXTwitter size={20} color={"black"} />}
+          isSelected={selectedPlatforms.includes("X")}
+          onClick={() => handlePlatformClick("X")}
+        />
       </div>
-      <div className="cp-calendar-and-platforms-container">
-        <div className="cp-calendar-container">
-          <FullCalendar
-            plugins={[dayGridPlugin,interactionPlugin]}
-            initialView="dayGridMonth"
-            weekends={true}
-            events={events}
-            eventContent={renderEventContent}
-            dateClick={handleDateClick} // Handle date clicks
-          />
-        {showTimePicker && (
-          <div className="time-picker-container">
-            <TimePicker
-              onChange={handleTimeChange}
-              value={selectedTime}
-              clearIcon={null}
+      <div className="cp-feed-container">
+        {combinedPosts.map((post) =>
+          selectedPlatforms.includes(post.source) && (
+            <PostSummary
+              key={post.timestamp}
+              source={post.source}
+              post={post.media_url}
+              caption={post.caption}
+              likes={post.likes}
+              shares={post.shares}
+              views={post.views}
             />
-            <button onClick={handleScheduleClick} className="schedule-post-button">
-              Schedule Post
-            </button>
-          </div>
+          )
+        )}
+      </div>
+    </div>
+    <div className="cp-right-side-container">
+      <div className="cp-calendar-container">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          weekends={true}
+          events={events}
+          eventContent={renderEventContent}
+          dateClick={handleDateClick} // Handle date clicks
+        />
+        </div>
+        <div className = "cp-time-picker-container"> 
+        {showTimePicker && (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoItem>
+                <DesktopTimePicker defaultValue={dayjs('2022-04-17T15:30')} />
+              </DemoItem>
+          </LocalizationProvider>
         )}
         </div>
-        {selectedDate && (
-        <div className="time-picker-container">
-          <p>Selected Date: {selectedDate}</p>
-          <TimePicker
-            onChange={setSelectedTime} // Update selected time
-            value={selectedTime}
-          />
-        </div>
-      )}
         <button className="cp-button" onClick={handleScheduleClick}>
           Schedule Post
         </button>
-       
-      </div>
     </div>
-  );
-};
+  </div>
+);
 
+}
 export default CalendarPage;
