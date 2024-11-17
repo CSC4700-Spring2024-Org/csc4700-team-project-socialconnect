@@ -21,7 +21,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 const CalendarPage = ({ posts }) => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState("12:00"); // Default time
+  const [selectedTime, setSelectedTime] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleDateClick = (info) => {
@@ -36,20 +36,24 @@ const CalendarPage = ({ posts }) => {
     info.dayEl.classList.add('fc-day-selected');
   };
 
-  const handleTimeChange = (time) => {
-    setSelectedTime(time);
-  };
+  const handleTimeChange = (newTime) => {
+    console.log(newTime)
+    setSelectedTime(newTime.format('HH:mm:ss'));
+  }
 
   const handleScheduleClick = () => {
     if (selectedDate && selectedTime) {
-      const urlEncodedDateTime = `${selectedDate}T${selectedTime}`;
-      navigate(`/post?datetime=${encodeURIComponent(urlEncodedDateTime)}`);
+      navigate(`/post?datetime=${encodeURIComponent(`${selectedDate}T${selectedTime}`)}`);
     }
   };
 
-  const handleClick = () => {
-    navigate('/post');
-  };
+  useEffect(() => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    setSelectedTime(`${hours}:${minutes}:${seconds}`);
+  }, []); 
 
  
 
@@ -305,7 +309,7 @@ return (
         {showTimePicker && (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoItem>
-                <DesktopTimePicker defaultValue={dayjs('2022-04-17T15:30')} />
+                <DesktopTimePicker value={dayjs(selectedTime, 'HH:mm')} onChange={handleTimeChange}/>
               </DemoItem>
           </LocalizationProvider>
         )}

@@ -32,9 +32,14 @@ public interface FuturePostRepository extends CrudRepository<FuturePost, Integer
     @Modifying
     @Query(
         nativeQuery = true,
-        value = "INSERT INTO FUTURE_POSTS(USER_ID,POST_URL,CAPTION,TAGGED_USERS,LOCATION,POST_DT,POST_TO_INSTA,POST_TO_TIKTOK,POST_TO_YOUTUBE,POST_STATUS,VIEWED_MESSAGE) " +
-        "VALUES(:id,:postURL,:caption,:taggedUsers,:location,:postDT,:postToInsta,:postToTiktok,FALSE,0,FALSE)"
+        value = "INSERT INTO FUTURE_POSTS(USER_ID, CAPTION, TAGGED_USERS, LOCATION, POST_DT, POST_TO_INSTA, POST_TO_TIKTOK, POST_TO_YOUTUBE, POST_STATUS, VIEWED_MESSAGE) " +
+                "VALUES(:id, :caption, :taggedUsers, :location, :postDT, :postToInsta, :postToTiktok, FALSE, 0, FALSE) RETURNING ID"
     )
-    void createFuturePost(@Param("id")Long id, @Param("postURL")String postURL, @Param("caption")String caption, @Param("taggedUsers")String taggedUsers, 
-    @Param("location")String location, @Param("postDT")LocalDateTime postDT, @Param("postToInsta")Boolean postToInsta, @Param("postToTiktok")Boolean postToTiktok);
+    Long createFuturePost(@Param("id") Long id, 
+                        @Param("caption") String caption, 
+                        @Param("taggedUsers") String taggedUsers, 
+                        @Param("location") String location, 
+                        @Param("postDT") LocalDateTime postDT, 
+                        @Param("postToInsta") Boolean postToInsta, 
+                        @Param("postToTiktok") Boolean postToTiktok);
 }
