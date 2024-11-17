@@ -103,32 +103,35 @@ const CalendarPage = ({ posts }) => {
     });
   };
 
-  // const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
-  //   const color = platformBorderColors[platform];
-  //   return (
-  //     <div 
-  //       className={`cp-platform-card ${isSelected ? 'selected' : ''}`} 
-  //       onClick={onClick}
-  //       style={{ color }}
-  //     >
-  //       {icon}
-  //     </div>
-  //   );
-  // };
-
-  const PlatformCard = ({ platform, icon, pfp, isSelected, onClick }) => {
+  const PlatformCard = ({ platform, isConnected, icon, pfp, isSelected, onClick }) => {
     const color = "white";
     
-    return (
-      <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
-        <div className="profile-container">
-          <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
-            {icon}
+    if (isConnected == true) {
+      return (
+        <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
+          <div className="profile-container">
+            <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
+              {icon}
+            </div>
+            <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
           </div>
-          <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
         </div>
-      </div>
-    );
+      );
+    }
+    else {
+      return (
+        <div className={`ap-platform-card disconnected`} onClick={() => navigate('../Profile')} style={{ color }}>
+          <div className="profile-container">
+            <div className="pc-platform-icon" style={{ background: "#e0e0e0" }}>
+              {icon}
+            </div>
+            <button className='ap-connect-platform-button'>
+              Connect Platform
+            </button>
+          </div>
+        </div>
+      );
+    }
   };
 
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
@@ -254,6 +257,7 @@ return (
       <div className="cp-platforms-container">
         <PlatformCard
           platform={"Instagram"}
+          isConnected={true}
           icon={<FaInstagram size={20} />}
           pfp={instaPage.business_discovery.profile_picture_url}
           isSelected={selectedPlatforms.includes("Instagram")}
@@ -261,18 +265,21 @@ return (
         />
         <PlatformCard
           platform={"TikTok"}
+          isConnected={true}
           icon={<FaTiktok size={20} />}
           isSelected={selectedPlatforms.includes("TikTok")}
           onClick={() => handlePlatformClick("TikTok")}
         />
         <PlatformCard
           platform={"YouTube"}
+          isConnected={false}
           icon={<FaYoutube size={22} color={"red"} />}
           isSelected={selectedPlatforms.includes("YouTube")}
           onClick={() => handlePlatformClick("YouTube")}
         />
         <PlatformCard
           platform={"X"}
+          isConnected={false}
           icon={<FaSquareXTwitter size={20} color={"black"} />}
           isSelected={selectedPlatforms.includes("X")}
           onClick={() => handlePlatformClick("X")}
