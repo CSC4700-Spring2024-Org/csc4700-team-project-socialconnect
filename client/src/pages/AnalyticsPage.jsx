@@ -6,6 +6,7 @@ import { AgCharts } from 'ag-charts-react';
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
 import '../Styles/AnalyticsPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const AnalyticsPage = () => {
   const { instaPage, isLoadingInsta, insights, tiktokPage } = useSelector((state) => state.insta);
@@ -489,19 +490,40 @@ const AnalyticsPage = () => {
     </div>
   );
 
-const PlatformCard = ({ platform, icon, pfp, isSelected, onClick }) => {
+const PlatformCard = ({ platform, isConnected, icon, pfp, isSelected, onClick }) => {
   const color = "white";
+  const navigate = useNavigate();
   
-  return (
-    <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
-      <div className="profile-container">
-        <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
-          {icon}
+  if (isConnected == true) {
+    return (
+      <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
+        <div className="profile-container">
+          <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
+            {icon}
+          </div>
+          <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
         </div>
-        <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
       </div>
-    </div>
-  );
+    );
+  }
+  else {
+    return (
+      <div 
+        className={`ap-platform-card disconnected`} 
+        onClick={() => navigate('../Profile')} 
+        style={{ color }}
+      >
+        <div className="profile-container">
+          <div className="pc-platform-icon" style={{ background: "#e0e0e0" }}>
+            {icon}
+          </div>
+          <button className='ap-connect-platform-button'>
+            Connect Platform
+          </button>
+        </div>
+      </div>
+    );
+  }
 };
 
 
@@ -510,10 +532,10 @@ return (
     <header className="analytics-header">
       <h1>Analytics</h1>
       <div className="ap-social-media-platforms">
-        <PlatformCard platform={"Instagram"} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-        <PlatformCard platform={"TikTok"} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-        <PlatformCard platform={"YouTube"} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-        <PlatformCard platform={"X"} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+        <PlatformCard platform={"Instagram"} isConnected = {true} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+        <PlatformCard platform={"TikTok"} isConnected = {true} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+        <PlatformCard platform={"YouTube"} isConnected = {false} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+        <PlatformCard platform={"X"} isConnected = {false} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
       </div>
     </header>
     <div className="nonHeader">
