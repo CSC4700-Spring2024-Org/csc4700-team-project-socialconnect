@@ -13,12 +13,12 @@ import instaService from '../features/instaService';
 const Profile = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
- 
     const { user, isLoading, isError, isSuccess } = useSelector(
        (state) => state.auth
     )
 
     const [initialRenderCompleted, setInitialRenderCompleted] = useState(false);
+    const [activeItem, setActiveItem] = useState('Apps')
 
     useEffect(() => {
       if (!user) {
@@ -40,47 +40,45 @@ const Profile = () => {
       }
     }, [user, isSuccess, isError, navigate, isLoading, initialRenderCompleted]);
 
-    const logInToFB = () => {
-      window.FB.login(
-        (response) => {
-          dispatch(setInstagram(response.authResponse?.accessToken));
-        },
-        {
-          config_id: '456270036836614',
-        }
-      );
-    };
 
-    const logOutOfFB = () => {
-      window.FB.logout(() => {
-        dispatch(setInstagram(null));
-      });
-    };
-    
-    const buildURL = async() => {
-      const url = await instaService.tiktokInitializeLogin()
-      const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
+    return (
+        <>
+            {!isLoading ? <div className="account-page">
+                <div className='profile-sidebar'>
+                    <div className='sidebar-item' onClick={() => setActiveItem('Apps')}>Apps and Accounts</div>
+                    <div className='sidebar-item' onClick={() => setActiveItem('Terms')}>Terms and Conditions</div>
+                    <div className='sidebar-item' onClick={() => setActiveItem('Privacy')}>Privacy Policy</div>
+                </div>
+                <ProfileItem activeItem={activeItem} dispatch={dispatch} user={user}/>
+            </div> : <></>}
+        </>
+    )
+}
 
-      
-      // window.addEventListener("message", (event) => {
-      //   console.log(event)
-      //   console.log(event.data)
-      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
-      //     console.log("HELLO")
-      //     loginWindow.close()
-      //   }
-      // });
+const ProfileItem = ({activeItem, dispatch, user}) => {
+  const logInToFB = () => {
+    window.FB.login(
+      (response) => {
+        dispatch(setInstagram(response.authResponse?.accessToken));
+      },
+      {
+        config_id: '456270036836614',
+      }
+    );
+  };
 
-      // loginWindow.addEventListener("message", (event) => {
-      //   console.log(event)
-      //   console.log(event.data)
-      //   if (event.origin === "https://danbfrost.com" && !event.data.error) {
-      //     console.log("HELLO")
-      //     loginWindow.close()
-      //   }
-      // });
-    }
+  const logOutOfFB = () => {
+    window.FB.logout(() => {
+      dispatch(setInstagram(null));
+    });
+  };
+  
+  const buildURL = async() => {
+    const url = await instaService.tiktokInitializeLogin()
+    const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
+  }
 
+  if (activeItem === 'Apps') {
     return (
         <>
             {!isLoading ? <div className="account-page">
@@ -99,18 +97,18 @@ const Profile = () => {
                         </div>
                         <div className='tiktok-connect'>
                             <FaTiktok className='tiktok-icon'/>
-                            <span>TikTok</span>
+                            <span>Tiktok</span>
                             {!user || (user && !user.tiktokConnected) ? <button onClick={buildURL}>Connect</button> :
                               <button onClick={() => dispatch(tiktokLogout())}>Logout</button>}
                         </div>
                         <div className='youtube-connect'>
                             <FaYoutube className='youtube-icon' color='red'/>
-                            <span>YouTube</span>
+                            <span>Youtube</span>
                             <button>Connect</button>
                         </div>
                         <div className='twitter-connect'>
                             <FaSquareXTwitter className='twitter-icon'/>
-                            <span>X</span>
+                            <span>Twitter</span>
                             <button>Connect</button>
                         </div>
                     </div>
