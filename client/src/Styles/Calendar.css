@@ -95,7 +95,6 @@
 /* Reduce the height of the day cells */
 .fc .fc-daygrid-day-frame {
   min-height: 1.5em;
-  max-height: 3em;
 }
 
 /* Make week day headers smaller */
