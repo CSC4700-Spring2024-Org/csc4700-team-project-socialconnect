@@ -127,22 +127,6 @@ export const authSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
-<<<<<<< HEAD
-=======
-          state.message = action.payload
-          state.user = null
-        })
-        .addCase(refreshToken.pending, (state) => {
-          state.isLoading = true
-        })
-        .addCase(refreshToken.fulfilled, (state, action) => {
-          state.isLoading = false
-          state.isSuccess = true
-        })
-        .addCase(refreshToken.rejected, (state, action) => {
-          state.isLoading = false
-          state.isError = true
->>>>>>> 60bb0cfde84bbe347365fb943adc491fe1482467
           state.message = action.payload
           state.user = null
         })

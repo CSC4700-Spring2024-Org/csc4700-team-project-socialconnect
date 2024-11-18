@@ -1,11 +1,6 @@
 import axios from 'axios'
 
-<<<<<<< HEAD
 const API_URL = process.env.REACT_APP_BACKEND_URL
-=======
-//const API_URL = 'https://api.danbfrost.com:443/api/';
-const API_URL = 'http://localhost:8080/api/'
->>>>>>> 60bb0cfde84bbe347365fb943adc491fe1482467
 
 axios.defaults.withCredentials = true;
 
@@ -43,14 +38,11 @@ const setInstagram = async (instaToken) => {
     const response = await axios.post(API_URL + 'setInstagram', {token : instaToken});
 
     return response.data;
-<<<<<<< HEAD
 }
 
 const tiktokLogout = async() => {
     const res = await axios.post(API_URL + 'tiktokLogout')
     return res.data
-=======
->>>>>>> 60bb0cfde84bbe347365fb943adc491fe1482467
 }
 
 
