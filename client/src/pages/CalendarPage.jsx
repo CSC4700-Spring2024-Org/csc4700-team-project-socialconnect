@@ -248,8 +248,7 @@ const CalendarPage = ({ posts }) => {
 return (
   <div className="calendar-page-container">
     <div className='cp-header-and-feed-container'>
-      <h1 style={{ height: "0px" }}>Posts Summary</h1>
-      <h1 className="cp-header">Select Platforms:</h1>
+      <h1 style={{ height: "15px", marginLeft: "10px", fontFamily: "-apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" }}>Posts Summary</h1>
       <div className="cp-platforms-container">
         <PlatformCard
           platform={"Instagram"}
@@ -305,7 +304,7 @@ return (
           weekends={true}
           events={events}
           eventContent={renderEventContent}
-          dateClick={handleDateClick} // Handle date clicks
+          dateClick={handleDateClick} 
         />
         </div>
         <div className = "cp-time-picker-container"> 

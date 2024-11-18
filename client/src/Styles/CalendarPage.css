@@ -121,8 +121,6 @@
 .cp-right-side-container {
   height: 100vh;
   width: 400px;
-  margin-right: 0%;
- 
 }
 
 
@@ -424,7 +422,7 @@
 }
 
 .fc-daygrid-day.selected {
-  background-color: #e6eaff; /* Light blue to indicate selection */
+  background-color: #e6eaff; 
   border: 2px solid var(--primary-color);
   color: var(--primary-color);
 }

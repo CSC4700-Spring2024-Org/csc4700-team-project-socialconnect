@@ -99,18 +99,18 @@ const Profile = () => {
                         </div>
                         <div className='tiktok-connect'>
                             <FaTiktok className='tiktok-icon'/>
-                            <span>Tiktok</span>
+                            <span>TikTok</span>
                             {!user || (user && !user.tiktokConnected) ? <button onClick={buildURL}>Connect</button> :
                               <button onClick={() => dispatch(tiktokLogout())}>Logout</button>}
                         </div>
                         <div className='youtube-connect'>
                             <FaYoutube className='youtube-icon' color='red'/>
-                            <span>Youtube</span>
+                            <span>YouTube</span>
                             <button>Connect</button>
                         </div>
                         <div className='twitter-connect'>
                             <FaSquareXTwitter className='twitter-icon'/>
-                            <span>Twitter</span>
+                            <span>X</span>
                             <button>Connect</button>
                         </div>
                     </div>

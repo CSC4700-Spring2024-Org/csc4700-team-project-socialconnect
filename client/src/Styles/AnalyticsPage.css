@@ -44,14 +44,14 @@ html, body {
   cursor: pointer;
   overflow: hidden;
   height: 50px;
-  /* border: 1px solid black; */
+  border: 1px solid black;
 }
 
 .ap-platform-card:hover {
-  transform: scale(1.05); 
+  transform: scale(1.02); 
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); 
   background-color: #f5f5f5; 
-  border: 1px solid black;
+  border: 1.5px solid black;
 }
 
 .ap-platform-card:focus {
@@ -122,10 +122,11 @@ html, body {
 }
 
 .ap-platform-card.disconnected:hover {
-  transform: scale(1.05); 
+  transform: scale(1.02); 
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); 
   background-color: #f5f5f5; 
-  border: 1px solid black;
+  border: 1.5px solid black;
+  font-weight: bold;
 }
 
 .ap-connect-platform-button {
@@ -134,11 +135,13 @@ html, body {
   cursor: pointer;
   border: none;
   background-color: #e0e0e0;
-  font-weight: bold;
   font-size: medium;
   display: flex;
-  align-items: center; /* Center vertically */
-  /* padding-right: 10px; */
+  align-items: center;
+}
+
+.ap-platform-card.disconnected:hover .ap-connect-platform-button {
+  font-weight: bold;
 }
 
 .ap-connect-platform-button:disabled {
