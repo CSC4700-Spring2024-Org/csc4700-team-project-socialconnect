@@ -11,6 +11,9 @@ import { FaInstagram, FaTiktok, FaTwitter, FaYoutube } from 'react-icons/fa';
 import instaService from '../features/instaService';
 import { toast } from 'react-toastify';
 import Loading from '../components/Loading';
+import { FaSquareXTwitter } from "react-icons/fa6";
+import { useLocation } from 'react-router-dom';
+
 
 const Post = () => {
     const [files, setFiles] = useState([]);
@@ -22,12 +25,35 @@ const Post = () => {
     const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
+    const getDatetimeFromQuery = () => {
+      const params = new URLSearchParams(location.search);
+      return params.get('datetime') ? new Date(params.get('datetime')) : new Date();
+    }
+
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    const [dateTime, setDateTime] = useState(formatDate(new Date(decodeURIComponent(getDatetimeFromQuery()))))
+
+    const platformColors = {
+      Instagram: '#FF69B4', 
+      TikTok: 'black',      
+      YouTube: 'red',       
+      X: 'black'          
+    };
     const platforms = [
-      { name: 'Instagram', icon: <FaInstagram /> },
-      { name: 'TikTok', icon: <FaTiktok /> },
-      { name: 'X', icon: <FaTwitter /> },
-      { name: 'YouTube', icon: <FaYoutube /> }
+      { name: 'Instagram', icon: <FaInstagram style={{color: platformColors["Instagram"]}} /> },
+      { name: 'TikTok', icon: <FaTiktok style={{color: platformColors["TikTok"]}} /> },
+      { name: 'YouTube', icon: <FaYoutube style={{color: platformColors["YouTube"]}} /> },
+      { name: 'X', icon: <FaSquareXTwitter style={{color: platformColors["X"]}} /> }
     ];
 
     const togglePlatform = (platform) => {
@@ -44,10 +70,10 @@ const Post = () => {
         formData.append('file', files[0]);
         formData.append('post', new Blob([JSON.stringify({urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})], { type: 'application/json' }));
 
-        const res = await instaService.createInstagramPost(user.instaRefresh, formData)
+        const res = await instaService.createInstagramPost(formData)
 
         if (res.data.error) {
-          toast(res.data.error)
+          toast.error(res.data.error)
         } else {
           setPostLinks(prev => [...prev, {Instagram:res.data}])
           setCurrStage(prev => prev + 1)
@@ -58,7 +84,7 @@ const Post = () => {
       useEffect(() => {
         if (!isLoading) {
           if (isSuccess && user) {
-            navigate('/post');
+            navigate(`${location.pathname}${location.search}`);
           } else if (isError || (!isSuccess && !user)) {
             navigate('/login');
           }
@@ -109,6 +135,17 @@ const Post = () => {
 
                   <label htmlFor="tagging">Tag Users:</label>
                   <input id="tagging" className="styled-input" type="text" placeholder="Tag users..." value={postData.mentions} onChange={(e) => setPostData(prev => ({ ...prev, mentions: e.target.value}))}/>
+
+                  <label htmlFor="datetime">Post Date and Time:</label>
+                  <input
+                    id="datetime"
+                    className="styled-input"
+                    type="datetime-local"
+                    value={dateTime}
+                    onChange={(e) =>
+                      setDateTime(e.target.value)
+                    }
+                  />
                 </div>
               </div>
               <div className='post-bottom-container'>

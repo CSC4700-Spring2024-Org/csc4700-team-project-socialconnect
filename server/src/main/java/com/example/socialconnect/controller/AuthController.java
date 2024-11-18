@@ -3,6 +3,7 @@ package com.example.socialconnect.controller;
 import com.example.socialconnect.dtos.AuthRequestDTO;
 import com.example.socialconnect.dtos.ErrorDTO;
 import com.example.socialconnect.dtos.UserRequest;
+import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.helpers.CustomUserDetails;
 import com.example.socialconnect.models.RefreshToken;
 import com.example.socialconnect.models.User;
@@ -15,7 +16,9 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +81,6 @@ public class AuthController {
             User user = userDetails.getUser();
             RefreshToken refreshToken = refreshTokenService.updateRefreshToken(user, authRequestDTO.getUserAgent());
             String accessToken = jwtService.generateToken(authRequestDTO.getUsername());
-            System.out.println("HERE 2");
             ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
                     .httpOnly(true)
                     .secure(true)
@@ -97,11 +99,18 @@ public class AuthController {
                     .path("/")
                     .maxAge(cookieExpiry * 12 * 24 * 30);
             if (!cookieDomain.equals("localhost")) {
-                cookie.domain(cookieDomain);
+                refreshCookie.domain(cookieDomain);
             }
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
             user.setPassword(null);
-            return ResponseEntity.ok(user);
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+            modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+                mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+            });
+            UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+            return ResponseEntity.ok(userResponse);
 
         } else {
             ErrorDTO errorDTO = new ErrorDTO();
@@ -132,32 +141,6 @@ public class AuthController {
         }
         return ResponseEntity.ok().body(null);
         
-        // RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse, userRequest.getUserAgent());
-        // String accessToken = jwtService.generateToken(userRequest.getUsername());
-        // // set accessToken to cookie header
-        // ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("accessToken", accessToken)
-        //     .httpOnly(true)
-        //     .secure(true)
-        //     .sameSite("None")
-        //     .path("/")
-        //     .maxAge(cookieExpiry);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-
-        // response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
-        // ResponseCookie.ResponseCookieBuilder refreshCookie = ResponseCookie.from("token", refreshToken.getToken())
-        //         .httpOnly(true)
-        //         .secure(true)
-        //         .sameSite("None")
-        //         .path("/")
-        //         .maxAge(cookieExpiry * 12 * 24 * 30);
-        // if (!cookieDomain.equals("localhost")) {
-        //     cookie.domain(cookieDomain);
-        // }
-        // response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.build().toString());
-        // userRequest.setPassword(null);
-        // return ResponseEntity.ok(userResponse);
     }
 
     @GetMapping("/verify")

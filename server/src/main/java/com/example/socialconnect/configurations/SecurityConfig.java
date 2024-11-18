@@ -3,7 +3,6 @@ package com.example.socialconnect.configurations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.socialconnect.helpers.UserDetailsServiceImpl;
@@ -41,7 +39,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "/api/refreshToken/**", "api/health/**", "api/instagramProfile/**", "api/verify/**", "api/createInstagramPost/**")
+                    req -> req.requestMatchers("/api/login/**", "/api/register/**", "api/health/**", "api/verify/**", "api/tiktokCallback/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -52,7 +50,7 @@ public class SecurityConfig {
                     e->e.accessDeniedHandler(
                                 (request, response, accessDeniedException)->response.setStatus(403)
                             )
-                            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                            .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .build();
     }
 

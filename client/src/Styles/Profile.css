@@ -41,6 +41,7 @@ body {
     background-color: #ffffff;
     overflow: hidden;
     margin: 1rem;
+    height: 100%;
 }
 
 .connections-header {
@@ -57,8 +58,8 @@ body {
 }
 
 .connections div {
-    width: 15rem;
-    height: 15rem;
+    width: 12rem;
+    height: 12rem;
     margin: 1em 0;
     padding: 1em;
     font-weight: 700;
@@ -79,6 +80,21 @@ body {
     background-color: #f4f4f4;
 }
 
+.connections a {
+    width: 90%;
+    height: 20%;
+    margin-top: 2.75rem;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    text-decoration: none;
+}
+
+.connections a:hover {
+    cursor: pointer;
+    background-color: #f0f0f0;
+    font-weight: 750;
+}
+
 .connections button:hover {
     cursor: pointer;
     background-color: #f0f0f0;
@@ -95,4 +111,37 @@ body {
     border-radius: 10px;
     font-size: 1rem;
     margin-top: 1rem;
+}
+
+.terms-container-profile-page {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    margin: 1rem;
+}
+
+.terms-content-profile-page {
+    margin: 1rem;
+}
+
+.pp-container-profile-page {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    margin: 1rem;
+}
+
+.pp-content-profile-page {
+    margin: 1rem;
+}
+
+.connections-container,
+.terms-container-profile-page,
+.pp-container-profile-page {
+    flex-grow: 1;
+    background-color: #ffffff;
+    margin: 1rem;
+    height: calc(100vh - 2rem);
+    overflow: auto;
+    box-sizing: border-box;
 }

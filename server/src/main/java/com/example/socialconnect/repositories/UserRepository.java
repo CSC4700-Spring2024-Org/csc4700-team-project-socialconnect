@@ -28,5 +28,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
    @Query("SELECT u FROM User u WHERE u.verificationCode = :code")
    public User findByVerificationCode(@Param("code") String code);
    
+   @Modifying
+   @Transactional
+   @Query(
+      nativeQuery = true,
+      value = "UPDATE users SET TIKTOK_ACCESS = CASE WHEN :accessToken IS NULL THEN NULL ELSE :accessToken END, TIKTOK_REFRESH = CASE WHEN :refreshToken IS NULL THEN NULL ELSE :refreshToken END WHERE id = :id"
+   )
+   void updateTiktok(@Param("accessToken") String accessToken, @Param("refreshToken") String refreshToken, @Param("id") Long id);
 
 }

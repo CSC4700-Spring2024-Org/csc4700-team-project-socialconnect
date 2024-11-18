@@ -1,5 +1,12 @@
 .sidebar-container {
     height: 100vh;
+    width: 4rem;
+    transition: width 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-container.expanded {
+    width: 14rem;
 }
 
 .sidebar {
@@ -16,8 +23,8 @@
 }
 
 .sidebar-toggle-container {
-    padding: 1rem;
-    padding-bottom: 0.5rem;
+    /* padding: 1rem;
+    padding-bottom: 0.5rem; */
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -31,7 +38,7 @@
     background-color: #C7D2FE;
     border-radius: 50%;
     border: none;
-    left: 3.5rem;
+    left: 3.25rem;
     top: 50%;
     display: flex;
     justify-content: center;
@@ -42,7 +49,7 @@
 }
 
 .sidebar-toggle.expanded {
-    left: 17.25rem;
+    left: 13.25rem;
     padding: 0 0.1rem 0 0;
 }
 
@@ -50,6 +57,10 @@
     flex: 1 1 0%;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .sidebar-li {
@@ -90,7 +101,7 @@
 
 /* Expanded State */
 .sidebar-span.expanded {
-    width: 13rem; /* Equivalent to w-52 */
+    width: 9rem; /* Equivalent to w-52 */
     margin-left: 0.75rem; /* Equivalent to ml-3 */
 }
 
@@ -127,4 +138,38 @@
 .sidebar-container:hover .sidebar-toggle {
     visibility: visible;
     opacity: 1;
+}
+
+.sidebar-items-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    height: 100%;
+}
+
+.sidebar-logo {
+    width: 100%;
+    height: auto;
+    max-width: 70%;
+    max-height: 20%;
+    object-fit: contain;
+}
+
+.sidebar-profile-icon {
+    color: #C7D2FE;
+    height: 1.5em;
+    width: 1.5em;
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: 2rem;
+}
+
+.sidebar-li:last-child {
+    color: red;
+}
+
+.sidebar-li:nth-last-child(2) {
+    margin-top: auto;
 }

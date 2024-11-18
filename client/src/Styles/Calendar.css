@@ -1,94 +1,115 @@
 .calendar-container {
-    height: 100%;
-    width: 100%;
-    border-radius: 10px;
-    background-color: white;
-    border: 1px solid rgb(0, 0, 0);
-    overflow: hidden;
-  }
-  
-  .fc {
-    height: 100% !important;
-    font-size: 0.85em; /* Reduce overall font size */
-  }
-  
-  .fc-scroller {
-    overflow: hidden !important;
-  }
-  
-  .fc-daygrid-day {
-    min-height: auto;
-  }
-  
-  .fc-event {
-   
-    border: none;
-    margin: 1px 0;
-    font-size: 0.8em;
-    padding: 1px 2px;
-  }
-  
-  .fc-event:hover {
-    background-color: #2c6aa0;
-  }
-  
-  .fc .fc-toolbar.fc-header-toolbar {
-    margin-bottom: 0.1em;
-    padding: 0.3em;
-  }
-  
-  .fc .fc-toolbar-title {
-    font-size: 1em;
-  }
-  
-  .fc .fc-button {
-    font-size: 0.7em;
-    padding: 0.2em 0.4em;
-  }
-  
-  .fc .fc-button .fc-icon {
-    font-size: 1em;
-  }
-  
-  .fc .fc-button-group {
-    gap: 0.1em;
-  }
-  
-  .fc .fc-toolbar-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-  }
-  
-  .fc-daygrid-day-number {
-    padding: 1px;
-    font-size: 0.8em;
-  }
-  
-  .fc-daygrid-day-frame {
-    min-height: auto;
-  }
-  
-  /* Reduce the height of the day cells */
-  .fc .fc-daygrid-day-frame {
-    min-height: 1.5em;
-  }
-  
-  /* Make week day headers smaller */
-  .fc .fc-col-header-cell-cushion {
-    padding: 2px;
-    font-size: 0.9em;
-  }
-  
-  /* Adjust the spacing in the day cells */
-  .fc .fc-daygrid-day-top {
-    flex-direction: row;
-    padding: 1px 2px;
-  }
-  
-  /* Reduce the size of event text */
-  .fc-event-title {
-    font-size: 0.75em;
-  }
-  
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid rgb(0, 0, 0);
+  overflow: hidden;
+}
+
+.fc {
+  height: 100% !important;
+  font-size: 0.8em; 
+}
+
+.fc-scroller {
+  overflow: hidden !important;
+}
+
+.fc-daygrid-day {
+  min-height: auto;
+}
+
+.fc-event {
+  border: none;
+  margin: 1px 2px;
+  font-size: 0.8em;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+}
+
+.fc-daygrid-event-harness {
+  width: auto !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+.fc-daygrid-day-events {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.fc-h-event {
+  background: transparent;
+  border: none;
+}
+
+.fc-event:hover {
+  background-color: #d9dbde;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0.1em;
+  padding: 0.3em;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1em;
+}
+
+.fc .fc-button {
+  font-size: 0.7em;
+  padding: 0.2em 0.4em;
+}
+
+.fc .fc-button .fc-icon {
+  font-size: 1em;
+}
+
+.fc .fc-button-group {
+  gap: 0.1em;
+}
+
+.fc .fc-toolbar-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.fc-daygrid-day-number {
+  padding: 1px;
+  font-size: 0.8em;
+}
+
+.fc-daygrid-day-frame {
+  min-height: auto;
+}
+
+/* Reduce the height of the day cells */
+.fc .fc-daygrid-day-frame {
+  min-height: 1.5em;
+}
+
+/* Make week day headers smaller */
+.fc .fc-col-header-cell-cushion {
+  padding: 2px;
+  font-size: 0.9em;
+}
+
+/* Adjust the spacing in the day cells */
+.fc .fc-daygrid-day-top {
+  flex-direction: row;
+  padding: 1px 2px;
+}
+
+/* Reduce the size of event text */
+.fc-event-title {
+  font-size: 0.75em;
+}

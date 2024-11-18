@@ -16,7 +16,7 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
-  const { message, isErrorInsta, instaPage } = useSelector((state) => state.insta)
+  const { message, isErrorInsta, instaPage, tiktokPage } = useSelector((state) => state.insta)
 
   const [initialRenderCompleted, setInitialRenderCompleted] = useState(false);
 
@@ -33,11 +33,11 @@ const Home = () => {
   useEffect(() => {
     if (initialRenderCompleted && !isLoading) {
       if (isSuccess && user) {
-        navigate('/');
+        // navigate('/');
         if (isErrorInsta) {
           toast.error(message)
         }
-        if (user.instaRefresh && !instaPage) {
+        if ((user.instagramConnected && !instaPage) || (user.tiktokConnected && !tiktokPage)) {
           dispatch(getInstaProfile(user))
         }
       } else if (isError || (!isSuccess && !user)) {

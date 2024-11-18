@@ -25,7 +25,7 @@ export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
     try {
       return await authService.login(user)
     } catch (error) {
-      const message = error.response.status
+      const message = error.response.data
       return thunkAPI.rejectWithValue(message)
     }
 })
@@ -38,18 +38,6 @@ export const getUser = createAsyncThunk('auth/getUser', async (thunkAPI) => {
             (error.response && error.response.data && error.response.data.message) ||
             error.message ||
             error.toString()
-        return thunkAPI.rejectWithValue(message)
-    }
-})
-
-export const refreshToken = createAsyncThunk('auth/refreshToken', async (thunkAPI) => {
-    try {
-        return await authService.refreshToken();
-    } catch (error) {
-        const message =
-            (error.response && error.response.data && error.response.data.message) ||
-            error.message ||
-            error.message.toString()
         return thunkAPI.rejectWithValue(message)
     }
 })
@@ -77,6 +65,25 @@ export const setInstagram = createAsyncThunk(
             error.toString()
           return thunkAPI.rejectWithValue(message)
       }
+  }
+)
+
+export const tiktokLogout = createAsyncThunk(
+  'auth/tiktokLogout',
+  async (thunkAPI) => {
+    try {
+        const res = await authService.tiktokLogout()
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
   }
 )
 
@@ -120,6 +127,8 @@ export const authSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
+<<<<<<< HEAD
+=======
           state.message = action.payload
           state.user = null
         })
@@ -133,7 +142,9 @@ export const authSlice = createSlice({
         .addCase(refreshToken.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
+>>>>>>> 60bb0cfde84bbe347365fb943adc491fe1482467
           state.message = action.payload
+          state.user = null
         })
         .addCase(getUser.pending, (state) => {
           state.isLoading = true
@@ -159,6 +170,20 @@ export const authSlice = createSlice({
         })
         .addCase(setInstagram.fulfilled, (state, action) => {
           state.user.instaRefresh = action.payload
+        })
+        .addCase(tiktokLogout.pending, (state) => {
+          state.isLoading = true
+        })
+        .addCase(tiktokLogout.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.user = action.payload
+
+        })
+        .addCase(tiktokLogout.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
         })
     },
   })

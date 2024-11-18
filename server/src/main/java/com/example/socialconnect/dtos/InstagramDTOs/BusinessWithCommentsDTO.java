@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BusinessWithCommentsDTO {
+    private List<InsightsDTO> insights;
     private BusinessDiscoveryListDTO business_discovery;
     private List<CommentDTO> comments;
 }

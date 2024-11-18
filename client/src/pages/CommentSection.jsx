@@ -27,7 +27,7 @@ const CommentSection = () => {
         }
     };
   
-    if (!isLoading && (user && !user.instaRefresh)) {
+    if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
       return <NoAccount />
     }
 

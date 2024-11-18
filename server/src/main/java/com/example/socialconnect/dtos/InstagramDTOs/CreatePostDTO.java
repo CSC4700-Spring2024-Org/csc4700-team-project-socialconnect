@@ -12,5 +12,8 @@ import lombok.ToString;
 public class CreatePostDTO {
     private String[] urls;
     private String caption;
-    private String[] taggedUsers;
+    private String taggedUsers;
+    private String location;
+    private Boolean postToInstagram;
+    private Boolean postToTiktok;
 }
