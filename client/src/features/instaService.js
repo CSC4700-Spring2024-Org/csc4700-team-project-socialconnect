@@ -7,7 +7,7 @@ const getInstaProfile = async () => {
     if (res.data.error) {
         return res.data
     }
-    return {instaPage: res.data.instaResponse.business_discovery, comments: res.data.instaResponse.comments, tiktokPage: res.data.tiktokResponse.data.videos, insights: res.data.instaResponse.insights}
+    return {instaPage: res.data.instaResponse.business_discovery, comments: res.data.instaResponse.comments, tiktokPage: res.data.tiktokResponse?.data?.videos, insights: res.data.instaResponse.insights}
 }
 
 const createInstagramPost = async(postData) => {

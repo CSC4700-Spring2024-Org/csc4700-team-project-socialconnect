@@ -6,6 +6,7 @@ import { AgCharts } from 'ag-charts-react';
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
 import '../Styles/AnalyticsPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const AnalyticsPage = () => {
   const { instaPage, isLoadingInsta, insights, tiktokPage } = useSelector((state) => state.insta);
@@ -13,7 +14,14 @@ const AnalyticsPage = () => {
 
   const [selectedPlatforms, setSelectedPlatforms] = useState(["Instagram"]);
 
-  const platformColors = {
+  const platformCardColors = { 
+    Instagram: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%)',
+    TikTok: 'black',      
+    YouTube: 'white',       
+    X: 'white'          
+  };
+
+  const platformLineColors = {
     Instagram: '#FF69B4', 
     TikTok: 'black',      
     YouTube: 'red',       
@@ -213,11 +221,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -230,7 +238,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} likes`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -242,11 +250,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -259,7 +267,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} views`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -271,11 +279,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -288,7 +296,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} shares`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -300,11 +308,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -317,7 +325,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} secs`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -329,11 +337,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -346,7 +354,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Reach`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -358,11 +366,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -375,7 +383,7 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Saved`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
@@ -387,11 +395,11 @@ const AnalyticsPage = () => {
       type: 'line',
       xKey: 'date',
       yKey: platform,
-      stroke: platformColors[platform],
+      stroke: platformLineColors[platform],
       marker: {
         enabled: true,
         size: 5,
-        fill: platformColors[platform]
+        fill: platformLineColors[platform]
       },
       tooltip: {
         enabled: true,
@@ -404,15 +412,13 @@ const AnalyticsPage = () => {
           return {
             title: formattedDate,
             content: `${params.datum[platform]} Comments`,
-            backgroundColor: platformColors[platform]
+            backgroundColor: platformLineColors[platform]
           };
         }
       }
     }));
   };
 
-
-  console.log(tiktokPage)
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
     return <NoAccount />;
   }
@@ -484,43 +490,66 @@ const AnalyticsPage = () => {
     </div>
   );
 
-  const PlatformCard = ({ platform, icon, isSelected, onClick }) => {
-    const color = platformColors[platform];
-    
+const PlatformCard = ({ platform, isConnected, icon, pfp, isSelected, onClick }) => {
+  const color = "white";
+  const navigate = useNavigate();
+  
+  if (isConnected == true) {
     return (
-      <div 
-        className={`platform-card ${isSelected ? 'selected' : ''}`} 
-        onClick={onClick}
-        style = {{color}}
-      >
-        {icon}
+      <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color}}>
+        <div className="profile-container">
+          <div className="pc-platform-icon" style={{ background: platformCardColors[platform] }}>
+            {icon}
+          </div>
+          <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
+        </div>
       </div>
     );
-  };
-
-  return (
-    <div className="analytics-container">
-      <header className="analytics-header">
-        <h1>Analytics</h1>
-        <div className="social-media-platforms">
-          <PlatformCard platform={"Instagram"} icon={<FaInstagram size={20}/>} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-          <PlatformCard platform={"TikTok"} icon={<FaTiktok size={20}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-          <PlatformCard platform={"YouTube"} icon={<FaYoutube size={20}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
-          <PlatformCard icon={<FaSquareXTwitter size={20}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+  }
+  else {
+    return (
+      <div 
+        className={`ap-platform-card disconnected`} 
+        onClick={() => navigate('../Profile')} 
+        style={{ color }}
+      >
+        <div className="profile-container">
+          <div className="pc-platform-icon" style={{ background: "#e0e0e0" }}>
+            {icon}
+          </div>
+          <button className='ap-connect-platform-button'>
+            Connect Platform
+          </button>
         </div>
-      </header>
-      <div className="nonHeader">
-        {['Likes', 'Views', 'Shares', 'AvgWatchTime','Reach','Saved','Comments'].map((graphType) => (
-          <GraphComponent
-            key={graphType}
-            title={graphType}
-            data={graphDataMap[graphType]} 
-            series={graphSeriesMap[graphType]}
-          />
-        ))}
       </div>
+    );
+  }
+};
+
+
+return (
+  <div className="analytics-container">
+    <header className="analytics-header">
+      <h1>Analytics</h1>
+      <div className="ap-social-media-platforms">
+        <PlatformCard platform={"Instagram"} isConnected = {true} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+        <PlatformCard platform={"TikTok"} isConnected = {true} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+        <PlatformCard platform={"YouTube"} isConnected = {false} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+        <PlatformCard platform={"X"} isConnected = {false} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
+      </div>
+    </header>
+    <div className="nonHeader">
+      {['Likes', 'Views', 'Shares', 'AvgWatchTime','Reach','Saved','Comments'].map((graphType) => (
+        <GraphComponent
+          key={graphType}
+          title={graphType}
+          data={graphDataMap[graphType]} 
+          series={graphSeriesMap[graphType]}
+        />
+      ))}
     </div>
-  );
+  </div>
+);
 };
 
 export default AnalyticsPage;

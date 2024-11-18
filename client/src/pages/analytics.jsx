@@ -10,8 +10,6 @@ import '../Styles/carousel.min.css';
 
 export default function Analytics() {
   const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
-  console.log(insights)
-  console.log(instaPage)
   const { user, isLoading } = useSelector((state) => state.auth);
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');
@@ -26,8 +24,9 @@ export default function Analytics() {
   }, [isLoadingInsta, insights, selectedPlatform, selectedDataType]);
 
   const updateChartData = () => {
-    let filteredData, yKey, color, counts, dates;
-
+    let filteredData, yKey, color
+    let counts = []
+    let dates = []
     switch (selectedPlatform) {
       case 'Instagram':
         filteredData = insights.filter((metric) => {
@@ -44,9 +43,11 @@ export default function Analytics() {
         color = '#FF69B4';
         break;
       case 'TikTok':
-        const metric = selectedDataType.slice(0,selectedDataType.length-1).toLowerCase() + "_count"
-        counts = tiktokPage.map(post => post[metric])
-        dates = tiktokPage.map(post => new Date(post.create_time*1000))
+        if (tiktokPage) {
+          const metric = selectedDataType.slice(0,selectedDataType.length-1).toLowerCase() + "_count"
+          counts = tiktokPage.map(post => post[metric])
+          dates = tiktokPage.map(post => new Date(post.create_time*1000))
+        }
         yKey = 'TikTok';
         color = '#000000';
         break;
@@ -144,7 +145,7 @@ export default function Analytics() {
         onChange={(index) => setSelectedDataType(dataTypes[index])}
       >
         {dataTypes.map((dataType, index) => (
-          <div key={index} style={{ height: '100%' }}>
+          <div key={index} style={{ height: '100%', backgroundColor: 'white' }}>
             <AgCharts options={chartOptions} style={{ height: '90%' }}/>
           </div>
         ))}

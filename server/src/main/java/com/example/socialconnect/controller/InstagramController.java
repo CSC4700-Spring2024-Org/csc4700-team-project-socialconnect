@@ -3,6 +3,7 @@ package com.example.socialconnect.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.socialconnect.dtos.InstagramDTOs.CommentDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.CreatePostDTO;
 import com.example.socialconnect.helpers.CustomUserDetails;
+import com.example.socialconnect.services.FuturePostService;
 import com.example.socialconnect.services.InstagramService;
 
 import jakarta.servlet.http.Cookie;
@@ -38,6 +40,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class InstagramController {
     @Autowired
     InstagramService instagramService;
+
+    @Autowired
+    FuturePostService futurePostService;
 
     @Value("${tiktok.key}")
     private String tiktokClientKey;
@@ -54,8 +59,13 @@ public class InstagramController {
     }
 
     @PostMapping("/createInstagramPost")
-    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile[] file) {
         return ResponseEntity.ok(instagramService.createInstagramPost(postDTO, file));
+    }
+
+    @PostMapping("schedulePost")
+    public ResponseEntity<?> schedulePost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("file") MultipartFile[] file, @RequestPart("datetime") LocalDateTime postDT) {
+        return ResponseEntity.ok(futurePostService.saveFuturePost(postDTO, postDT, file));
     }
 
     @PostMapping("/replyInstagram")
@@ -83,7 +93,7 @@ public class InstagramController {
         try {
             String url = UriComponentsBuilder.fromHttpUrl("https://www.tiktok.com/v2/auth/authorize/")
             .queryParam("client_key", URLEncoder.encode(tiktokClientKey, StandardCharsets.UTF_8.toString()))
-            .queryParam("scope", URLEncoder.encode("user.info.basic,user.info.profile,user.info.stats,video.publish,video.list", StandardCharsets.UTF_8.toString()))
+            .queryParam("scope", URLEncoder.encode("user.info.basic,user.info.profile,user.info.stats,video.publish,video.upload,video.list", StandardCharsets.UTF_8.toString()))
             .queryParam("response_type", URLEncoder.encode("code", StandardCharsets.UTF_8.toString()))
             .queryParam("redirect_uri", URLEncoder.encode(tiktokRedirectURI, StandardCharsets.UTF_8.toString()))
             .queryParam("state", URLEncoder.encode(csrfState, StandardCharsets.UTF_8.toString()))

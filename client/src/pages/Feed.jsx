@@ -46,8 +46,8 @@ const Feed = (props) => {
         case "VIDEO":
             if (source === "TikTok") {
                 post = (
-                    <div className="feedContainer" ref={feedRef}>
-                        <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
+                    <div className="feedContainer" ref={feedRef} style= {{border:'1px solid black'}}>
+                        <p className='sourceText'>{sourceToIconMap[source]}</p>
                         {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://www.tiktok.com/player/v1/${media_url}?description=1`} allow="fullscreen"></iframe> : <p>Video Not Available</p>}
                         <br />
                     </div>
@@ -55,8 +55,8 @@ const Feed = (props) => {
             } else {
                 // Use video tag for other platforms
                 post = (
-                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef}>
-                        <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
+                    <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef} style= {{border:'1px solid #E1306C'}}>
+                        <p className='sourceText'>{sourceToIconMap[source]}</p>
                         {isVisible && media_url ? (
                             <video
                                 src={media_url}
@@ -76,7 +76,7 @@ const Feed = (props) => {
         case "CAROUSEL_ALBUM":
             post = (
                 <div onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)}>
-                    <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
+                    <p className='sourceText'>{sourceToIconMap[source]}</p>
                     {media_url ? (
                         <img 
                             id={id} 
@@ -94,7 +94,7 @@ const Feed = (props) => {
         default:
             post = (
                 <div onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)}>
-                    <p className='sourceText'>{sourceToIconMap[source]} {source}</p>
+                    <p className='sourceText'>{sourceToIconMap[source]}</p>
                     {media_url ? (
                         <img 
                             className="img"
