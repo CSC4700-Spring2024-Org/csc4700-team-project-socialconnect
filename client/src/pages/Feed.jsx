@@ -48,12 +48,19 @@ const Feed = (props) => {
                 post = (
                     <div className="feedContainer" ref={feedRef} style= {{border:'1px solid black'}}>
                         <p className='sourceText'>{sourceToIconMap[source]}</p>
-                        {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://www.tiktok.com/player/v1/${media_url}?description=1`} allow="fullscreen"></iframe> : <p>Video Not Available</p>}
+                        {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://www.tiktok.com/player/v1/${media_url}?description=1&loop=1&autoplay=1`} allow="fullscreen"></iframe> : <p>Video Not Available</p>}
+                        <br />
+                    </div>
+                );
+            } else if (source === "YouTube") {
+                post = (
+                    <div className="feedContainer" ref={feedRef} style= {{border:'1px solid red'}}>
+                        <p className='sourceText'>{sourceToIconMap[source]}</p>
+                        {isVisible && media_url ? <iframe height="100%" width= "100%" src={`https://youtube.com/embed/${media_url}?showinfo=0&loop=1&controls=0&modestbranding=1`} allow="autoplay; fullscreen"></iframe> : <p>Video Not Available</p>}
                         <br />
                     </div>
                 );
             } else {
-                // Use video tag for other platforms
                 post = (
                     <div className="feedContainer" onMouseEnter={() => setShowCaption(true)} onMouseLeave={() => setShowCaption(false)} ref={feedRef} style= {{border:'1px solid #E1306C'}}>
                         <p className='sourceText'>{sourceToIconMap[source]}</p>
@@ -63,6 +70,8 @@ const Feed = (props) => {
                                 type="video/mp4"
                                 controls
                                 playsInline
+                                autoPlay
+                                loop
                             ></video>
                         ) : (
                             <p className="notAvailable">Video not available</p>
