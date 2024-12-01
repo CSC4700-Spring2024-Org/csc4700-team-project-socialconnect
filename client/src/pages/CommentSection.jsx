@@ -36,10 +36,11 @@ const CommentSection = () => {
     combinedComments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
     const [replyTo, setReplyTo] = useState(null);
+    console.log(replyTo)
     const [replyContent, setReplyContent] = useState('');
 
     const handleReplyButtonClick = (comment) => {
-        setReplyTo(comment.id === replyTo.id ? null : {source : comment.source, id: comment.id});
+        setReplyTo(replyTo && comment.id === replyTo.id ? null : {source : comment.source, id: comment.id});
     };
 
     const handleSendButtonClick = () => {
@@ -79,9 +80,9 @@ const CommentSection = () => {
                             </div>
                             <p className='comment-text'>{comment.text}</p>
                             <button className='reply-button' onClick={() => handleReplyButtonClick(comment)}>
-                                {replyTo === comment.id ? 'Cancel' : 'Reply'}
+                                {replyTo && replyTo.id === comment.id ? 'Cancel' : 'Reply'}
                             </button>
-                            {replyTo === comment.id &&
+                            {replyTo && replyTo.id === comment.id &&
                                 <div className='reply-input-container'>
                                     <input
                                         type='text'
@@ -109,9 +110,9 @@ const CommentSection = () => {
                                                     </div>
                                                     <p className='comment-text'>{reply.text}</p>
                                                     <button className='reply-button' onClick={() => handleReplyButtonClick(reply)}>
-                                                        {replyTo === reply.id ? 'Cancel' : 'Reply'}
+                                                        {replyTo && replyTo.id === reply.id ? 'Cancel' : 'Reply'}
                                                     </button>
-                                                    {replyTo === reply.id &&
+                                                    {replyTo && replyTo.id === reply.id &&
                                                         <div className='reply-input-container'>
                                                             <input
                                                                 type='text'

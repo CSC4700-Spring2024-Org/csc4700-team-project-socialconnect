@@ -64,6 +64,7 @@ import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeAltAnalyticsDTO;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeChannelListResponse;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCombinedResponseDTO;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCommentResponseDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeErrorDTO;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubePlaylistItemListResponse;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeTokenRequestDTO;
 import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCombinedResponseDTO.YoutubeVideoInfo;
@@ -907,10 +908,65 @@ public class InstagramService {
                 modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
                     mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
                     mapper.using(tokenConverter).map(User::getTiktokAccess, UserResponse::setTiktokConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
                 });
                 UserResponse userResponse = modelMapper.map(user, UserResponse.class);
                 System.out.println("TIKTOK LOGOUT USER RESPONSE: " + userResponse);
                 return userResponse;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging out. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object youtubeLogout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetail.getUser();
+        String accessToken = user.getYoutubeAccess();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your YouTube account");
+            return dto;
+        }
+
+        try {
+            URIBuilder builder = new URIBuilder("https://oauth2.googleapis.com/revoke");
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("token", accessToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                userService.updateYoutube(null, null, userDetail.getUser().getId());
+                user.setPassword(null);
+                user.setYoutubeAccess(null);
+                user.setYoutubeRefresh(null);
+                modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+                Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+                modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                    mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeAccess, UserResponse::setYoutubeConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
+                });
+                UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+                return userResponse;
+            } else {
+                ObjectMapper objectMapper = new ObjectMapper();
+                YoutubeErrorDTO youtubeLogoutResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), YoutubeErrorDTO.class);
+                System.out.println(youtubeLogoutResponse.getError());
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error logging out of YouTube");
+                return dto;
             }
 
         } catch (Exception e) {

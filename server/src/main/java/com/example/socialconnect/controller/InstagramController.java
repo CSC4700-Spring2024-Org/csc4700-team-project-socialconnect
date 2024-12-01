@@ -92,6 +92,11 @@ public class InstagramController {
         return ResponseEntity.ok(instagramService.tiktokLogout());
     }
 
+    @PostMapping("/youtubeLogout")
+    public ResponseEntity<?> youtubeLogout() {
+        return ResponseEntity.ok(instagramService.youtubeLogout());
+    }
+
     @GetMapping("/tiktokInitializeLogin")
     public ResponseEntity<?> tiktokInitializeLogin(HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
