@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AgCharts } from 'ag-charts-react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import NoAccount from '../components/NoAccount';
 import Spinner from '../components/Spinner';
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
@@ -14,6 +15,7 @@ export default function Analytics() {
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');
   const [chartOptions, setChartOptions] = useState({});
+  const navigate = useNavigate();
 
   const dataTypes = ['Views', 'Likes', 'Shares'];
 
@@ -116,41 +118,90 @@ export default function Analytics() {
     return <Spinner />;
   }
 
+  const platformCardColors = { 
+    Instagram: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%)',
+    TikTok: 'black',      
+    YouTube: 'white',       
+    X: 'white'          
+  };
+
+  const PlatformCard = ({ platform, isConnected, icon, pfp, isSelected, onClick }) => {
+    const color = "white";
+    
+    if (isConnected == true) {
+      return (
+        <div className={`ap-platform-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style = {{color, height: '70%', width: '23%'}} >
+          <div className="profile-container">
+            <div className="pc-platform-icon" style={{ background: platformCardColors[platform], height: "100%" }}>
+              {icon}
+            </div>
+            <img src={pfp} style={{ width: '100%', height: '100%', objectFit: "cover" }} />
+          </div>
+        </div>
+      );
+    }
+    else {
+      return (
+        <div className={`ap-platform-card disconnected`} onClick={() => navigate('../Profile')} style = {{color, height: '70%', width: '23%'}}>
+          <div className="profile-container">
+            <div className="pc-platform-icon" style={{ background: "#e0e0e0", height: "100%" }}>
+              {icon}
+            </div>
+            <button className='ap-connect-platform-button' style={{fontSize: 'small'}}>
+              Connect Platform
+            </button>
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px', height:'10%' }}>
-        <div onClick={() => handlePlatformChange('Instagram')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-          <FaInstagram size={20} color="#E1306C" />
-          <span style={{ color: 'black', marginLeft: '5px' }}>Instagram </span>
-        </div>
-        <div onClick={() => handlePlatformChange('TikTok')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-          <FaTiktok size={20} />
-          <span style={{ color: 'black', marginLeft: '5px' }}>TikTok </span>
-        </div>
-        <div onClick={() => handlePlatformChange('YouTube')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-          <FaYoutube size={20} color="#FF0000" />
-          <span style={{ color: 'black', marginLeft: '5px' }}>YouTube </span>
-        </div>
-        <div onClick={() => handlePlatformChange('X')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-          <FaSquareXTwitter size={20} />
-          <span style={{ color: 'black', marginLeft: '5px' }}>X </span>
-        </div>
+        <PlatformCard
+          platform={"Instagram"}
+          isConnected={true}
+          icon={<FaInstagram size={15} />}
+          pfp={instaPage.business_discovery.profile_picture_url}
+          isSelected={selectedPlatform.includes("Instagram")}
+          onClick={() => handlePlatformChange("Instagram")}
+        />
+        <PlatformCard
+          platform={"TikTok"}
+          isConnected={true}
+          icon={<FaTiktok size={15} />}
+          isSelected={selectedPlatform.includes("TikTok")}
+          onClick={() => handlePlatformChange("TikTok")}
+        />
+        <PlatformCard
+          platform={"YouTube"}
+          isConnected={false}
+          icon={<FaYoutube size={17} color={"red"} />}
+          onClick={() => handlePlatformChange("YouTube")}
+        />
+        <PlatformCard
+          platform={"X"}
+          isConnected={false}
+          icon={<FaSquareXTwitter size={17} color={"black"} />}
+          onClick={() => handlePlatformChange("X")}
+        />
       </div>
       <div style={{ flexGrow: 1, overflowY: 'hidden' }}>
-      <Carousel
-        showArrows={true}
-        showStatus={true}
-        showIndicators={true}
-        infiniteLoop={true}
-        onChange={(index) => setSelectedDataType(dataTypes[index])}
-      >
-        {dataTypes.map((dataType, index) => (
-          <div key={index} style={{ height: '100%', backgroundColor: 'white' }}>
-            <AgCharts options={chartOptions} style={{ height: '90%' }}/>
-          </div>
-        ))}
-      </Carousel>
-       </div>
+        <Carousel
+          showArrows={true}
+          showStatus={true}
+          showIndicators={true}
+          infiniteLoop={true}
+          onChange={(index) => setSelectedDataType(dataTypes[index])}
+        >
+          {dataTypes.map((dataType, index) => (
+            <div key={index} style={{ height: '100%', backgroundColor: 'white' }}>
+              <AgCharts options={chartOptions} style={{ height: '100%' }}/>
+            </div>
+          ))}
+        </Carousel>
+      </div>
     </div>
   );
 }

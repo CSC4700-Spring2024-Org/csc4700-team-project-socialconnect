@@ -277,7 +277,7 @@ body {
     margin: 1.5rem;
     width: 85%;
     margin-top: 0.5rem;
-    box-shadow: 0 0 10px rgba(225, 48, 108, 1);
+    box-shadow: 0 0 10px rgba(225, 48, 108, 0.8);
     border-radius: 10px;
   }
 
