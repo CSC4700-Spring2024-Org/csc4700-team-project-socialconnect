@@ -131,8 +131,15 @@ body {
     width: 90%;
     margin-top: 0.5rem;
     /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); */
-    box-shadow: 0 0 8px rgba(225, 48, 108, 0.8);
+    
     border-radius: 10px;
+  }
+
+  .comment-container.Instagram {
+    box-shadow: 0 0 8px rgba(225, 48, 108, 0.8);
+  }
+  .comment-container.YouTube {
+    box-shadow: 0 0 8px rgba(225, 0, 0, 0.8);
   }
 
   .comment-platform {

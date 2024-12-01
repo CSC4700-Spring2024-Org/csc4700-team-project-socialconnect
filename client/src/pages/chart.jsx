@@ -7,7 +7,7 @@ import '../Styles/instaFeeds.css'
 import Spinner from '../components/Spinner'
 
 const Chart = () => {
-  const { instaPage, isLoadingInsta, tiktokPage } = useSelector((state) => state.insta)
+  const { instaPage, isLoadingInsta, tiktokPage , youtubePage} = useSelector((state) => state.insta)
   const { user, isLoading } = useSelector((state) => state.auth);
 
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
@@ -19,7 +19,7 @@ const Chart = () => {
   }
 
   const combinedPosts = [
-    ...(tiktokPage ? tiktokPage.map(post => ({
+    ...(tiktokPage ? tiktokPage.videos.data.videos.map(post => ({
       timestamp: post.create_time * 1000,
       source: 'TikTok',
       caption: post.video_description,
@@ -30,7 +30,14 @@ const Chart = () => {
       ...post,
       timestamp: post.timestamp,
       source: 'Instagram'
-    }))
+    })),
+    ...(youtubePage ? youtubePage.videos.map(post => ({
+      timestamp: post.contentDetails.videoPublishedAt,
+      source: 'YouTube',
+      caption: null,
+      media_url: post.contentDetails.videoId,
+      media_type: 'VIDEO'
+    })) : [])
   ]
   
   combinedPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

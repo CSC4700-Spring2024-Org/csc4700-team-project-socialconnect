@@ -32,7 +32,7 @@ public class FuturePostService {
     @Autowired
     FileUploadService fileUploadService;
 
-    @Scheduled(cron = "0 */15 * ? * *")
+    //@Scheduled(cron = "0 */15 * ? * *")
     public void postScheduledPosts() {
         List<FuturePost> futurePosts = futurePostRepository.findPosts();
         for (FuturePost post : futurePosts) {
@@ -51,16 +51,34 @@ public class FuturePostService {
     public Object saveFuturePost(CreatePostDTO post, LocalDateTime postDT, MultipartFile[] files) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
-        Long userID = userDetail.getUser().getId();
-        Long futurePostID = futurePostRepository.createFuturePost(userID, post.getCaption(), post.getTaggedUsers(), post.getLocation(), postDT, post.getPostToInstagram(), post.getPostToTiktok());
         
+        FuturePost futurePost = new FuturePost();
+        futurePost.setUserInfo(userDetail.getUser());
+        futurePost.setCaption(post.getCaption());
+        futurePost.setTaggedUsers(post.getTaggedUsers());
+        futurePost.setLocation(post.getLocation());
+        futurePost.setPostToInsta(post.getPostToInstagram());
+        futurePost.setPostToTiktok(post.getPostToTiktok());
+        futurePost.setPostDT(postDT);
+        futurePost.setPostStatus(0);
+        futurePost.setPostToYoutube(false);
+        futurePost.setViewedMessage(false);
+        Integer futurePostID = futurePostRepository.save(futurePost).getId();
+
+        String[] mediaURLs = new String[files.length];
         for (MultipartFile file : files) {
             try {
-                String mediaURL = fileUploadService.uploadFile(file);
+                String mediaURL = "https://posts.danbfrost.com/" + fileUploadService.uploadFile(file);
                 postMediaRepository.createPostMedia(futurePostID, mediaURL);
             } catch (Exception e) {
+                System.out.println(e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError("Error uploading file for future post");
+
+                //Logic to delete future post if one of the uploads fails
+                for (String url : mediaURLs) {
+                    fileUploadService.deleteFile(url);
+                }
                 return errorDTO;
             }
         }

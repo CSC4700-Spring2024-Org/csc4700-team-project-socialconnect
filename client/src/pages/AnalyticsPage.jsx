@@ -9,7 +9,7 @@ import '../Styles/AnalyticsPage.css';
 import { useNavigate } from 'react-router-dom';
 
 const AnalyticsPage = () => {
-  const { instaPage, isLoadingInsta, insights, tiktokPage } = useSelector((state) => state.insta);
+  const { instaPage, isLoadingInsta, insights, tiktokPage, youtubePage } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
 
   const [selectedPlatforms, setSelectedPlatforms] = useState(["Instagram"]);
@@ -57,13 +57,24 @@ const AnalyticsPage = () => {
     }
 
     if (!isLoadingInsta && tiktokPage) {
-      const tiktokLikes = tiktokPage.map((video) => video.like_count);
-      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+      const tiktokLikes = tiktokPage.videos.data.videos.map((video) => video.like_count);
+      const tiktokDates = tiktokPage.videos.data.videos.map((video) => new Date(video.create_time * 1000));
   
       tiktokLikes.forEach((likeCount, index) => {
         const date = tiktokDates[index];
         if (!dateMap.has(date)) dateMap.set(date, { date });
         dateMap.get(date).TikTok = likeCount;
+      });
+    }
+
+    if (!isLoadingInsta && youtubePage) {
+      const youtubeViews = youtubePage.videos.map((video) => video.statistics !== null ? Number(video.statistics.likes) : null)
+      const youtubeDates = youtubePage.videos.map((video) => new Date(video.contentDetails.videoPublishedAt))
+
+      youtubeViews.forEach((likeCount, index) => {
+        const date = youtubeDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).YouTube = likeCount;
       });
     }
   
@@ -89,13 +100,24 @@ const AnalyticsPage = () => {
     }
   
     if (!isLoadingInsta && tiktokPage) {
-      const tiktokViews = tiktokPage.map((video) => video.view_count);
-      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+      const tiktokViews = tiktokPage.videos.data.videos.map((video) => video.view_count);
+      const tiktokDates = tiktokPage.videos.data.videos.map((video) => new Date(video.create_time * 1000));
   
       tiktokViews.forEach((viewCount, index) => {
         const date = tiktokDates[index];
         if (!dateMap.has(date)) dateMap.set(date, { date });
         dateMap.get(date).TikTok = viewCount;
+      });
+    }
+
+    if (!isLoadingInsta && youtubePage) {
+      const youtubeViews = youtubePage.videos.map((video) => video.statistics !== null ? Number(video.statistics.views) : null)
+      const youtubeDates = youtubePage.videos.map((video) => new Date(video.contentDetails.videoPublishedAt))
+
+      youtubeViews.forEach((viewCount, index) => {
+        const date = youtubeDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).YouTube = viewCount;
       });
     }
   
@@ -120,8 +142,8 @@ const AnalyticsPage = () => {
     }
 
     if (!isLoadingInsta && tiktokPage) {
-      const tiktokShares = tiktokPage.map((video) => video.share_count);
-      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+      const tiktokShares = tiktokPage.videos.data.videos.map((video) => video.share_count);
+      const tiktokDates = tiktokPage.videos.data.videos.map((video) => new Date(video.create_time * 1000));
   
       tiktokShares.forEach((shareCount, index) => {
         const date = tiktokDates[index];
@@ -129,7 +151,17 @@ const AnalyticsPage = () => {
         dateMap.get(date).TikTok = shareCount;
       });
     }
-  
+
+    if (!isLoadingInsta && youtubePage) {
+      const youtubeViews = youtubePage.videos.map((video) => video.statistics !== null ? Number(video.statistics.shares) : null)
+      const youtubeDates = youtubePage.videos.map((video) => new Date(video.contentDetails.videoPublishedAt))
+
+      youtubeViews.forEach((shareCount, index) => {
+        const date = youtubeDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).YouTube = shareCount;
+      });
+    }
     res = Array.from(dateMap.values())
     return res
   };
@@ -146,6 +178,17 @@ const AnalyticsPage = () => {
         const date = dates[index];
         if (!dateMap.has(date)) dateMap.set(date, { date });
         dateMap.get(date).Instagram = watchCount;
+      });
+    }
+
+    if (!isLoadingInsta && youtubePage) {
+      const youtubeViews = youtubePage.videos.map((video) => video.statistics !== null ? Number(video.statistics.averageViewDuration) : null)
+      const youtubeDates = youtubePage.videos.map((video) => new Date(video.contentDetails.videoPublishedAt))
+
+      youtubeViews.forEach((averageViewDuration, index) => {
+        const date = youtubeDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).YouTube = averageViewDuration;
       });
     }
 
@@ -203,13 +246,24 @@ const AnalyticsPage = () => {
     }
 
     if (!isLoadingInsta && tiktokPage) {
-      const tiktokComments = tiktokPage.map((video) => video.comment_count);
-      const tiktokDates = tiktokPage.map((video) => new Date(video.create_time * 1000));
+      const tiktokComments = tiktokPage.videos.data.videos.map((video) => video.comment_count);
+      const tiktokDates = tiktokPage.videos.data.videos.map((video) => new Date(video.create_time * 1000));
   
       tiktokComments.forEach((commentCount, index) => {
         const date = tiktokDates[index];
         if (!dateMap.has(date)) dateMap.set(date, { date });
         dateMap.get(date).TikTok = commentCount;
+      });
+    }
+
+    if (!isLoadingInsta && youtubePage) {
+      const youtubeViews = youtubePage.videos.map((video) => video.statistics !== null ? Number(video.statistics.comments) : null)
+      const youtubeDates = youtubePage.videos.map((video) => new Date(video.contentDetails.videoPublishedAt))
+
+      youtubeViews.forEach((commentCount, index) => {
+        const date = youtubeDates[index];
+        if (!dateMap.has(date)) dateMap.set(date, { date });
+        dateMap.get(date).YouTube = commentCount;
       });
     }
     res = Array.from(dateMap.values())
@@ -532,9 +586,9 @@ return (
     <header className="analytics-header">
       <h1>Analytics</h1>
       <div className="ap-social-media-platforms">
-        <PlatformCard platform={"Instagram"} isConnected = {true} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-        <PlatformCard platform={"TikTok"} isConnected = {true} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-        <PlatformCard platform={"YouTube"} isConnected = {false} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+        <PlatformCard platform={"Instagram"} isConnected = {user.instagramConnected} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
+        <PlatformCard platform={"TikTok"} isConnected = {user.tiktokConnected} icon={<FaTiktok size={23}/>} pfp={tiktokPage.profilePicture} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+        <PlatformCard platform={"YouTube"} isConnected = {user.youtubeConnected} icon={<FaYoutube size={25} color={"red"}/>} pfp={youtubePage.profilePicture} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
         <PlatformCard platform={"X"} isConnected = {false} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
       </div>
     </header>

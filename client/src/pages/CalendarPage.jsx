@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import '../Styles/CalendarPage.css';
@@ -23,6 +23,8 @@ const CalendarPage = ({ posts }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const { instaPage, isLoadingInsta, tiktokPage, insights, youtubePage } = useSelector((state) => state.insta);
+  const { user, isLoading } = useSelector((state) => state.auth);
 
   const handleDateClick = (info) => {
     setSelectedDate(info.dateStr);
@@ -37,7 +39,6 @@ const CalendarPage = ({ posts }) => {
   };
 
   const handleTimeChange = (newTime) => {
-    console.log(newTime)
     setSelectedTime(newTime.format('HH:mm:ss'));
   }
 
@@ -55,7 +56,39 @@ const CalendarPage = ({ posts }) => {
     setSelectedTime(`${hours}:${minutes}:${seconds}`);
   }, []); 
 
- 
+  const combinedPosts = useMemo(() => {
+    return [
+    ...(tiktokPage ? tiktokPage.videos.data.videos.map(post => ({
+      timestamp: post.create_time * 1000,
+      source: 'TikTok',
+      caption: post.video_description,
+      media_url: `https://www.tiktok.com/player/v1/${post.id}?description=1`,
+      media_type: 'VIDEO',
+      views: post.view_count,
+      likes: post.like_count,
+      shares: post.share_count
+    })) : []),
+    ...(youtubePage ? youtubePage.videos.map(post => ({
+      timestamp: post.contentDetails.videoPublishedAt,
+      source: 'YouTube',
+      caption: post.snippet.title,
+      media_url: `https://youtube.com/embed/${post.contentDetails.videoId}?showinfo=0&loop=1&controls=0&modestbranding=1`,
+      media_type: 'VIDEO',
+      views: (post.statistics ? post.statistics.views : 0),
+      likes: (post.statistics ? post.statistics.likes : 0),
+      shares: (post.statistics ? post.statistics.shares : 0)
+    })) : []),
+    ...(instaPage ? instaPage.business_discovery.media.data.map(post => ({
+      timestamp: post.timestamp,
+      media_url: post.media_url,
+      media_type: post.media_type,
+      caption: post.caption,
+      likes: post.like_count,
+      views: insights.find((insight) => insight.name === "ig_reels_aggregated_all_plays_count" && insight.id.includes(post.id))?.values[0].value,
+      shares: insights.find((insight) => insight.name === "shares" && insight.id.includes(post.id))?.values[0].value,
+      source: 'Instagram'
+    })) : [])
+  ]}, [tiktokPage, youtubePage, instaPage])
 
   function renderEventContent(eventInfo) {
     return (
@@ -138,10 +171,6 @@ const CalendarPage = ({ posts }) => {
     }
   };
 
-  const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
-  const { user, isLoading } = useSelector((state) => state.auth);
-
-  
   if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
     return <NoAccount />;
   }
@@ -156,7 +185,7 @@ const CalendarPage = ({ posts }) => {
     source: 'Instagram',
   }));
 
-  const tiktokEvents = tiktokPage?.map((post, i) => ({
+  const tiktokEvents = tiktokPage?.videos.data.videos.map((post, i) => ({
     title: 'TikTok Post',
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
@@ -164,32 +193,10 @@ const CalendarPage = ({ posts }) => {
 
   const events = [...(instaEvents || []), ...(tiktokEvents || [])]
 
-  const combinedPosts = [
-    ...(tiktokPage ? tiktokPage.map(post => ({
-      timestamp: post.create_time * 1000,
-      source: 'TikTok',
-      caption: post.video_description,
-      media_url: `https://www.tiktok.com/player/v1/${post.id}?description=1`,
-      media_type: 'VIDEO',
-      views: post.view_count,
-      likes: post.like_count,
-      shares: post.share_count
-    })) : []),
-    ...instaPage.business_discovery.media.data.map(post => ({
-      timestamp: post.timestamp,
-      media_url: post.media_url,
-      media_type: post.media_type,
-      caption: post.caption,
-      likes: post.like_count,
-      views: insights.find((insight) => insight.name === "ig_reels_aggregated_all_plays_count" && insight.id.includes(post.id))?.values[0].value,
-      shares: insights.find((insight) => insight.name === "shares" && insight.id.includes(post.id))?.values[0].value,
-      source: 'Instagram'
-    }))
-  ];
-
   const PostSummary = ({ source, post, caption, likes, shares, views }) => {
     const [isVisible, setIsVisible] = useState(false);
     const feedRef = useRef(null);
+    const iframeRef = useRef(null)
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -216,21 +223,33 @@ const CalendarPage = ({ posts }) => {
       };
   }, []);
 
+  useEffect(() => {
+    if (iframeRef.current && post) {
+      iframeRef.current.src = post; 
+    }
+  }, [post])
+
   return (
     <div 
       className="cp-post-container" 
-      // style={{ borderColor: platformBorderColors[source] }}
       style={{ boxShadow: platformBoxShadows[source] }}
     >
      <div className="cp-post-media" ref={feedRef}>
-      {(source === 'Instagram' || source === 'TikTok') ? (
+      {(source === 'TikTok' || source === 'YouTube') ? (
         isVisible && post ? (
-          <iframe className="cp-post-media" height="100%" width="100%" src={post} allow="fullscreen"></iframe>
+          <iframe className="cp-post-media" height="100%" width="100%" src={post} allow="fullscreen" ref={iframeRef}></iframe>
         ) : (
           <p className="cp-post-media">Video Not Available</p>
         )
       ) : (
-        <img src={post} alt={caption} className="cp-post-media" />
+        <video
+          src={post}
+          type="video/mp4"
+          controls
+          playsInline
+          loop
+          className='cp-post-media'
+        ></video>
       )}
     </div>
       <div className="cp-post-caption">
@@ -241,13 +260,13 @@ const CalendarPage = ({ posts }) => {
           <div style={{ color: platformBorderColors[source] }}>{platformSymbols[source]}</div>
         </div>
         <div className="cp-post-mini-container">
-          {views ? <div><FaPlay /> {views}</div> : null}
+          <div><FaPlay /> {views ? views : 0}</div>
         </div>
         <div className="cp-post-mini-container">
-          <div><FaHeart style={{ color: "red" }} /> {likes}</div>
+          <div><FaHeart style={{ color: "red" }} /> {likes ? likes : 0}</div>
         </div>
         <div className="cp-post-mini-container">
-          {shares ? <div><FaPaperPlane style={{ color: '#1877F2' }} /> {shares}</div> : null}
+          <div><FaPaperPlane style={{ color: '#1877F2' }} /> {shares ? shares : 0}</div>
         </div>
       </div>
     </div>
@@ -261,7 +280,7 @@ return (
       <div className="cp-platforms-container">
         <PlatformCard
           platform={"Instagram"}
-          isConnected={true}
+          isConnected={user.instagramConnected}
           icon={<FaInstagram size={20} />}
           pfp={instaPage.business_discovery.profile_picture_url}
           isSelected={selectedPlatforms.includes("Instagram")}
@@ -269,15 +288,17 @@ return (
         />
         <PlatformCard
           platform={"TikTok"}
-          isConnected={true}
+          isConnected={user.tiktokConnected}
           icon={<FaTiktok size={20} />}
+          pfp={tiktokPage.profilePicture}
           isSelected={selectedPlatforms.includes("TikTok")}
           onClick={() => handlePlatformClick("TikTok")}
         />
         <PlatformCard
           platform={"YouTube"}
-          isConnected={false}
+          isConnected={user.youtubeConnected}
           icon={<FaYoutube size={22} color={"red"} />}
+          pfp={youtubePage.profilePicture}
           isSelected={selectedPlatforms.includes("YouTube")}
           onClick={() => handlePlatformClick("YouTube")}
         />

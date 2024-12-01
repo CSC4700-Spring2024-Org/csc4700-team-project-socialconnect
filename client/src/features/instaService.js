@@ -7,7 +7,7 @@ const getInstaProfile = async () => {
     if (res.data.error) {
         return res.data
     }
-    return {instaPage: res.data.instaResponse.business_discovery, comments: res.data.instaResponse.comments, tiktokPage: res.data.tiktokResponse?.data?.videos, insights: res.data.instaResponse.insights}
+    return {instaPage: res.data.instaResponse.business_discovery, comments: res.data.instaResponse.comments, tiktokPage: res.data.tiktokResponse, insights: res.data.instaResponse.insights, youtubePage: res.data.youtubeResponse}
 }
 
 const createInstagramPost = async(postData) => {
@@ -24,16 +24,37 @@ const replyInstagram = async(replyData) => {
     return {oldID: replyData.id, newComment:res.data}
 }
 
+const replyYoutube = async(replyData) => {
+    const res = await axios.post(API_URL + 'replyYoutube', replyData)
+    return {oldID: replyData.id, newComment:res.data}
+}
+
 const tiktokInitializeLogin = async() => {
     const res = await axios.get(API_URL + 'tiktokInitializeLogin')
     return res.data
+}
+
+const youtubeInitializeLogin = async() => {
+    const res = await axios.get(API_URL + 'youtubeInitializeLogin')
+    return res.data
+}
+
+const createFuturePost = async(postData, datetime) => {
+    const res = await axios.post(API_URL + `schedulePost?datetime=${datetime}`, postData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return res
 }
 
 const instaService = {
     getInstaProfile,
     createInstagramPost,
     replyInstagram,
-    tiktokInitializeLogin
+    tiktokInitializeLogin,
+    createFuturePost,
+    youtubeInitializeLogin
 }
 
 export default instaService;

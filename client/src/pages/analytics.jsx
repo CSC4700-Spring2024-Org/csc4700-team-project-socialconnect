@@ -10,7 +10,7 @@ import { Carousel } from 'react-responsive-carousel';
 import '../Styles/carousel.min.css';
 
 export default function Analytics() {
-  const { instaPage, isLoadingInsta, tiktokPage, insights } = useSelector((state) => state.insta);
+  const { instaPage, isLoadingInsta, tiktokPage, insights, youtubePage } = useSelector((state) => state.insta);
   const { user, isLoading } = useSelector((state) => state.auth);
   const [selectedPlatform, setSelectedPlatform] = useState('Instagram');
   const [selectedDataType, setSelectedDataType] = useState('Views');
@@ -47,14 +47,18 @@ export default function Analytics() {
       case 'TikTok':
         if (tiktokPage) {
           const metric = selectedDataType.slice(0,selectedDataType.length-1).toLowerCase() + "_count"
-          counts = tiktokPage.map(post => post[metric])
-          dates = tiktokPage.map(post => new Date(post.create_time*1000))
+          counts = tiktokPage.videos.data.videos.map(post => post[metric])
+          dates = tiktokPage.videos.data.videos.map(post => new Date(post.create_time*1000))
         }
         yKey = 'TikTok';
         color = '#000000';
         break;
       case 'YouTube':
-        filteredData = [];
+        if (youtubePage) {
+          const metric = selectedDataType.toLowerCase()
+          counts = youtubePage.videos.map(post => post.statistics !== null ? Number(post.statistics[metric]) : null)
+          dates = youtubePage.videos.map(post => post.contentDetails.videoPublishedAt)
+        }
         yKey = 'YouTube';
         color = '#FF0000';
         break;
@@ -161,7 +165,7 @@ export default function Analytics() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px', height:'10%' }}>
         <PlatformCard
           platform={"Instagram"}
-          isConnected={true}
+          isConnected={user.instagramConnected}
           icon={<FaInstagram size={15} />}
           pfp={instaPage.business_discovery.profile_picture_url}
           isSelected={selectedPlatform.includes("Instagram")}
@@ -169,14 +173,16 @@ export default function Analytics() {
         />
         <PlatformCard
           platform={"TikTok"}
-          isConnected={true}
+          isConnected={user.tiktokConnected}
           icon={<FaTiktok size={15} />}
+          pfp={tiktokPage.profilePicture}
           isSelected={selectedPlatform.includes("TikTok")}
           onClick={() => handlePlatformChange("TikTok")}
         />
         <PlatformCard
           platform={"YouTube"}
-          isConnected={false}
+          isConnected={user.youtubeConnected}
+          pfp={youtubePage.profilePicture}
           icon={<FaYoutube size={17} color={"red"} />}
           onClick={() => handlePlatformChange("YouTube")}
         />

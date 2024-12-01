@@ -5,52 +5,80 @@ import Spinner from '../components/Spinner';
 import NoAccount from '../components/NoAccount';
 import { IoSend } from "react-icons/io5";
 import { replyInstagram } from '../features/instaSlice';
-import { FaInstagram } from 'react-icons/fa';
+import { FaInstagram, FaYoutube } from 'react-icons/fa';
 
 const CommentSection = () => {
-    const { comments, isLoadingInsta, instaCommentsLoading } = useSelector((state) => state.insta)
+    const { comments, isLoadingInsta, instaCommentsLoading, youtubePage } = useSelector((state) => state.insta)
+    console.log(youtubePage)
     const { user, isLoading } = useSelector((state) => state.auth);
     const dispatch = useDispatch()
+
+    const combinedComments = [
+        ...(comments ? comments.map(comment => ({
+            timestamp: comment.timestamp,
+            id: comment.id,
+            username: comment.username,
+            text: comment.text,
+            replies: comment.replies,
+            source: 'Instagram'
+        })) : []),
+        ...(youtubePage ? youtubePage.videos.flatMap(post => (
+            post.comments ? post.comments.items.map(comment => ({
+                timestamp: comment.snippet.topLevelComment.snippet.updatedAt,
+                id: comment.snippet.topLevelComment.id,
+                username: comment.snippet.topLevelComment.snippet.authorDisplayName,
+                text: comment.snippet.topLevelComment.snippet.textOriginal,
+                replies: null,
+                source: 'YouTube'
+            })) : []
+        )) : [])
+    ]
+    combinedComments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
     const [replyTo, setReplyTo] = useState(null);
     const [replyContent, setReplyContent] = useState('');
 
-    const handleReplyButtonClick = (commentId) => {
-        setReplyTo(commentId === replyTo ? null : commentId);
+    const handleReplyButtonClick = (comment) => {
+        setReplyTo(comment.id === replyTo.id ? null : {source : comment.source, id: comment.id});
     };
 
     const handleSendButtonClick = () => {
-        if (replyTo !== null && replyContent.trim() !== '') {
-            dispatch(replyInstagram({user: user, replyData:{id:replyTo, text:replyContent.trim()}}))
+        if (replyTo.id !== null && replyContent.trim() !== '') {
+            if (replyTo.source === 'Instagram') {
+                dispatch(replyInstagram({replyData:{id:replyTo.id, text:replyContent.trim()}}))
+            } else if (replyTo.source === 'YouTube') {
+                dispatch(replyInstagram({replyData:{id:replyTo.id, text:replyContent.trim()}}))
+            }
             setReplyTo(null);
             setReplyContent('');
         }
     };
   
-    if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
+    if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected && !user.youtubeConnected)) {
       return <NoAccount />
     }
 
     if (isLoadingInsta || instaCommentsLoading || !comments) {
       return <Spinner />
     }
+    console.log(combinedComments)
 
     return (
         <div className='comments-dashboard-container'>
             <h3 className='comments-title'>Comments</h3>
             <div className='all-comments-container'>
-                {comments.map((comment) => {
+                {combinedComments.map((comment) => {
                     const commentDate = new Date(comment.timestamp);
                     const formattedCommentDate = `${commentDate.getMonth() + 1}/${commentDate.getDate()}/${commentDate.getFullYear()}`;
                     return (
-                        <div className='comment-container' key={comment.id}>
+                        <div className={`comment-container ${comment.source}`} key={comment.id}>
                             <div className='platform-name-date-container'>
-                                <p className='comment-platform'><FaInstagram size = {20} color="#E1306C"/></p>
+                                <p className='comment-platform'>{comment.source === 'Instagram' ? <FaInstagram size = {20} color="#E1306C"/> : <FaYoutube size = {20} color='#ff0000' />}</p>
                                 <p className='comment-username'>{comment.username}</p>
                                 <p className='comment-date'>{formattedCommentDate}</p>
                             </div>
                             <p className='comment-text'>{comment.text}</p>
-                            <button className='reply-button' onClick={() => handleReplyButtonClick(comment.id)}>
+                            <button className='reply-button' onClick={() => handleReplyButtonClick(comment)}>
                                 {replyTo === comment.id ? 'Cancel' : 'Reply'}
                             </button>
                             {replyTo === comment.id &&
@@ -80,7 +108,7 @@ const CommentSection = () => {
                                                         <p className='comment-date'>{formattedReplyDate}</p>
                                                     </div>
                                                     <p className='comment-text'>{reply.text}</p>
-                                                    <button className='reply-button' onClick={() => handleReplyButtonClick(reply.id)}>
+                                                    <button className='reply-button' onClick={() => handleReplyButtonClick(reply)}>
                                                         {replyTo === reply.id ? 'Cancel' : 'Reply'}
                                                     </button>
                                                     {replyTo === reply.id &&

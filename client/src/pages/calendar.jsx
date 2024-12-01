@@ -38,7 +38,7 @@ export default function Calendar() {
     source: 'Instagram',
   }));
 
-  const tiktokEvents = tiktokPage?.map((post, i) => ({
+  const tiktokEvents = tiktokPage?.videos.data.videos.map((post, i) => ({
     title: 'TikTok Post',
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
