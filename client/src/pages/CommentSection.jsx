@@ -8,26 +8,52 @@ import { IoSend } from "react-icons/io5";
 import { replyInstagram } from '../features/instaSlice';
 
 const CommentSection = () => {
-    const { comments, isLoadingInsta, instaCommentsLoading } = useSelector((state) => state.insta)
+    const { comments, isLoadingInsta, instaCommentsLoading, youtubePage } = useSelector((state) => state.insta)
     const { user, isLoading } = useSelector((state) => state.auth);
     const dispatch = useDispatch()
+
+    const combinedComments = [
+        ...(comments ? comments.map(comment => ({
+            timestamp: comment.timestamp,
+            id: comment.id,
+            username: comment.username,
+            text: comment.text,
+            replies: comment.replies,
+            source: 'Instagram'
+        })) : []),
+        ...(youtubePage ? youtubePage.videos.flatMap(post => (
+            post.comments ? post.comments.items.map(comment => ({
+                timestamp: comment.snippet.topLevelComment.snippet.updatedAt,
+                id: comment.snippet.topLevelComment.id,
+                username: comment.snippet.topLevelComment.snippet.authorDisplayName,
+                text: comment.snippet.topLevelComment.snippet.textOriginal,
+                replies: null,
+                source: 'YouTube'
+            })) : []
+        )) : [])
+    ]
+    combinedComments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
     const [replyTo, setReplyTo] = useState(null);
     const [replyContent, setReplyContent] = useState('');
 
-    const handleReplyButtonClick = (commentId) => {
-        setReplyTo(commentId === replyTo ? null : commentId);
+    const handleReplyButtonClick = (comment) => {
+        setReplyTo(comment.id === replyTo.id ? null : {source : comment.source, id: comment.id});
     };
 
     const handleSendButtonClick = () => {
-        if (replyTo !== null && replyContent.trim() !== '') {
-            dispatch(replyInstagram({user: user, replyData:{id:replyTo, text:replyContent.trim()}}))
+        if (replyTo.id !== null && replyContent.trim() !== '') {
+            if (replyTo.source === 'Instagram') {
+                dispatch(replyInstagram({replyData:{id:replyTo.id, text:replyContent.trim()}}))
+            } else if (replyTo.source === 'YouTube') {
+                dispatch(replyInstagram({replyData:{id:replyTo.id, text:replyContent.trim()}}))
+            }
             setReplyTo(null);
             setReplyContent('');
         }
     };
   
-    if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected)) {
+    if (!isLoading && (user && !user.instagramConnected && !user.tiktokConnected && !user.youtubeConnected)) {
       return <NoAccount />
     }
 
@@ -38,7 +64,7 @@ const CommentSection = () => {
     return (
         <div className='comments-dashboard-container'>
             <h3 className='comments-title'>Newest Comments</h3>
-            {comments.map((comment) => {
+            {combinedComments.map((comment) => {
                 const commentDate = new Date(comment.timestamp);
                 const formattedCommentDate = `${commentDate.getMonth() + 1}/${commentDate.getDate()}/${commentDate.getFullYear()}`;
                 return (
@@ -48,7 +74,7 @@ const CommentSection = () => {
                             <p className='comment-date'>{formattedCommentDate}</p>
                         </div>
                         <p className='comment-text'>{comment.text}</p>
-                        <button className='reply-button' onClick={() => handleReplyButtonClick(comment.id)}>
+                        <button className='reply-button' onClick={() => handleReplyButtonClick(comment)}>
                             {replyTo === comment.id ? 'Cancel' : 'Reply'}
                         </button>
                         {replyTo === comment.id &&
@@ -76,7 +102,7 @@ const CommentSection = () => {
                                                 <p className='comment-date'>{formattedReplyDate}</p>
                                             </div>
                                             <p className='comment-text'>{reply.text}</p>
-                                            <button className='reply-button' onClick={() => handleReplyButtonClick(reply.id)}>
+                                            <button className='reply-button' onClick={() => handleReplyButtonClick(reply)}>
                                                 {replyTo === reply.id ? 'Cancel' : 'Reply'}
                                             </button>
                                             {replyTo === reply.id &&
@@ -88,7 +114,7 @@ const CommentSection = () => {
                                                         value={replyContent}
                                                         onChange={(e) => setReplyContent(e.target.value)}
                                                     />
-                                                    <button className='send-button' onClick={handleSendButtonClick}>Send</button>
+                                                    <IoSend className='send-button' onClick={handleSendButtonClick}/>
                                                 </div>
                                             }
                                         </div>

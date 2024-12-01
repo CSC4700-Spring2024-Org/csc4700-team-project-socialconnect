@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.socialconnect.models.PostMedia;
 
@@ -14,14 +15,15 @@ import com.example.socialconnect.models.PostMedia;
 public interface PostMediaRepository extends CrudRepository<PostMedia, Integer> {
     @Query(
         nativeQuery = true,
-        value = "SELECT * FROM POST_MEDIA WHERE POST_ID = :id"
+        value = "SELECT * FROM post_media WHERE POST_ID = :id"
     )
     List<PostMedia> findMediaFromID(@Param("id")Integer id);
 
     @Modifying
+    @Transactional
     @Query(
         nativeQuery = true,
-        value = "INSERT INTO POST_MEDIA(MEDIA_URL, POST_ID) VALUES(:mediaURL, :postID) RETURNING MEDIA_ID"
+        value = "INSERT INTO post_media(MEDIA_URL, POST_ID) VALUES(:mediaURL, :postID)"
     )
-    Long createPostMedia(@Param("postID") Long postID, @Param("mediaURL") String mediaURL);
+    void createPostMedia(@Param("postID") Integer postID, @Param("mediaURL") String mediaURL);
 }

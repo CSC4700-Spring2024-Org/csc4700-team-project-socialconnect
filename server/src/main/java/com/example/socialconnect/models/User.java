@@ -45,4 +45,10 @@ public class User {
 
     @Column(name="TIKTOK_REFRESH")
     private String tiktokRefresh;
+
+    @Column(name="YOUTUBE_ACCESS")
+    private String youtubeAccess;
+
+    @Column(name="YOUTUBE_REFRESH")
+    private String youtubeRefresh;
 }

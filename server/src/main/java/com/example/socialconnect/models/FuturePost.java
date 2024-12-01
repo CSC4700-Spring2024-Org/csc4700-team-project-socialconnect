@@ -23,7 +23,7 @@ public class FuturePost {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)
     private User userInfo;
 
