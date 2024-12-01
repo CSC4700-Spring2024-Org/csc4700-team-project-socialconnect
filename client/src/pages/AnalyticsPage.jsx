@@ -587,8 +587,8 @@ return (
       <h1>Analytics</h1>
       <div className="ap-social-media-platforms">
         <PlatformCard platform={"Instagram"} isConnected = {user.instagramConnected} icon={<FaInstagram size={25}/>} pfp={instaPage.business_discovery.profile_picture_url} isSelected={selectedPlatforms.includes("Instagram")} onClick={() => handlePlatformClick("Instagram")} />
-        <PlatformCard platform={"TikTok"} isConnected = {user.tiktokConnected} icon={<FaTiktok size={23}/>} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
-        <PlatformCard platform={"YouTube"} isConnected = {user.youtubeConnected} icon={<FaYoutube size={25} color={"red"}/>} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
+        <PlatformCard platform={"TikTok"} isConnected = {user.tiktokConnected} icon={<FaTiktok size={23}/>} pfp={tiktokPage.profilePicture} isSelected={selectedPlatforms.includes("TikTok")} onClick={() => handlePlatformClick("TikTok")} />
+        <PlatformCard platform={"YouTube"} isConnected = {user.youtubeConnected} icon={<FaYoutube size={25} color={"red"}/>} pfp={youtubePage.profilePicture} isSelected={selectedPlatforms.includes("YouTube")} onClick={() => handlePlatformClick("YouTube")} />
         <PlatformCard platform={"X"} isConnected = {false} icon={<FaSquareXTwitter size={24} color={"black"}/>} isSelected={selectedPlatforms.includes("X")} onClick={() => handlePlatformClick("X")} />
       </div>
     </header>

@@ -95,6 +95,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   }
 
@@ -103,7 +104,7 @@ body {
     color: #000000;
     margin-left: 1.5rem;
     padding: 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    /* text-shadow: 2px 2px 4px rgba(0,0,0,0.3); */
     margin-top: 1rem;
   }
   .replies-header {
@@ -115,20 +116,41 @@ body {
     background: none;
   }
 
+  .all-comments-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
   .comment-container {
     display: flex;
     flex-direction: column;
-    margin: 1.5rem;
     justify-content: center;
-    width: 85%;
+    width: 90%;
     margin-top: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); */
+    
     border-radius: 10px;
+  }
+
+  .comment-container.Instagram {
+    box-shadow: 0 0 8px rgba(225, 48, 108, 0.8);
+  }
+  .comment-container.YouTube {
+    box-shadow: 0 0 8px rgba(225, 0, 0, 0.8);
+  }
+
+  .comment-platform {
+    margin-left: 3%;
   }
 
   .comment-username {
     color: black;
     font-weight: 700;
+    margin-left: 2%;
+    margin-right: 20%;
   }
 
   .comment-date {
@@ -141,12 +163,12 @@ body {
     margin-right: 1rem;
   }
 
-  .reply-button {
+  /* .reply-button {
     background: #e0e0e0;
     border: none;
     padding: 0.5rem 1rem;
     margin-top: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     margin-left: auto;
     margin-right: 1.5rem;
     transition: all 0.3s ease-in-out;
@@ -158,7 +180,72 @@ body {
   .reply-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+  } */
+
+
+
+  /* .reply-button {
+    background: #f5f5f5; 
+    border: 1px solid #d1d1d1; 
+    padding: 0.5rem 1.25rem; 
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: auto;
+    margin-right: 1.5rem;
+    transition: all 0.3s ease-in-out;
+    border-radius: 10px; 
+    color: #333; 
+    font-size: 0.9rem; 
+    font-weight: 500; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    cursor: pointer;
   }
+  
+  .reply-button:hover {
+    background: #e0e0e0; 
+    transform: translateY(-3px); 
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); 
+  }
+  
+  .reply-button:active {
+    transform: translateY(0); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    background: #d6d6d6; 
+  }
+   */
+
+   .reply-button {
+    background: #007BFF; /* Vibrant blue for a professional look */
+    border: 1px solid #007BFF; /* Match the border color with the background */
+    padding: 0.5rem 1.25rem; /* Comfortable padding */
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: auto;
+    margin-right: 1.5rem;
+    transition: all 0.3s ease-in-out;
+    border-radius: 10px; /* Rounded corners for a modern style */
+    color: white; /* White text for contrast */
+    font-size: 0.9rem; /* Balanced font size */
+    font-weight: 500; /* Medium weight for clarity */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    cursor: pointer;
+  }
+  
+  .reply-button:hover {
+    background: #3e70a6; /* Darker blue for hover effect */
+    border-color: #0056b3; /* Adjust border to match the hover background */
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+  }
+  
+  .reply-button:active {
+    background: #004085; /* Even darker blue for active state */
+    border-color: #004085; /* Match border to active background */
+    transform: translateY(0); /* Reset transform on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow on click */
+  }
+  
+
 
   /* Styling reply input */
   .reply-input {
@@ -166,7 +253,8 @@ body {
     border-radius: 20px;
     transition: all ease-in-out .5s;
     padding: 0.7rem 1rem;
-    border: 2px solid #8179ff;
+    /* border: 2px solid #8179ff; */
+    border: 2px solid #007BFF;
     background-color: rgba(255, 255, 255, 0.8);
     margin-bottom: 1rem;
   }
@@ -176,17 +264,28 @@ body {
     box-shadow: 0 0 10px rgba(255, 224, 130, 0.5);
   }
 
-  .name-date-container {
+  .platform-name-date-container {
     display: flex;
     flex-direction: row;
-    margin-left: 1.5rem;
-    margin-top: 1rem;
+    /* margin-left: 1.5rem; */
+    /* margin-top: 1rem;  */
+  }
+
+  .all-replies-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .reply-comment-container {
     display: flex;
     justify-content: center;
     flex-direction: column;
+    margin: 1.5rem;
+    width: 85%;
+    margin-top: 0.5rem;
+    box-shadow: 0 0 10px rgba(225, 48, 108, 0.8);
+    border-radius: 10px;
   }
 
   .reply-input-container {

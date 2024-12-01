@@ -117,6 +117,10 @@ const CalendarPage = ({ posts }) => {
     X: '#1DA1F2'          
   };
 
+  const platformBoxShadows = {
+    Instagram: '0 0 10px rgba(225, 48, 108, 1)'        
+  };
+
   const platformSymbols = {
     Instagram: <FaInstagram size={30} />,
     TikTok: <FaTiktok size={30} />,
@@ -228,7 +232,7 @@ const CalendarPage = ({ posts }) => {
   return (
     <div 
       className="cp-post-container" 
-      style={{ borderColor: platformBorderColors[source] }}
+      style={{ boxShadow: platformBoxShadows[source] }}
     >
      <div className="cp-post-media" ref={feedRef}>
       {(source === 'TikTok' || source === 'YouTube') ? (
