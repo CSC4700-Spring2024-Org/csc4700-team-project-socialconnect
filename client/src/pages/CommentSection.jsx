@@ -37,7 +37,7 @@ const CommentSection = () => {
 
     return (
         <div className='comments-dashboard-container'>
-            <h3 className='comments-title'>Newest Comments</h3>
+            <h3 className='comments-title'>Comments</h3>
             <div className='all-comments-container'>
                 {comments.map((comment) => {
                     const commentDate = new Date(comment.timestamp);

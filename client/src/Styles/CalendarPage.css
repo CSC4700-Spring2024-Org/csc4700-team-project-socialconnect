@@ -55,7 +55,7 @@
   margin-left: 0px;
   margin-bottom: 0px;
   padding: 10px 5px; 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);  */
   transition: transform 0.2s ease-in-out; 
   display: flex;
   flex-direction: column;
@@ -107,7 +107,7 @@
 
 .cp-post-container:hover {
   transform: scale(1.02); 
-  border-color: #aaa; 
+  /* border-color: #aaa;  */
   background-color: #f1f1f1; 
 }
 
@@ -398,7 +398,6 @@
   background: #0056b3;
   transform: translateY(-1px);
 }
-
 
 .fc {
   height: 100% !important;
