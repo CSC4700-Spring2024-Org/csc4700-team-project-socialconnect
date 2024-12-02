@@ -176,7 +176,7 @@ public class InstagramService {
             List<CompletableFuture<List<CommentDTO>>> commentFutures = new ArrayList<>();
             List<CompletableFuture<List<InsightsDTO>>> insightsFutures = new ArrayList<>();
     
-            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 10); i++) {
+            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 20); i++) {
                 String mediaId = res4.getBusiness_discovery().getMedia().getData().get(i).getId();
     
                 CompletableFuture<List<CommentDTO>> commentFuture = CompletableFuture.supplyAsync(() -> {
