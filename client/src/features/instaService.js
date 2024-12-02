@@ -54,7 +54,8 @@ const instaService = {
     replyInstagram,
     tiktokInitializeLogin,
     createFuturePost,
-    youtubeInitializeLogin
+    youtubeInitializeLogin,
+    replyYoutube
 }
 
 export default instaService;

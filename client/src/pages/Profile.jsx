@@ -6,7 +6,7 @@ import { FaTiktok } from "react-icons/fa6";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getUser, updateUser } from '../features/authSlice';
+import { getUser, updateUser, youtubeLogout } from '../features/authSlice';
 import { setInstagram, tiktokLogout } from '../features/authSlice';
 import instaService from '../features/instaService';
 import { toast } from 'react-toastify';
@@ -137,7 +137,7 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
                 <FaYoutube className='youtube-icon' color='red'/>
                 <span>Youtube</span>
                 {!user || (user && !user.youtubeConnected) ? <button onClick={buildYoutubeURL}>Connect</button> :
-                  <button>Logout</button>}
+                  <button onClick={() => dispatch(youtubeLogout())}>Logout</button>}
             </div>
             <div className='twitter-connect'>
                 <FaSquareXTwitter className='twitter-icon'/>
