@@ -94,11 +94,14 @@ const CalendarPage = ({ posts }) => {
     return (
       <>
         {eventInfo.event.extendedProps.source === 'Instagram' && (
-          <FaInstagram style={{ fontSize: '11px', color: '#FF69B4' }} />
+          <FaInstagram className="calendar-icon instagram-icon" />
         )}
         {eventInfo.event.extendedProps.source === 'TikTok' && (
-          <FaTiktok style={{ fontSize: '12px', color: 'black' }} />
+          <FaTiktok className="calendar-icon tiktok-icon" />
         )}
+        {eventInfo.event.extendedProps.source === 'YouTube' && (
+        <FaYoutube className="calendar-icon youtube-icon" />
+      )}
       </>
     );
   }
@@ -190,8 +193,14 @@ const CalendarPage = ({ posts }) => {
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
   }));
+  const youtubeEvents = youtubePage.videos.map((post, i) => ({
+    title: 'Youtube Post',
+    start: post.contentDetails.videoPublishedAt,
+    source: 'YouTube', 
+  }));
+  
 
-  const events = [...(instaEvents || []), ...(tiktokEvents || [])]
+  const events = [...(instaEvents || []), ...(tiktokEvents || []), ...(youtubeEvents || [])]
 
   const PostSummary = ({ source, post, caption, likes, shares, views }) => {
     const [isVisible, setIsVisible] = useState(false);

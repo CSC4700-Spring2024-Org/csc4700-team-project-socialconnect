@@ -29,6 +29,44 @@
   background: rgba(255, 255, 255, 0.1); /* Light background for scrollbar track */
 }
 
+/* Calendar event icon styling */
+.fc .fc-event {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row;
+}
+
+.fc .fc-event .calendar-icon {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.fc .fc-event .instagram-icon {
+  color: #E1306C;
+}
+
+.fc .fc-event .tiktok-icon {
+  color: #000000;
+}
+
+.fc .fc-event .youtube-icon {
+  color: #FF0000;
+}
+
+.fc .fc-event {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-direction: row;
+}
+
+.fc .fc-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
 .cp-feed-container::-webkit-scrollbar-track:hover {
   background: rgba(115, 115, 115, 0.1); /* Light background for scrollbar track */
 }
@@ -121,7 +159,7 @@
 
 .cp-right-side-container {
   height: 100vh;
-  width: 30%;
+  width: 50vh;
   margin-right: 0%;
  
 }
@@ -130,9 +168,9 @@
 .cp-calendar-container {
   height: 48%;
   width: 90%;
-  margin-top: 100px;
+  margin-top: 22%;
   margin-right: 20px;
-  margin-left: 10px;
+  margin-left: 5%;
   border-radius: 10px;
   background-color: white;
   border: 2px solid rgb(0, 0, 0);
@@ -399,32 +437,3 @@
   transform: translateY(-1px);
 }
 
-.fc {
-  height: 100% !important;
-}
-
-.fc-daygrid-day-events {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-
-.fc-event {
-  margin: 1px 2px !important;
-  display: inline-flex !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.fc-daygrid-event-harness {
-  display: inline-block !important;
-  margin-right: 2px !important;
-}
-
-.fc-daygrid-day.selected {
-  background-color: #e6eaff; 
-  border: 2px solid var(--primary-color);
-  color: var(--primary-color);
-}
