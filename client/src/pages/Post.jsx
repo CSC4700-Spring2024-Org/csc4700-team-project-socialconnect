@@ -88,6 +88,7 @@ const Post = () => {
             taggedUsers: postData.mentions,
             postToInstagram: selectedPlatforms.includes('Instagram'),
             postToTiktok: selectedPlatforms.includes('TikTok'),
+            postToYoutube: selectedPlatforms.includes('YouTube')
           })],
           { type: 'application/json' }
         )
@@ -99,7 +100,7 @@ const Post = () => {
           toast.error(res.data.error);
         } else {
           if (!isFuturePost) {
-            setPostLinks((prev) => [...prev, { Instagram: res.data }])
+            setPostLinks((prev) => [...prev, { Instagram: res.data.instagramLink, YouTube: res.data.youtubeLink }])
           }
           setCurrStage((prev) => prev + 1)
         }
@@ -276,6 +277,7 @@ const Post = () => {
                       {postLinks.map((post, index) => {
                         const platformName = Object.keys(post)[0];
                         const link = post[platformName];
+                        if (!link) return null;
 
                         const platform = platforms.find((p) => p.name === platformName);
 

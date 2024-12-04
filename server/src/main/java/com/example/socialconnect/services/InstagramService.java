@@ -1,5 +1,6 @@
 package com.example.socialconnect.services;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.socialconnect.dtos.ErrorDTO;
+import com.example.socialconnect.dtos.PostResultDTO;
 import com.example.socialconnect.dtos.SocialsResponse;
 import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.dtos.InstagramDTOs.AccountDTO;
@@ -72,6 +74,14 @@ import com.example.socialconnect.helpers.CustomUserDetails;
 import com.example.socialconnect.models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.Video;
+import com.google.api.services.youtube.model.VideoSnippet;
+import com.google.api.services.youtube.model.VideoStatus;
 
 @Service
 public class InstagramService {
@@ -82,6 +92,9 @@ public class InstagramService {
     UserService userService;
 
     ModelMapper modelMapper = new ModelMapper();
+
+    private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private static HttpTransport HTTP_TRANSPORT;
 
     @Value("${tiktok.key}")
     private String tiktokClientKey;
@@ -323,19 +336,16 @@ public class InstagramService {
         return instagramAccountRes;
     }
 
-    public Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files) {
+    public Object createPosts(CreatePostDTO postDTO, MultipartFile[] files) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
-        String accessToken = userDetail.getUser().getInstaRefresh();
-        if (accessToken == null) {
-            ErrorDTO dto = new ErrorDTO();
-            dto.setError("Please connect your Instagram account");
-            return dto;
+        String instaAccess = userDetail.getUser().getInstaRefresh();
+        String youtubeAccess = userDetail.getUser().getYoutubeAccess();
+        if (youtubeAccess == null && postDTO.getPostToYoutube() || instaAccess == null && postDTO.getPostToInstagram()) {
+            return handleError("Please connect your accounts");
         }
-        UriComponentsBuilder builder;
-        URI uri;
+        List<String> postUrls = new ArrayList<String>();
         try {
-            List<String> postUrls = new ArrayList<String>();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
                     postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(files[i]));
@@ -343,7 +353,41 @@ public class InstagramService {
             } else {
                 postUrls = Arrays.asList(postDTO.getUrls());
             }
+        } catch (Exception e) {
+            System.out.println(e);
+            return handleError("Error uploading files");
+        }
+        PostResultDTO postResultDTO = new PostResultDTO();
+        if (postDTO.getPostToYoutube()) {
+            Object youtubeRes = createYoutubePost(youtubeAccess, postDTO, files[0]);
+            if (youtubeRes instanceof ErrorDTO) {
+                postResultDTO.setYoutubeLink("Error");
+            } else {
+                postResultDTO.setYoutubeLink((String)youtubeRes);
+            }
+        }
+        if (postDTO.getPostToInstagram()) {
+            Object instagramRes = createInstagramPost(postDTO, files, youtubeAccess, postUrls);
+            if (instagramRes instanceof ErrorDTO) {
+                postResultDTO.setInstagramLink("Error");
+            } else {
+                postResultDTO.setInstagramLink((String)instagramRes);
+            }
+        }
 
+        for (int i = 0; i < postUrls.size(); i++) {
+            fileUploadService.deleteFile(postUrls.get(i));
+        }
+        if (postResultDTO.getInstagramLink() == null && postResultDTO.getYoutubeLink() == null) {
+            return handleError("Error creating posts");
+        }
+        return postResultDTO;
+    }
+
+    private Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files, String accessToken, List<String> postUrls) {
+        UriComponentsBuilder builder;
+        URI uri;
+        try {
             InstaBusinessAcct instagramAccountRes = getInstagramBusinessAccount(accessToken);
 
             String[] postContainerResArr = new String[postUrls.size()];
@@ -433,10 +477,6 @@ public class InstagramService {
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
             System.out.println(mediaURLRes.getPermalink());
-
-            for (int i = 0; i < postUrls.size(); i++) {
-                fileUploadService.deleteFile(postUrls.get(i));
-            }
             
             return mediaURLRes.getPermalink();
         } catch (Exception e) {
@@ -458,6 +498,42 @@ public class InstagramService {
             
             return dto;
         }
+    }
+
+    private Object createYoutubePost(String accessToken, CreatePostDTO postDTO, MultipartFile file) {
+        try {
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+            YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, request -> {
+                request.getHeaders().set("Authorization", "Bearer " + accessToken);
+            }).setApplicationName("Social Connect").build();
+
+            VideoSnippet snippet = new VideoSnippet();
+            snippet.setTitle(postDTO.getCaption());
+            snippet.setDescription(postDTO.getCaption());
+            snippet.setTags(List.of("Shorts", "YouTube"));
+
+            VideoStatus status = new VideoStatus();
+            status.setPrivacyStatus("private");
+
+            FileContent mediaContent;
+            if (file != null) {
+                mediaContent = new FileContent("video/*", new File("/uploads/" + file.getOriginalFilename()));
+            } else {
+                mediaContent = new FileContent("video/*", new File("/uploads/" + postDTO.getUrls()[0].substring(postDTO.getUrls()[0].lastIndexOf("/"))));
+            }
+            Video video = new Video();
+            video.setSnippet(snippet);
+            video.setStatus(status);
+
+            YouTube.Videos.Insert videoInsert = youtube.videos().insert("snippet,status", video, mediaContent);
+            Video returnedVideo = videoInsert.execute();
+            return returnedVideo.getId();
+        } catch (Exception e) {
+            System.out.println(e);
+            return handleError("Something went wrong posting to YouTube");
+        }
+        
     }
 
     private Object createTiktokPost(String accessToken, CreatePostDTO postDTO, String postURL) {

@@ -3,15 +3,12 @@ package com.example.socialconnect.repositories;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.socialconnect.models.FuturePost;
-
-import jakarta.transaction.Transactional;
 
 @Repository
 public interface FuturePostRepository extends CrudRepository<FuturePost, Integer> {
@@ -20,14 +17,6 @@ public interface FuturePostRepository extends CrudRepository<FuturePost, Integer
         value = "SELECT * FROM future_posts WHERE POST_DT < CURRENT_TIMESTAMP AND POST_STATUS = 0"
     )
     List<FuturePost> findPosts();
-
-    @Modifying
-    @Transactional
-    @Query(
-        nativeQuery = true,
-        value = "UPDATE future_posts SET VIEWED_MESSAGE = TRUE WHERE USER_ID = :id AND ID = :postID"
-    )
-    void updateViewedMessage(@Param("id")Long id, @Param("postID")int postID);
 
     @Query(
         nativeQuery = true,

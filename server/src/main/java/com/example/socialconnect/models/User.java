@@ -51,4 +51,7 @@ public class User {
 
     @Column(name="YOUTUBE_REFRESH")
     private String youtubeRefresh;
+
+    @Column(name="POST_STATUS_MESSAGE")
+    private String postStatusMessage;
 }

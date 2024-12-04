@@ -16,4 +16,5 @@ public class CreatePostDTO {
     private String location;
     private Boolean postToInstagram;
     private Boolean postToTiktok;
+    private Boolean postToYoutube;
 }
