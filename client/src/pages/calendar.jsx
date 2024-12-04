@@ -47,7 +47,7 @@ export default function Calendar() {
     source: 'TikTok',
   }));
 
-  const youtubeEvents = youtubePage?.videos.data.videos.map((post, i) => ({
+  const youtubeEvents = youtubePage?.videos.map((post, i) => ({
     title: 'Youtube Post',
     start: post.contentDetails.videoPublishedAt,
     source: 'YouTube', 

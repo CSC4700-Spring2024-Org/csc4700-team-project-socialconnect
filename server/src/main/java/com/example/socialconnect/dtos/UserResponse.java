@@ -18,4 +18,5 @@ public class UserResponse {
     private Boolean enabled;
     private Boolean tiktokConnected;
     private Boolean youtubeConnected;
+    private String postStatusMessage;
 }

@@ -71,6 +71,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetail.getUser();
+        System.out.println(user.getPostStatusMessage());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
         modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
