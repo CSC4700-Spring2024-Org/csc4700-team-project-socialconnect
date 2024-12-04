@@ -182,7 +182,7 @@ export default function Analytics() {
         <PlatformCard
           platform={"YouTube"}
           isConnected={user.youtubeConnected}
-          pfp={youtubePage.profilePicture}
+          pfp={youtubePage?.profilePicture}
           icon={<FaYoutube size={17} color={"red"} />}
           onClick={() => handlePlatformChange("YouTube")}
         />

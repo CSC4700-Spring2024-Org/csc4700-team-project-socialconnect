@@ -359,7 +359,12 @@ public class InstagramService {
         }
         PostResultDTO postResultDTO = new PostResultDTO();
         if (postDTO.getPostToYoutube()) {
-            Object youtubeRes = createYoutubePost(youtubeAccess, postDTO, files[0]);
+            Object youtubeRes;
+            if (files != null) {
+                youtubeRes = createYoutubePost(youtubeAccess, postDTO, files[0]);
+            } else {
+                youtubeRes = createYoutubePost(youtubeAccess, postDTO, null);
+            }
             if (youtubeRes instanceof ErrorDTO) {
                 postResultDTO.setYoutubeLink("Error");
             } else {
