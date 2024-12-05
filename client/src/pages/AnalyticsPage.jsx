@@ -173,7 +173,7 @@ const AnalyticsPage = () => {
       const filteredArr = insights.filter((metric) => metric.name === 'ig_reels_avg_watch_time');
       const dates = instaPage.business_discovery.media.data.map((media) => new Date(media.timestamp));
       
-      const watchTimeValues = filteredArr.map(media => media.values[0].value);
+      const watchTimeValues = filteredArr.map(media => media.values[0].value /1000);
       watchTimeValues.forEach((watchCount, index) => {
         const date = dates[index];
         if (!dateMap.has(date)) dateMap.set(date, { date });

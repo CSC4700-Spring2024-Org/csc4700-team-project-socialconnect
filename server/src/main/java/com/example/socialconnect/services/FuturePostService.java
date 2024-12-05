@@ -1,6 +1,8 @@
 package com.example.socialconnect.services;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -40,6 +42,8 @@ public class FuturePostService {
     @Autowired
     FileUploadService fileUploadService;
 
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a");
+
     @Scheduled(cron = "0 */15 * ? * *")
     public void postScheduledPosts() {
         List<FuturePost> futurePosts = futurePostRepository.findPosts();
@@ -55,7 +59,7 @@ public class FuturePostService {
                 postURLS[i] = postMedias.get(i).getMediaUrl();
             }
             postDTO.setUrls(postURLS);
-            Object postRes = socialsService.createPosts(postDTO, null);
+            Object postRes = socialsService.createPosts(postDTO, null, post.getUserInfo());
             if (postRes instanceof ErrorDTO) {
                 String platforms = Stream.of(
                     postDTO.getPostToInstagram() ? "Instagram" : null,
@@ -64,7 +68,7 @@ public class FuturePostService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
 
-                String errorMessage = "Error posting to " + platforms + " at " + post.getPostDT();
+                String errorMessage = "Error posting to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).format(formatter);
                 userRepository.updatePostStatusMessage(errorMessage, post.getUserInfo().getId());
             } else {
                 PostResultDTO postResultDTO = (PostResultDTO) postRes;
@@ -74,8 +78,13 @@ public class FuturePostService {
                     postResultDTO.getYoutubeLink() != null && !postResultDTO.getYoutubeLink().equals("Error") ? "YouTube" : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
-                userRepository.updatePostStatusMessage("Successfully posted to " + platforms + " at " + post.getPostDT(), post.getUserInfo().getId());
+                userRepository.updatePostStatusMessage("Successfully posted to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).format(formatter), post.getUserInfo().getId());
             }
+
+            for (int i = 0; i < postMedias.size(); i++) {
+                postMediaRepository.deletePostMedia(postMedias.get(i).getMediaID());
+            }
+            futurePostRepository.deleteFuturePost(post.getId());
         }
     }
 

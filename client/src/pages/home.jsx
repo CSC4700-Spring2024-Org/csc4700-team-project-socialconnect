@@ -36,8 +36,8 @@ const Home = () => {
         // navigate('/');
         if (isErrorInsta) {
           toast.error(message)
-        } else if (!isErrorInsta && user.post_status_message && user.post_status_message !== '') {
-          toast(user.post_status_message)
+        } else if (!isErrorInsta && user.postStatusMessage && user.postStatusMessage !== '') {
+          toast(user.postStatusMessage)
         }
         if ((user.instagramConnected && !instaPage) || (user.tiktokConnected && !tiktokPage)) {
           dispatch(getInstaProfile(user))

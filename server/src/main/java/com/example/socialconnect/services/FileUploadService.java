@@ -61,9 +61,9 @@ public class FileUploadService {
             filePath = multipartFile.getOriginalFilename();
             s3Client.putObject(bucketName, filePath, processedFile);
 
-            if (!processedFile.delete()) {
-                System.out.println("Error deleting processed file");
-            }
+            // if (!processedFile.delete()) {
+            //     System.out.println("Error deleting processed file");
+            // }
         } catch (Exception e) {
             throw new FileUploadException("Error occurred in file upload ==> "+e.getMessage());
         }

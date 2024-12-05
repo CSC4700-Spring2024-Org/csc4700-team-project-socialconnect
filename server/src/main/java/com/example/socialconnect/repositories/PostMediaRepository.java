@@ -26,4 +26,12 @@ public interface PostMediaRepository extends CrudRepository<PostMedia, Integer> 
         value = "INSERT INTO post_media(MEDIA_URL, POST_ID) VALUES(:mediaURL, :postID)"
     )
     void createPostMedia(@Param("postID") Integer postID, @Param("mediaURL") String mediaURL);
+
+    @Modifying
+    @Transactional
+    @Query(
+        nativeQuery = true,
+        value = "DELETE FROM post_media WHERE media_id = :mediaID"
+    )
+    void deletePostMedia(@Param("mediaID") Integer mediaID);
 }

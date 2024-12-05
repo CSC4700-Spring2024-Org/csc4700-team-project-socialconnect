@@ -69,7 +69,7 @@ public class InstagramController {
 
     @PostMapping("/createInstagramPost")
     public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("files") MultipartFile[] files) {
-        return ResponseEntity.ok(instagramService.createPosts(postDTO, files));
+        return ResponseEntity.ok(instagramService.createPosts(postDTO, files, null));
     }
 
     @PostMapping("/schedulePost")
