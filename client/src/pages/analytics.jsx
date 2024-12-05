@@ -175,7 +175,7 @@ export default function Analytics() {
           platform={"TikTok"}
           isConnected={user.tiktokConnected}
           icon={<FaTiktok size={15} />}
-          pfp={tiktokPage.profilePicture}
+          pfp={tiktokPage?.profilePicture}
           isSelected={selectedPlatform.includes("TikTok")}
           onClick={() => handlePlatformChange("TikTok")}
         />
