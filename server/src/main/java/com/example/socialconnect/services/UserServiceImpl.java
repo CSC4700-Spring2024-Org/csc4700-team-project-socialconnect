@@ -180,4 +180,9 @@ public class UserServiceImpl implements UserService {
         }
          
     }
+
+    @Override
+    public void updatePostStatusMessage(String message, Long id) {
+        userRepository.updatePostStatusMessage(message, id);
+    }
 }

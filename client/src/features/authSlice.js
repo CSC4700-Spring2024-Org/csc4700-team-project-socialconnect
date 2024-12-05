@@ -106,6 +106,25 @@ export const youtubeLogout = createAsyncThunk(
   }
 )
 
+export const removePostStatusMessage = createAsyncThunk(
+  'auth/removeMessage',
+  async (thunkAPI) => {
+    try {
+        const res = await authService.removePostStatusMessage()
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -201,6 +220,18 @@ export const authSlice = createSlice({
 
         })
         .addCase(youtubeLogout.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
+        })
+        .addCase(removePostStatusMessage.fulfilled, (state) => {
+          state.isLoading = false
+          state.isSuccess = true
+          let tempUser = state.user
+          tempUser.postStatusMessage = null
+          state.user = tempUser
+        })
+        .addCase(removePostStatusMessage.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
           state.message = action.payload

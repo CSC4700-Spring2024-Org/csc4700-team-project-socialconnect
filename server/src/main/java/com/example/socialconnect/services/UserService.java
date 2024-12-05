@@ -23,4 +23,6 @@ public interface UserService {
 
     boolean verify(String verificationCode);
 
+    void updatePostStatusMessage(String message, Long id);
+
 }

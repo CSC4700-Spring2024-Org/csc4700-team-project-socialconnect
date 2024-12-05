@@ -2,7 +2,6 @@ package com.example.socialconnect.services;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,8 +41,6 @@ public class FuturePostService {
     @Autowired
     FileUploadService fileUploadService;
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a");
-
     @Scheduled(cron = "0 */15 * ? * *")
     public void postScheduledPosts() {
         List<FuturePost> futurePosts = futurePostRepository.findPosts();
@@ -68,7 +65,7 @@ public class FuturePostService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
 
-                String errorMessage = "Error posting to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).format(formatter);
+                String errorMessage = "Error posting to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).toString();
                 userRepository.updatePostStatusMessage(errorMessage, post.getUserInfo().getId());
             } else {
                 PostResultDTO postResultDTO = (PostResultDTO) postRes;
@@ -78,7 +75,7 @@ public class FuturePostService {
                     postResultDTO.getYoutubeLink() != null && !postResultDTO.getYoutubeLink().equals("Error") ? "YouTube" : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
-                userRepository.updatePostStatusMessage("Successfully posted to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).format(formatter), post.getUserInfo().getId());
+                userRepository.updatePostStatusMessage("Successfully posted to " + platforms + " at " + post.getPostDT().atZone(ZoneId.systemDefault()).toString(), post.getUserInfo().getId());
             }
 
             for (int i = 0; i < postMedias.size(); i++) {

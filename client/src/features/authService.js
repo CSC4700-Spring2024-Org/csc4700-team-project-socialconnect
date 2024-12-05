@@ -50,6 +50,11 @@ const youtubeLogout = async() => {
     return res.data
 }
 
+const removePostStatusMessage = async() => {
+    const res = await axios.post(API_URL + 'removeMessage')
+    return res.data
+}
+
 
 const authService = {
     register,
@@ -59,7 +64,8 @@ const authService = {
     logout,
     setInstagram,
     tiktokLogout,
-    youtubeLogout
+    youtubeLogout,
+    removePostStatusMessage
 }
 
 export default authService;

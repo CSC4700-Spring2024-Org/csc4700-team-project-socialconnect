@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -72,6 +75,19 @@ public class FileUploadService {
 
     public void deleteFile(String fileName) {
         s3Client.deleteObject(bucketName, fileName.substring(fileName.lastIndexOf("/")+1));
+        String filePath = Paths.get(System.getProperty("user.dir"), "uploads", "processed_" + fileName.substring(fileName.lastIndexOf("/") + 1)).toString();
+
+        Path path = Paths.get(filePath);
+        if (Files.exists(path)) {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("File does not exist");
+        }
+
     }
 
     private File formatVideo(MultipartFile file) throws IOException, InterruptedException {

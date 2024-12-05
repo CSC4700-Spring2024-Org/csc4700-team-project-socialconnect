@@ -353,20 +353,21 @@ public class InstagramService {
             return handleError("Please connect your accounts");
         }
         List<String> postUrls = new ArrayList<String>();
-        try {
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    System.out.println("File loop");
-                    postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(files[i]));
-                    System.out.println(postUrls.get(i));
+        if (postDTO.getPostToInstagram() || postDTO.getPostToTiktok()) {
+            try {
+                if (files != null) {
+                    for (int i = 0; i < files.length; i++) {
+                        postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(files[i]));
+                    }
+                } else {
+                    postUrls = Arrays.asList(postDTO.getUrls());
                 }
-            } else {
-                postUrls = Arrays.asList(postDTO.getUrls());
+            } catch (Exception e) {
+                System.out.println(e);
+                return handleError("Error uploading files");
             }
-        } catch (Exception e) {
-            System.out.println(e);
-            return handleError("Error uploading files");
         }
+        
         PostResultDTO postResultDTO = new PostResultDTO();
         if (postDTO.getPostToYoutube()) {
             Object youtubeRes;
@@ -382,7 +383,6 @@ public class InstagramService {
             }
         }
         if (postDTO.getPostToInstagram()) {
-            System.out.println("HELLO!");
             Object instagramRes = createInstagramPost(postDTO, files, instaAccess, postUrls);
             if (instagramRes instanceof ErrorDTO) {
                 postResultDTO.setInstagramLink("Error");
@@ -401,12 +401,10 @@ public class InstagramService {
     }
 
     private Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files, String accessToken, List<String> postUrls) {
-        System.out.println("INSTAGRAM POST!!!!");
         UriComponentsBuilder builder;
         URI uri;
         try {
             InstaBusinessAcct instagramAccountRes = getInstagramBusinessAccount(accessToken);
-            System.out.println(instagramAccountRes.getInstagram_business_account().getId());
 
             String[] postContainerResArr = new String[postUrls.size()];
             for (int i = 0; i < postUrls.size(); i++) {
@@ -414,7 +412,6 @@ public class InstagramService {
                 System.out.println(fileExtension);
                 if (postUrls.size() == 1) {
                     if (fileExtension.equalsIgnoreCase(".mp4") || fileExtension.equalsIgnoreCase(".mov")) {
-                        System.out.println("HELOOOOOOO");
                         builder = UriComponentsBuilder
                             .fromUriString("https://graph.facebook.com/v19.0/" + instagramAccountRes.getInstagram_business_account().getId() + "/media")
                             .queryParam("media_type", "REELS")
