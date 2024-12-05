@@ -299,7 +299,7 @@ return (
           platform={"TikTok"}
           isConnected={user.tiktokConnected}
           icon={<FaTiktok size={20} />}
-          pfp={tiktokPage.profilePicture}
+          pfp={tiktokPage?.profilePicture}
           isSelected={selectedPlatforms.includes("TikTok")}
           onClick={() => handlePlatformClick("TikTok")}
         />
@@ -307,7 +307,7 @@ return (
           platform={"YouTube"}
           isConnected={user.youtubeConnected}
           icon={<FaYoutube size={22} color={"red"} />}
-          pfp={youtubePage.profilePicture}
+          pfp={youtubePage?.profilePicture}
           isSelected={selectedPlatforms.includes("YouTube")}
           onClick={() => handlePlatformClick("YouTube")}
         />
