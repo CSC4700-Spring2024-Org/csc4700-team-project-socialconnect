@@ -16,6 +16,7 @@ const createInstagramPost = async(postData) => {
             'Content-Type': 'multipart/form-data'
         }
     })
+    console.log(res.data)
     return res
 }
 

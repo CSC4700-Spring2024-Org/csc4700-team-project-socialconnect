@@ -90,7 +90,13 @@ public class FileUploadService {
 
     }
 
-    private File formatVideo(MultipartFile file) throws IOException, InterruptedException {
+    public void deleteLocalFile(File file) {
+        if (!file.delete()) {
+            System.out.println("Error deleting local file");
+        }
+    }
+
+    public File formatVideo(MultipartFile file) throws IOException, InterruptedException {
     if (!file.isEmpty()) {
         String uploadsDir = "/uploads/";
         String realPathtoUploads = System.getProperty("user.dir") + uploadsDir;

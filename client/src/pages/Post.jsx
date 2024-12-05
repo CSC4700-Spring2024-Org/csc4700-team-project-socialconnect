@@ -53,7 +53,7 @@ const Post = () => {
     const platformColors = {
       Instagram: '#FF69B4', 
       TikTok: 'black',      
-      YouTube: 'red',       
+      YouTube: 'white',       
       X: 'black'          
     };
     const platforms = [
@@ -100,7 +100,7 @@ const Post = () => {
           toast.error(res.data.error);
         } else {
           if (!isFuturePost) {
-            setPostLinks((prev) => [...prev, { Instagram: res.data.instagramLink, YouTube: res.data.youtubeLink }])
+            setPostLinks((prev) => [...prev, { Instagram: res.data.instagramLink}, { YouTube: res.data.youtubeLink }])
           }
           setCurrStage((prev) => prev + 1)
         }

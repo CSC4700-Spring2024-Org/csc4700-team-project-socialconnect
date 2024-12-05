@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpEntity;
@@ -348,57 +349,110 @@ public class InstagramService {
             instaAccess = user.getInstaRefresh();
             youtubeAccess = user.getYoutubeAccess();
         }
-        
+    
         if (youtubeAccess == null && postDTO.getPostToYoutube() || instaAccess == null && postDTO.getPostToInstagram()) {
             return handleError("Please connect your accounts");
         }
-        List<String> postUrls = new ArrayList<String>();
+    
+        AtomicReference<List<String>> postUrlsRef = new AtomicReference<>(new ArrayList<>());
+        AtomicReference<File> processedFileRef = new AtomicReference<>(null);
+    
         if (postDTO.getPostToInstagram() || postDTO.getPostToTiktok()) {
             try {
+                List<String> postUrls = postUrlsRef.get();
                 if (files != null) {
-                    for (int i = 0; i < files.length; i++) {
-                        postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(files[i]));
+                    for (MultipartFile file : files) {
+                        postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(file));
                     }
                 } else {
                     postUrls = Arrays.asList(postDTO.getUrls());
+                    postUrlsRef.set(postUrls);
                 }
             } catch (Exception e) {
                 System.out.println(e);
                 return handleError("Error uploading files");
             }
-        }
-        
-        PostResultDTO postResultDTO = new PostResultDTO();
-        if (postDTO.getPostToYoutube()) {
-            Object youtubeRes;
-            if (files != null) {
-                youtubeRes = createYoutubePost(youtubeAccess, postDTO, files[0]);
-            } else {
-                youtubeRes = createYoutubePost(youtubeAccess, postDTO, null);
-            }
-            if (youtubeRes instanceof ErrorDTO) {
-                postResultDTO.setYoutubeLink("Error");
-            } else {
-                postResultDTO.setYoutubeLink((String)youtubeRes);
-            }
-        }
-        if (postDTO.getPostToInstagram()) {
-            Object instagramRes = createInstagramPost(postDTO, files, instaAccess, postUrls);
-            if (instagramRes instanceof ErrorDTO) {
-                postResultDTO.setInstagramLink("Error");
-            } else {
-                postResultDTO.setInstagramLink((String)instagramRes);
+        } else {
+            if (files[0] != null) {
+                try {
+                    processedFileRef.set(fileUploadService.formatVideo(files[0]));
+                } catch (Exception e) {
+                    System.out.println(e);
+                    return handleError("Error processing file");
+                }
             }
         }
 
-        for (int i = 0; i < postUrls.size(); i++) {
-            fileUploadService.deleteFile(postUrls.get(i));
+        AtomicReference<CompletableFuture<Object>> youtubeFutureRef = new AtomicReference<>(CompletableFuture.completedFuture(null));
+        AtomicReference<CompletableFuture<Object>> instagramFutureRef = new AtomicReference<>(CompletableFuture.completedFuture(null));
+    
+        if (postDTO.getPostToYoutube()) {
+            youtubeFutureRef.set(CompletableFuture.supplyAsync(() -> {
+                File processedFile = processedFileRef.get();
+                if (processedFile != null) {
+                    return createYoutubePost(youtubeAccess, postDTO, processedFile);
+                } else {
+                    return createYoutubePost(youtubeAccess, postDTO, null);
+                }
+            }, executor));
         }
-        if (postResultDTO.getInstagramLink() == null && postResultDTO.getYoutubeLink() == null) {
-            return handleError("Error creating posts");
+    
+        if (postDTO.getPostToInstagram()) {
+            instagramFutureRef.set(CompletableFuture.supplyAsync(() -> {
+                List<String> postUrls = postUrlsRef.get();
+                return createInstagramPost(postDTO, files, instaAccess, postUrls);
+            }, executor));
         }
-        return postResultDTO;
-    }
+    
+        CompletableFuture<Void> allDone = CompletableFuture.allOf(
+            youtubeFutureRef.get(),
+            instagramFutureRef.get()
+        );
+    
+        return allDone.thenApply(v -> {
+            try {
+                Object youtubeRes = youtubeFutureRef.get().get();
+                Object instagramRes = instagramFutureRef.get().get();
+    
+                PostResultDTO postResultDTO = new PostResultDTO();
+    
+                if (youtubeRes != null) {
+                    if (youtubeRes instanceof ErrorDTO) {
+                        postResultDTO.setYoutubeLink("Error");
+                    } else {
+                        postResultDTO.setYoutubeLink((String) youtubeRes);
+                    }
+                }
+                if (instagramRes != null) {
+                    if (instagramRes instanceof ErrorDTO) {
+                        postResultDTO.setInstagramLink("Error");
+                    } else {
+                        postResultDTO.setInstagramLink((String) instagramRes);
+                    }
+                }
+    
+                List<String> postUrls = postUrlsRef.get();
+                if (postUrls != null) {
+                    for (String url : postUrls) {
+                        fileUploadService.deleteFile(url);
+                    }
+                } else {
+                    System.out.println("No postUrls found");
+                    System.out.println(processedFileRef.get().getAbsolutePath());
+                    fileUploadService.deleteLocalFile(processedFileRef.get());
+                }
+    
+                if (postResultDTO.getInstagramLink() == null && postResultDTO.getYoutubeLink() == null) {
+                    return handleError("Error creating posts");
+                }
+                return postResultDTO;
+    
+            } catch (Exception e) {
+                System.out.println("Error during concurrent execution: " + e.getMessage());
+                return handleError("Error creating posts");
+            }
+        }).join();
+    }    
 
     private Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files, String accessToken, List<String> postUrls) {
         UriComponentsBuilder builder;
@@ -519,7 +573,7 @@ public class InstagramService {
         }
     }
 
-    private Object createYoutubePost(String accessToken, CreatePostDTO postDTO, MultipartFile file) {
+    private Object createYoutubePost(String accessToken, CreatePostDTO postDTO, File file) {
         try {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
@@ -537,9 +591,9 @@ public class InstagramService {
 
             FileContent mediaContent;
             if (file != null) {
-                mediaContent = new FileContent("video/*", new File(System.getProperty("user.dir") + "/uploads/processed_" + file.getOriginalFilename()));
+                mediaContent = new FileContent("video/*", file);
             } else {
-                mediaContent = new FileContent("video/*", new File("/uploads/" + postDTO.getUrls()[0].substring(postDTO.getUrls()[0].lastIndexOf("/"))));
+                mediaContent = new FileContent("video/*", new File(System.getProperty("user.dir") + "/uploads/processed_" + postDTO.getUrls()[0].substring(postDTO.getUrls()[0].lastIndexOf("/")+1)));
             }
             Video video = new Video();
             video.setSnippet(snippet);
