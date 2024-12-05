@@ -5,6 +5,7 @@ import { setInstagram } from './authSlice';
 const initialState = {
     instaPage: null,
     tiktokPage: null,
+    youtubePage: null,
     comments: null,
     insights: null,
     isErrorInsta: false,
@@ -56,6 +57,25 @@ export const replyInstagram = createAsyncThunk(
   }
 )
 
+export const replyYoutube = createAsyncThunk(
+  'insta/replyYoutube',
+  async (replyData, thunkAPI) => {
+    try {
+        const res = await instaService.replyYoutube(replyData.replyData)
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+}
+)
+
 export const instaSlice = createSlice({
     name: 'insta',
     initialState,
@@ -76,6 +96,7 @@ export const instaSlice = createSlice({
           state.isSuccessInsta = true
           state.instaPage = action.payload.instaPage
           state.tiktokPage = action.payload.tiktokPage
+          state.youtubePage = action.payload.youtubePage
           state.comments = action.payload.comments
           state.insights = action.payload.insights
           state.isLoadingInsta = false
@@ -107,6 +128,19 @@ export const instaSlice = createSlice({
           state.instaCommentsLoading = false
         })
         .addCase(replyInstagram.rejected, (state, action) => {
+          state.isErrorInsta = true
+          state.message = action.payload
+          state.isLoadingInsta = false
+        })
+        .addCase(replyYoutube.pending, (state) => {
+          state.instaCommentsLoading = true
+        })
+        .addCase(replyYoutube.fulfilled, (state) => {
+          state.isSuccessInsta = true
+          state.instaCommentsLoading = false
+          state.message = 'Replied successfully'
+        })
+        .addCase(replyYoutube.rejected, (state, action) => {
           state.isErrorInsta = true
           state.message = action.payload
           state.isLoadingInsta = false

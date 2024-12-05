@@ -6,9 +6,10 @@ import { FaTiktok } from "react-icons/fa6";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getUser } from '../features/authSlice';
+import { getUser, updateUser } from '../features/authSlice';
 import { setInstagram, tiktokLogout } from '../features/authSlice';
 import instaService from '../features/instaService';
+import { toast } from 'react-toastify';
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -76,6 +77,43 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
   const buildURL = async() => {
     const url = await instaService.tiktokInitializeLogin()
     const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
+
+    const handleMessage = (event) => {
+      if (event.origin !== "https://api.danbfrost.com") return;
+      const { success, updatedUser } = event.data;
+
+      if (success) {
+        dispatch(updateUser(updatedUser))
+        loginWindow.close()
+      } else {
+        toast.error("Something went wrong logging in to TikTok")
+        loginWindow.close()
+      }
+      window.removeEventListener("message", handleMessage);
+    }
+
+    window.addEventListener("message", handleMessage);
+  }
+
+  const buildYoutubeURL = async() => {
+    const url = await instaService.youtubeInitializeLogin()
+    const loginWindow = window.open(url, "_blank", "width=500, height=700, resizable=yes, scrollbars=yes")
+
+    const handleMessage = (event) => {
+      if (event.origin !== "https://api.danbfrost.com") return;
+      const { success, updatedUser } = event.data;
+
+      if (success) {
+        dispatch(updateUser(updatedUser))
+        loginWindow.close()
+      } else {
+        toast.error("Something went wrong logging in to Youtube")
+        loginWindow.close()
+      }
+      window.removeEventListener("message", handleMessage);
+    }
+
+    window.addEventListener("message", handleMessage);
   }
 
   if (activeItem === 'Apps') {
@@ -98,11 +136,10 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
                     ? <button style={{marginTop: '5%'}} onClick={buildURL}>Connect</button> 
                     : <button style={{marginTop: '5%'}} onClick={() => dispatch(tiktokLogout())}>Logout</button>}
             </div>
-
-            <div className={`youtube-connect ${user && user.youtubeConnected ? 'connected' : 'disconnected'}`}>
-                <h2>YouTube</h2>
-                <FaYoutube className={`profile-platform-icon ${user && user.youtubeConnected ? 'connected' : 'disconnected'}`}/>
-                <button style={{marginTop: '5%'}}>Connect</button>
+            <div className='youtube-connect'>
+                <FaYoutube className='youtube-icon' color='red'/>
+                <span>Youtube</span>
+                <button>Connect</button>
             </div>
 
             <div className={`x-connect ${user && user.xConnected ? 'connected' : 'disconnected'}`}>

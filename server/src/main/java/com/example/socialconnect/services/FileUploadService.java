@@ -49,7 +49,14 @@ public class FileUploadService {
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentType(multipartFile.getContentType());
-            File processedFile = formatVideo(multipartFile);
+            File processedFile;
+            if (multipartFile.getContentType().equals("video/mp4") || multipartFile.getContentType().equals("video/quicktime")) {
+                processedFile = formatVideo(multipartFile);
+            } else {
+                processedFile = File.createTempFile("temp", null);
+                multipartFile.transferTo(processedFile);
+            }
+            
 
             filePath = multipartFile.getOriginalFilename();
             s3Client.putObject(bucketName, filePath, processedFile);

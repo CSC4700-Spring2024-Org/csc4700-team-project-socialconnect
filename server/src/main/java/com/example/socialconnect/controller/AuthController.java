@@ -67,7 +67,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response){
+        System.out.println("hello");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
+        System.out.println("AUTHENTICATION DONE");
         if(authentication.isAuthenticated()){
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             if(!userDetails.isEnabled())

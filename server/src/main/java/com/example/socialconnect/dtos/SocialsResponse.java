@@ -1,7 +1,8 @@
 package com.example.socialconnect.dtos;
 
 import com.example.socialconnect.dtos.InstagramDTOs.BusinessWithCommentsDTO;
-import com.example.socialconnect.dtos.TikTokDTOs.VideosListDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.CombinedTikTokResponseDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCombinedResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,5 +15,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SocialsResponse {
     private BusinessWithCommentsDTO instaResponse;
-    private VideosListDTO tiktokResponse;
+    private CombinedTikTokResponseDTO tiktokResponse;
+    private YoutubeCombinedResponseDTO youtubeResponse;
 }
