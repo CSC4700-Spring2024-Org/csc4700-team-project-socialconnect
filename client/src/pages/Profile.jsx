@@ -136,10 +136,12 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
                     ? <button style={{marginTop: '5%'}} onClick={buildURL}>Connect</button> 
                     : <button style={{marginTop: '5%'}} onClick={() => dispatch(tiktokLogout())}>Logout</button>}
             </div>
-            <div className='youtube-connect'>
+            <div className={`youtube-connect ${user && user.tiktokConnected ? 'connected' : 'disconnected'}`}>
+                <h2>YouTube</h2>
                 <FaYoutube className='youtube-icon' color='red'/>
-                <span>Youtube</span>
-                <button>Connect</button>
+                {!user || (user && !user.tiktokConnected) 
+                    ? <button style={{marginTop: '5%'}} onClick={buildURL}>Connect</button> 
+                    : <button style={{marginTop: '5%'}} onClick={() => dispatch(tiktokLogout())}>Logout</button>}
             </div>
 
             <div className={`x-connect ${user && user.xConnected ? 'connected' : 'disconnected'}`}>
