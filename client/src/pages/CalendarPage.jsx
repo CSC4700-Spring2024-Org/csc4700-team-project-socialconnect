@@ -193,7 +193,7 @@ const CalendarPage = ({ posts }) => {
     start: new Date(post.create_time * 1000).toISOString(),
     source: 'TikTok',
   }));
-  const youtubeEvents = youtubePage.videos.map((post, i) => ({
+  const youtubeEvents = youtubePage?.videos.map((post, i) => ({
     title: 'Youtube Post',
     start: post.contentDetails.videoPublishedAt,
     source: 'YouTube', 
