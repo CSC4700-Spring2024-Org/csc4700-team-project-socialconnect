@@ -6,7 +6,7 @@ import { FaTiktok } from "react-icons/fa6";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getUser, updateUser } from '../features/authSlice';
+import { getUser, updateUser, youtubeLogout } from '../features/authSlice';
 import { setInstagram, tiktokLogout } from '../features/authSlice';
 import instaService from '../features/instaService';
 import { toast } from 'react-toastify';
@@ -78,7 +78,7 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
     const url = await instaService.tiktokInitializeLogin()
     const loginWindow = window.open(url, "_blank", "width=500,height=700,resizable=yes,scrollbars=yes")
 
-    const handleMessage = (event) => {
+    const handleTikTokMessage = (event) => {
       if (event.origin !== "https://api.danbfrost.com") return;
       const { success, updatedUser } = event.data;
 
@@ -89,17 +89,17 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
         toast.error("Something went wrong logging in to TikTok")
         loginWindow.close()
       }
-      window.removeEventListener("message", handleMessage);
+      window.removeEventListener("message", handleTikTokMessage);
     }
 
-    window.addEventListener("message", handleMessage);
+    window.addEventListener("message", handleTikTokMessage);
   }
 
   const buildYoutubeURL = async() => {
     const url = await instaService.youtubeInitializeLogin()
     const loginWindow = window.open(url, "_blank", "width=500, height=700, resizable=yes, scrollbars=yes")
 
-    const handleMessage = (event) => {
+    const handleYouTubeMessage = (event) => {
       if (event.origin !== "https://api.danbfrost.com") return;
       const { success, updatedUser } = event.data;
 
@@ -110,10 +110,10 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
         toast.error("Something went wrong logging in to Youtube")
         loginWindow.close()
       }
-      window.removeEventListener("message", handleMessage);
+      window.removeEventListener("message", handleYouTubeMessage);
     }
 
-    window.addEventListener("message", handleMessage);
+    window.addEventListener("message", handleYouTubeMessage);
   }
 
   if (activeItem === 'Apps') {
@@ -137,7 +137,7 @@ const ProfileItem = ({activeItem, dispatch, user}) => {
                 <FaYoutube className='youtube-icon' color='red'/>
                 <span>Youtube</span>
                 {!user || (user && !user.youtubeConnected) ? <button onClick={buildYoutubeURL}>Connect</button> :
-                  <button>Logout</button>}
+                  <button onClick={() => dispatch(youtubeLogout())}>Logout</button>}
             </div>
             <div className='twitter-connect'>
                 <FaSquareXTwitter className='twitter-icon'/>

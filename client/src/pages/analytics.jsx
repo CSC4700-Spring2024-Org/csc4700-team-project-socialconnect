@@ -175,14 +175,14 @@ export default function Analytics() {
           platform={"TikTok"}
           isConnected={user.tiktokConnected}
           icon={<FaTiktok size={15} />}
-          pfp={tiktokPage.profilePicture}
+          pfp={tiktokPage?.profilePicture}
           isSelected={selectedPlatform.includes("TikTok")}
           onClick={() => handlePlatformChange("TikTok")}
         />
         <PlatformCard
           platform={"YouTube"}
           isConnected={user.youtubeConnected}
-          pfp={youtubePage.profilePicture}
+          pfp={youtubePage?.profilePicture}
           icon={<FaYoutube size={17} color={"red"} />}
           onClick={() => handlePlatformChange("YouTube")}
         />

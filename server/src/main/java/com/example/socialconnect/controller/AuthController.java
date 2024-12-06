@@ -108,6 +108,7 @@ public class AuthController {
             modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
                 mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
                 mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+                mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
             });
             UserResponse userResponse = modelMapper.map(user, UserResponse.class);
             return ResponseEntity.ok(userResponse);

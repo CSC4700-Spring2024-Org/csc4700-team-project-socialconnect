@@ -69,7 +69,7 @@ public class InstagramController {
 
     @PostMapping("/createInstagramPost")
     public ResponseEntity<?> createInstagramPost(@RequestPart("post") CreatePostDTO postDTO, @RequestPart("files") MultipartFile[] files) {
-        return ResponseEntity.ok(instagramService.createInstagramPost(postDTO, files));
+        return ResponseEntity.ok(instagramService.createPosts(postDTO, files, null));
     }
 
     @PostMapping("/schedulePost")
@@ -90,6 +90,11 @@ public class InstagramController {
     @PostMapping("/tiktokLogout")
     public ResponseEntity<?> tiktokLogout() {
         return ResponseEntity.ok(instagramService.tiktokLogout());
+    }
+
+    @PostMapping("/youtubeLogout")
+    public ResponseEntity<?> youtubeLogout() {
+        return ResponseEntity.ok(instagramService.youtubeLogout());
     }
 
     @GetMapping("/tiktokInitializeLogin")

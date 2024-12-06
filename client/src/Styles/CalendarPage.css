@@ -29,6 +29,44 @@
   background: rgba(255, 255, 255, 0.1); /* Light background for scrollbar track */
 }
 
+/* Calendar event icon styling */
+.fc .fc-event {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row;
+}
+
+.fc .fc-event .calendar-icon {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.fc .fc-event .instagram-icon {
+  color: #E1306C;
+}
+
+.fc .fc-event .tiktok-icon {
+  color: #000000;
+}
+
+.fc .fc-event .youtube-icon {
+  color: #FF0000;
+}
+
+.fc .fc-event {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-direction: row;
+}
+
+.fc .fc-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
 .cp-feed-container::-webkit-scrollbar-track:hover {
   background: rgba(115, 115, 115, 0.1); /* Light background for scrollbar track */
 }
@@ -130,9 +168,9 @@
 .cp-calendar-container {
   height: 48%;
   width: 90%;
-  margin-top: 100px;
+  margin-top: 22%;
   margin-right: 20px;
-  margin-left: 10px;
+  margin-left: 5%;
   border-radius: 10px;
   background-color: white;
   border: 2px solid rgb(0, 0, 0);

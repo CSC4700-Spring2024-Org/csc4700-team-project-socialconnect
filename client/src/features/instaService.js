@@ -16,6 +16,7 @@ const createInstagramPost = async(postData) => {
             'Content-Type': 'multipart/form-data'
         }
     })
+    console.log(res.data)
     return res
 }
 
@@ -54,7 +55,8 @@ const instaService = {
     replyInstagram,
     tiktokInitializeLogin,
     createFuturePost,
-    youtubeInitializeLogin
+    youtubeInitializeLogin,
+    replyYoutube
 }
 
 export default instaService;

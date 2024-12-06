@@ -44,4 +44,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
    )
    void updateYoutube(@Param("accessToken") String accessToken, @Param("refreshToken") String refreshToken, @Param("id") Long id);
 
+
+   @Modifying
+   @Transactional
+   @Query(
+      nativeQuery = true,
+      value = "UPDATE users SET POST_STATUS_MESSAGE = :message WHERE id = :id"
+   )
+   void updatePostStatusMessage(@Param("message") String message, @Param("id") Long id);
 }

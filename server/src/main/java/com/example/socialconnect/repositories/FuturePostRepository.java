@@ -1,6 +1,5 @@
 package com.example.socialconnect.repositories;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,7 +16,7 @@ import jakarta.transaction.Transactional;
 public interface FuturePostRepository extends CrudRepository<FuturePost, Integer> {
     @Query(
         nativeQuery = true,
-        value = "SELECT * FROM future_posts WHERE POST_DT < CURRENT_TIMESTAMP AND POST_STATUS = 0"
+        value = "SELECT * FROM future_posts WHERE POST_DT <= CURRENT_TIMESTAMP"
     )
     List<FuturePost> findPosts();
 
@@ -25,20 +24,7 @@ public interface FuturePostRepository extends CrudRepository<FuturePost, Integer
     @Transactional
     @Query(
         nativeQuery = true,
-        value = "UPDATE future_posts SET VIEWED_MESSAGE = TRUE WHERE USER_ID = :id AND ID = :postID"
+        value = "DELETE FROM future_posts WHERE id = :id"
     )
-    void updateViewedMessage(@Param("id")Long id, @Param("postID")int postID);
-
-    @Query(
-        nativeQuery = true,
-        value = "INSERT INTO future_posts(USER_ID, CAPTION, TAGGED_USERS, LOCATION, POST_DT, POST_TO_INSTA, POST_TO_TIKTOK, POST_TO_YOUTUBE, POST_STATUS, VIEWED_MESSAGE) " +
-                "VALUES(:id, :caption, :taggedUsers, :location, :postDT, :postToInsta, :postToTiktok, FALSE, 0, FALSE) RETURNING ID"
-    )
-    Long createFuturePost(@Param("id") Long id, 
-                        @Param("caption") String caption, 
-                        @Param("taggedUsers") String taggedUsers, 
-                        @Param("location") String location, 
-                        @Param("postDT") LocalDateTime postDT, 
-                        @Param("postToInsta") Boolean postToInsta, 
-                        @Param("postToTiktok") Boolean postToTiktok);
+    void deleteFuturePost(@Param("id") Integer id);
 }
