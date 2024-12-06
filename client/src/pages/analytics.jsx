@@ -162,7 +162,7 @@ export default function Analytics() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px', height:'10%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginBottom: '0px', height:'12%' }}>
         <PlatformCard
           platform={"Instagram"}
           isConnected={user.instagramConnected}

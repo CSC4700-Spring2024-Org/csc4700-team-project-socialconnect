@@ -1,147 +1,210 @@
+body {
+    background-color: #f9f9f9;
+    font-family: 'Arial', sans-serif;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+}
+
 .account-page {
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: row;
 }
 
-body {
-    background-color: #f4f4f4;
-}
-
+/* Sidebar Styles */
 .profile-sidebar {
     display: flex;
-    width: 25%;
-    float: left;
-    align-items: center;
-    justify-content:flex-start;
+    width: 20%;
     flex-direction: column;
     background-color: #ffffff;
-    margin: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
 }
 
 .sidebar-item {
-    background-color: #ffffff;
     width: 90%;
-    height: 2rem;
+    padding: 0.75rem;
     text-align: center;
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: 0.5rem 0;
+    background-color: #f9f9f9;
+    border-radius: 60px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
 }
 
 .sidebar-item:hover {
-    background-color: #f4f4f4;
+    background-color: #e6f7ff;
+    font-weight: 60;
+    color: #0073e6;
     cursor: pointer;
-    font-weight: 525;
 }
 
-
 .connections-container {
+    height: 45%;
+    flex-grow: 1;
     background-color: #ffffff;
-    overflow: hidden;
-    margin: 1rem;
-    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .connections-header {
+    font-size: 1.5rem;
+    font-weight: 600;
     text-align: center;
-    margin-top: 1.5em;
+    color: black;
+    margin-bottom: 1rem;
 }
 
 .connections {
-    background-color: #ffffff;
-    display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 1.5em;
+    justify-content: space-evenly;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex: .95;
 }
 
 .connections div {
-    width: 12rem;
-    height: 12rem;
-    margin: 1em 0;
-    padding: 1em;
-    font-weight: 700;
-    text-align: center;
-    border: 2px solid #f0f0f0;
-    border-radius: 10px;
-    background-color: #ffffff;
-    flex-direction: column;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+    margin-bottom: 2rem;
+    border-radius: 80px;
+    width: 40%;
+    height: 40%;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    overflow: hidden;
 }
 
-.connections button {
-    width: 90%;
-    height: 20%;
-    margin-top: 2.75rem;
-    border-radius: 5px;
-    background-color: #f4f4f4;
+/* Connected */
+.connections div.connected {
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    padding: 1%;
 }
 
-.connections a {
-    width: 90%;
-    height: 20%;
-    margin-top: 2.75rem;
-    border-radius: 5px;
-    background-color: #f4f4f4;
-    text-decoration: none;
+/* Disconnected */
+.connections div.disconnected {
+    background-color: #d0ccccd8;
+    border-color: #dddddd9d;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    padding: 1%;
 }
 
-.connections a:hover {
-    cursor: pointer;
-    background-color: #f0f0f0;
-    font-weight: 750;
+/* Hover Effects */
+.connections div:hover {
+    transform: translateY(-5px);
+    background-color: #f0f8ff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.connections button:hover {
-    cursor: pointer;
-    background-color: #f0f0f0;
-    font-weight: 750;
-}
-
-.connections span {
-    margin-top: 0.5rem;
+.connections div.disconnected:hover {
+    transform: translateY(-5px);
+    background-color: #d0ccccd8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .connections svg {
     width: 30%;
     height: 30%;
-    border-radius: 10px;
-    font-size: 1rem;
-    margin-top: 1rem;
 }
 
-.terms-container-profile-page {
-    width: 100%;
-    height: 100%;
-    background-color: #ffffff;
-    margin: 1rem;
+.connections button {
+    width: 50%;
+    height: 15%;
+    padding: 0.5rem;
+    border-radius: 60px;
+    border: none;
+    background-color: #0073e6;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
 
-.terms-content-profile-page {
-    margin: 1rem;
+.connections button:hover {
+    background-color: #005bb5;
 }
 
-.pp-container-profile-page {
-    width: 100%;
-    height: 100%;
-    background-color: #ffffff;
-    margin: 1rem;
+.connections div.connected button {
+    background-color: red;
 }
 
-.pp-content-profile-page {
-    margin: 1rem;
+.connections div.connected button:hover {
+    background-color: rgb(228, 5, 5);
 }
 
-.connections-container,
-.terms-container-profile-page,
-.pp-container-profile-page {
-    flex-grow: 1;
-    background-color: #ffffff;
-    margin: 1rem;
-    height: calc(100vh - 2rem);
-    overflow: auto;
-    box-sizing: border-box;
+.connections div.disconnected button {
+    background-color: #0073e6;
+}
+
+.connections div.disconnected button:hover {
+    background-color: #005bb5;
+}
+
+.profile-terms-container {
+    width: 70%;
+    margin-left: 3%;
+    margin-top: 1%;
+    overflow-y: auto;
+    height: 780px;
+    margin-right: 0%;
+    padding-right: 5%;
+}
+
+.profile-platform-icon {
+    margin-top: 0%;
+}
+  
+.profile-platform-icon.connected {
+    color: red;
+}
+
+.profile-platform-icon.disconnected {
+    color: grey;
+}
+
+.instagram-connect.connected:hover {
+    box-shadow: 0 8px 20px rgba(193, 53, 132, 0.5); 
+}
+
+.instagram-connect.disconnected:hover {
+    box-shadow: 0 4px 12px rgba(193, 53, 132, 0.5); 
+}
+
+.tiktok-connect.connected:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tiktok-connect.disconnected:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.youtube-connect.connected:hover{
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.5);
+}
+
+.youtube-connect.disconnected:hover{
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.5);
+}
+
+.x-connect.connected:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); 
+}
+
+.x-connect.disconnected:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
