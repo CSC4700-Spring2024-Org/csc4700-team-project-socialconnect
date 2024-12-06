@@ -46,7 +46,7 @@ const Profile = () => {
         <>
             {!isLoading ? <div className="account-page">
                 <div className='profile-sidebar'>
-                    <div className='sidebar-item' onClick={() => setActiveItem('Apps')}>Apps and Accounts</div>
+                    <div className='sidebar-item' onClick={() => setActiveItem('Apps')}>My Accounts</div>
                     <div className='sidebar-item' onClick={() => setActiveItem('Terms')}>Terms and Conditions</div>
                     <div className='sidebar-item' onClick={() => setActiveItem('Privacy')}>Privacy Policy</div>
                 </div>
