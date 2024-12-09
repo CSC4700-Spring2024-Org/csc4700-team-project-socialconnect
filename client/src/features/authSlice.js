@@ -87,6 +87,44 @@ export const tiktokLogout = createAsyncThunk(
   }
 )
 
+export const youtubeLogout = createAsyncThunk(
+  'auth/youtubeLogout',
+  async (thunkAPI) => {
+    try {
+        const res = await authService.youtubeLogout()
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+export const removePostStatusMessage = createAsyncThunk(
+  'auth/removeMessage',
+  async (thunkAPI) => {
+    try {
+        const res = await authService.removePostStatusMessage()
+        if (res.error) {
+          return thunkAPI.rejectWithValue(res.error)
+        }
+        return res;
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.message.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -97,6 +135,9 @@ export const authSlice = createSlice({
         state.isError = false
         state.message = ''
       },
+      updateUser: (state, action) => {
+        state.user = action.payload
+      }
     },
     extraReducers: (builder) => {
       builder
@@ -127,22 +168,6 @@ export const authSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
-<<<<<<< HEAD
-=======
-          state.message = action.payload
-          state.user = null
-        })
-        .addCase(refreshToken.pending, (state) => {
-          state.isLoading = true
-        })
-        .addCase(refreshToken.fulfilled, (state, action) => {
-          state.isLoading = false
-          state.isSuccess = true
-        })
-        .addCase(refreshToken.rejected, (state, action) => {
-          state.isLoading = false
-          state.isError = true
->>>>>>> 60bb0cfde84bbe347365fb943adc491fe1482467
           state.message = action.payload
           state.user = null
         })
@@ -185,8 +210,34 @@ export const authSlice = createSlice({
           state.isError = true
           state.message = action.payload
         })
+        .addCase(youtubeLogout.pending, (state) => {
+          state.isLoading = true
+        })
+        .addCase(youtubeLogout.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.user = action.payload
+
+        })
+        .addCase(youtubeLogout.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
+        })
+        .addCase(removePostStatusMessage.fulfilled, (state) => {
+          state.isLoading = false
+          state.isSuccess = true
+          let tempUser = state.user
+          tempUser.postStatusMessage = null
+          state.user = tempUser
+        })
+        .addCase(removePostStatusMessage.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
+        })
     },
   })
   
-  export const { reset } = authSlice.actions
+  export const { reset, updateUser } = authSlice.actions
   export default authSlice.reducer

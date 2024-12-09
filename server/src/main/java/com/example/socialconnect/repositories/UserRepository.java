@@ -36,4 +36,20 @@ public interface UserRepository extends CrudRepository<User, Long> {
    )
    void updateTiktok(@Param("accessToken") String accessToken, @Param("refreshToken") String refreshToken, @Param("id") Long id);
 
+   @Modifying
+   @Transactional
+   @Query(
+      nativeQuery = true,
+      value = "UPDATE users SET YOUTUBE_ACCESS = CASE WHEN :accessToken IS NULL THEN NULL ELSE :accessToken END, YOUTUBE_REFRESH = CASE WHEN :refreshToken IS NULL THEN NULL ELSE :refreshToken END WHERE id = :id"
+   )
+   void updateYoutube(@Param("accessToken") String accessToken, @Param("refreshToken") String refreshToken, @Param("id") Long id);
+
+
+   @Modifying
+   @Transactional
+   @Query(
+      nativeQuery = true,
+      value = "UPDATE users SET POST_STATUS_MESSAGE = :message WHERE id = :id"
+   )
+   void updatePostStatusMessage(@Param("message") String message, @Param("id") Long id);
 }

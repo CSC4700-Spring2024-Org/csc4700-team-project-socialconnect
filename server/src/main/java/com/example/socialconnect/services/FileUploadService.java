@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -49,14 +52,21 @@ public class FileUploadService {
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentType(multipartFile.getContentType());
-            File processedFile = formatVideo(multipartFile);
+            File processedFile;
+            if (multipartFile.getContentType().equals("video/mp4") || multipartFile.getContentType().equals("video/quicktime")) {
+                processedFile = formatVideo(multipartFile);
+            } else {
+                processedFile = File.createTempFile("temp", null);
+                multipartFile.transferTo(processedFile);
+            }
+            
 
             filePath = multipartFile.getOriginalFilename();
             s3Client.putObject(bucketName, filePath, processedFile);
 
-            if (!processedFile.delete()) {
-                System.out.println("Error deleting processed file");
-            }
+            // if (!processedFile.delete()) {
+            //     System.out.println("Error deleting processed file");
+            // }
         } catch (Exception e) {
             throw new FileUploadException("Error occurred in file upload ==> "+e.getMessage());
         }
@@ -65,9 +75,28 @@ public class FileUploadService {
 
     public void deleteFile(String fileName) {
         s3Client.deleteObject(bucketName, fileName.substring(fileName.lastIndexOf("/")+1));
+        String filePath = Paths.get(System.getProperty("user.dir"), "uploads", "processed_" + fileName.substring(fileName.lastIndexOf("/") + 1)).toString();
+
+        Path path = Paths.get(filePath);
+        if (Files.exists(path)) {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("File does not exist");
+        }
+
     }
 
-    private File formatVideo(MultipartFile file) throws IOException, InterruptedException {
+    public void deleteLocalFile(File file) {
+        if (!file.delete()) {
+            System.out.println("Error deleting local file");
+        }
+    }
+
+    public File formatVideo(MultipartFile file) throws IOException, InterruptedException {
     if (!file.isEmpty()) {
         String uploadsDir = "/uploads/";
         String realPathtoUploads = System.getProperty("user.dir") + uploadsDir;

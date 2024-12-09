@@ -3,7 +3,7 @@ import CommentSection from './CommentSection';
 import React, {useState, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { getUser } from '../features/authSlice';
+import { getUser, removePostStatusMessage } from '../features/authSlice';
 import Analytics from './analytics';
 import { getInstaProfile } from '../features/instaSlice';
 import Calendar from './calendar';
@@ -36,6 +36,28 @@ const Home = () => {
         // navigate('/');
         if (isErrorInsta) {
           toast.error(message)
+        } else if (!isErrorInsta && user.postStatusMessage && user.postStatusMessage !== '') {
+          const dateMatch = user.postStatusMessage.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+          const datePart = dateMatch ? dateMatch[0] : null;
+          if (datePart !== null) {
+            const date = new Date(datePart)
+            const options = {
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            }
+            const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+            const updatedMessage = user.postStatusMessage.replace(datePart, formattedDate)
+            toast(updatedMessage)
+            dispatch(removePostStatusMessage())
+          } else {
+            toast(user.postStatusMessage)
+            dispatch(removePostStatusMessage())
+          }
         }
         if ((user.instagramConnected && !instaPage) || (user.tiktokConnected && !tiktokPage)) {
           dispatch(getInstaProfile(user))

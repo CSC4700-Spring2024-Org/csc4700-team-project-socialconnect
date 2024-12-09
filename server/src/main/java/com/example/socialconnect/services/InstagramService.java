@@ -1,5 +1,6 @@
 package com.example.socialconnect.services;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -29,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.socialconnect.dtos.ErrorDTO;
+import com.example.socialconnect.dtos.PostResultDTO;
 import com.example.socialconnect.dtos.SocialsResponse;
 import com.example.socialconnect.dtos.UserResponse;
 import com.example.socialconnect.dtos.InstagramDTOs.AccountDTO;
@@ -53,12 +58,31 @@ import com.example.socialconnect.dtos.InstagramDTOs.InsightsResponseDTO;
 import com.example.socialconnect.dtos.InstagramDTOs.InstaBusinessAcct;
 import com.example.socialconnect.dtos.InstagramDTOs.PostDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.AccessTokenRequestDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.CombinedTikTokResponseDTO;
+import com.example.socialconnect.dtos.TikTokDTOs.TikTokProfileResponseDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.TiktokErrorDTO;
 import com.example.socialconnect.dtos.TikTokDTOs.VideosListDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeAdvancedStatisticsDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeAltAnalyticsDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeChannelListResponse;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCombinedResponseDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCommentResponseDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeErrorDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubePlaylistItemListResponse;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeTokenRequestDTO;
+import com.example.socialconnect.dtos.YoutubeDTOs.YoutubeCombinedResponseDTO.YoutubeVideoInfo;
 import com.example.socialconnect.helpers.CustomUserDetails;
 import com.example.socialconnect.models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.Video;
+import com.google.api.services.youtube.model.VideoSnippet;
+import com.google.api.services.youtube.model.VideoStatus;
 
 @Service
 public class InstagramService {
@@ -69,6 +93,9 @@ public class InstagramService {
     UserService userService;
 
     ModelMapper modelMapper = new ModelMapper();
+
+    private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private static HttpTransport HTTP_TRANSPORT;
 
     @Value("${tiktok.key}")
     private String tiktokClientKey;
@@ -82,47 +109,66 @@ public class InstagramService {
     @Value("${tiktok.redirect.uri}")
     private String tiktokRedirectURI;
 
+    @Value("${youtube.clientid}")
+    private String youtubeClientID;
+
+    @Value("${youtube.secret}")
+    private String youtubeSecret;
+
     private static final RestTemplate restTemplate = new RestTemplate();
-    private static final ExecutorService executor = Executors.newFixedThreadPool(4);
+    private static final ExecutorService executor = Executors.newFixedThreadPool(8);
 
     public Object getSocialsInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
         String instaAccessToken = userDetail.getUser().getInstaRefresh();
-        String tiktokAccessToken = userDetail.getUser().getTiktokAccess(); 
+        String tiktokAccessToken = userDetail.getUser().getTiktokAccess();
+        String youtubeAccessToken = userDetail.getUser().getYoutubeAccess();
     
-        if (tiktokAccessToken == null && instaAccessToken == null) {
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setError("Please connect your social media accounts");
-            return errorDTO;
+        if (tiktokAccessToken == null && instaAccessToken == null && youtubeAccessToken == null) {
+            return handleError("Please connect at least one social media account");
         }
     
         SocialsResponse socialsRes = new SocialsResponse();
+        List<CompletableFuture<?>> futures = new ArrayList<>();
     
-        CompletableFuture<Void> instaFuture = CompletableFuture.runAsync(() -> {
-            if (instaAccessToken != null) {
-                Object instaInfo = getInstagramInfo(instaAccessToken);
-                if (instaInfo instanceof ErrorDTO) {
-                    System.out.println("Error fetching Instagram data");
-                } else {
+        if (instaAccessToken != null) {
+            CompletableFuture<Void> instaFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    Object instaInfo = getInstagramInfo(instaAccessToken);
                     socialsRes.setInstaResponse((BusinessWithCommentsDTO) instaInfo);
+                } catch (Exception e) {
+                    System.err.println("Error fetching Instagram data: " + e.getMessage());
                 }
-            }
-        }, executor);
+            }, executor);
+            futures.add(instaFuture);
+        }
     
-        CompletableFuture<Void> tiktokFuture = CompletableFuture.runAsync(() -> {
-            if (tiktokAccessToken != null) {
-                Object tiktokInfo = getTiktokInfo(tiktokAccessToken, userDetail.getUser().getTiktokRefresh(), userDetail.getUser().getId());
-                if (tiktokInfo instanceof ErrorDTO) {
-                    System.out.println("Error fetching TikTok data");
-                } else {
-                    socialsRes.setTiktokResponse((VideosListDTO) tiktokInfo);
+        if (tiktokAccessToken != null) {
+            CompletableFuture<Void> tiktokFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    Object tiktokInfo = getTiktokInfo(tiktokAccessToken, userDetail.getUser().getTiktokRefresh(), userDetail.getUser().getId());
+                    socialsRes.setTiktokResponse((CombinedTikTokResponseDTO) tiktokInfo);
+                } catch (Exception e) {
+                    System.err.println("Error fetching TikTok data: " + e.getMessage());
                 }
-            }
-        }, executor);
+            }, executor);
+            futures.add(tiktokFuture);
+        }
     
-        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(instaFuture, tiktokFuture);
-        combinedFuture.join();
+        if (youtubeAccessToken != null) {
+            CompletableFuture<Void> youtubeFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    Object youtubeInfo = getYoutubeVideos(youtubeAccessToken, userDetail.getUser().getYoutubeRefresh(), userDetail.getUser().getId());
+                    socialsRes.setYoutubeResponse((YoutubeCombinedResponseDTO) youtubeInfo);
+                } catch (Exception e) {
+                    System.err.println("Error fetching YouTube data: " + e.getMessage());
+                }
+            }, executor);
+            futures.add(youtubeFuture);
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     
         return socialsRes;
     }
@@ -144,7 +190,7 @@ public class InstagramService {
             List<CompletableFuture<List<CommentDTO>>> commentFutures = new ArrayList<>();
             List<CompletableFuture<List<InsightsDTO>>> insightsFutures = new ArrayList<>();
     
-            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 10); i++) {
+            for (int i = 0; i < Math.min(res4.getBusiness_discovery().getMedia().getData().size(), 20); i++) {
                 String mediaId = res4.getBusiness_discovery().getMedia().getData().get(i).getId();
     
                 CompletableFuture<List<CommentDTO>> commentFuture = CompletableFuture.supplyAsync(() -> {
@@ -153,7 +199,7 @@ public class InstagramService {
                     URI commentUri = commentBuilder.build().toUri();
                     CommentResponseDTO commentRes = restTemplate.getForObject(commentUri, CommentResponseDTO.class);
                     return commentRes != null ? commentRes.getData() : new ArrayList<>();
-                });
+                }, executor);
                 commentFutures.add(commentFuture);
     
                 CompletableFuture<List<InsightsDTO>> insightsFuture = CompletableFuture.supplyAsync(() -> {
@@ -162,7 +208,7 @@ public class InstagramService {
                     URI insightsUri = insightsBuilder.build().toUri();
                     InsightsResponseDTO insightRes = restTemplate.getForObject(insightsUri, InsightsResponseDTO.class);
                     return insightRes != null ? insightRes.getData() : new ArrayList<>();
-                });
+                }, executor);
                 insightsFutures.add(insightsFuture);
             }
     
@@ -215,21 +261,51 @@ public class InstagramService {
         org.springframework.http.HttpEntity<Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
     
         Object result = fetchTiktokVideos(uri, entity);
-        System.out.println(result.getClass());
         if (result instanceof VideosListDTO && ((VideosListDTO)result).getData() != null) {
-            return result;
+            CombinedTikTokResponseDTO combinedRes = new CombinedTikTokResponseDTO();
+            combinedRes.setVideos(((VideosListDTO)result));
+            url = "https://open.tiktokapis.com/v2/user/info/?fields=avatar_url";
+            uri = UriComponentsBuilder.fromUriString(url).build().toUri();
+        
+            entity = new org.springframework.http.HttpEntity<>(headers);
+            TikTokProfileResponseDTO tiktokProfile = restTemplate.exchange(uri, HttpMethod.GET, entity, TikTokProfileResponseDTO.class).getBody();
+            if (tiktokProfile.getError().getCode().equals("ok")) {
+                combinedRes.setProfilePicture(tiktokProfile.getData().getUser().getAvatar_url());
+            } else {
+                combinedRes.setProfilePicture(null);
+            }
+            return combinedRes;
         }
     
-
-        System.out.println(result instanceof ErrorDTO);
         if (result instanceof ErrorDTO || "access_token_invalid".equals(((VideosListDTO)result).getError().getCode())) {
-            refreshTiktokToken(refreshToken, id);
-            result = fetchTiktokVideos(uri, entity);
-            System.out.println("RESULT AFTER REFRESH: " + result);
+            Object refreshResponse = refreshTiktokToken(refreshToken, id);
+            if (refreshResponse instanceof ErrorDTO) {
+                return refreshResponse;
+            } else {
+                accessToken = ((AccessTokenRequestDTO)refreshResponse).getAccess_token();
+                headers.set("Authorization", "Bearer " + accessToken);
+                entity = new org.springframework.http.HttpEntity<>(bodyParams, headers);
+                result = fetchTiktokVideos(uri, entity);
+            }
         }
     
-        System.out.println(result instanceof VideosListDTO);
-        return result instanceof VideosListDTO ? result : handleError("Something went wrong fetching TikTok page");
+        if (result instanceof VideosListDTO) {
+            CombinedTikTokResponseDTO combinedRes = new CombinedTikTokResponseDTO();
+            combinedRes.setVideos(((VideosListDTO)result));
+            url = "https://open.tiktokapis.com/v2/user/info/?fields=avatar_url";
+            uri = UriComponentsBuilder.fromUriString(url).build().toUri();
+        
+            entity = new org.springframework.http.HttpEntity<>(headers);
+            TikTokProfileResponseDTO tiktokProfile = restTemplate.exchange(uri, HttpMethod.GET, entity, TikTokProfileResponseDTO.class).getBody();
+            if (tiktokProfile.getError().getCode().equals("ok")) {
+                combinedRes.setProfilePicture(tiktokProfile.getData().getUser().getAvatar_url());
+            } else {
+                combinedRes.setProfilePicture(null);
+            }
+            return combinedRes;
+        } else {
+            return handleError("Something went wrong fetching TikTok page");
+        }   
     }
     
     private Object fetchTiktokVideos(URI uri, org.springframework.http.HttpEntity<Map<String, Object>> entity) {
@@ -241,7 +317,7 @@ public class InstagramService {
             return handleError("Something went wrong fetching TikTok page");
         }
     }
-    
+
     private ErrorDTO handleError(String message) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError(message);
@@ -253,7 +329,6 @@ public class InstagramService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
         URI uri = builder.build().toUri();
         AccountDTO accountsRes = restTemplate.getForObject(uri, AccountDTO.class);
-        System.out.println("ACCOUNTS RES: " + accountsRes.getData().get(0).getId());
 
         url = "https://graph.facebook.com/v19.0/" + accountsRes.getData().get(0).getId() + "?access_token=" + accessToken + "&fields=instagram_business_account";
         builder = UriComponentsBuilder.fromUriString(url);
@@ -262,33 +337,135 @@ public class InstagramService {
         return instagramAccountRes;
     }
 
-    public Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
-        String accessToken = userDetail.getUser().getInstaRefresh();
-        if (accessToken == null) {
-            ErrorDTO dto = new ErrorDTO();
-            dto.setError("Please connect your Instagram account");
-            return dto;
+    public Object createPosts(CreatePostDTO postDTO, MultipartFile[] files, User user) {
+        String instaAccess;
+        String youtubeAccess;
+        if (user == null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+            instaAccess = userDetail.getUser().getInstaRefresh();
+            youtubeAccess = userDetail.getUser().getYoutubeAccess();
+        } else {
+            instaAccess = user.getInstaRefresh();
+            youtubeAccess = user.getYoutubeAccess();
         }
+    
+        if (youtubeAccess == null && postDTO.getPostToYoutube() || instaAccess == null && postDTO.getPostToInstagram()) {
+            return handleError("Please connect your accounts");
+        }
+    
+        AtomicReference<List<String>> postUrlsRef = new AtomicReference<>(new ArrayList<>());
+        AtomicReference<File> processedFileRef = new AtomicReference<>(null);
+    
+        if (postDTO.getPostToInstagram() || postDTO.getPostToTiktok()) {
+            try {
+                List<String> postUrls = postUrlsRef.get();
+                if (files != null) {
+                    for (MultipartFile file : files) {
+                        postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(file));
+                    }
+                } else {
+                    postUrls = Arrays.asList(postDTO.getUrls());
+                    postUrlsRef.set(postUrls);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+                return handleError("Error uploading files");
+            }
+        } else {
+            if (files[0] != null) {
+                try {
+                    processedFileRef.set(fileUploadService.formatVideo(files[0]));
+                } catch (Exception e) {
+                    System.out.println(e);
+                    return handleError("Error processing file");
+                }
+            }
+        }
+
+        AtomicReference<CompletableFuture<Object>> youtubeFutureRef = new AtomicReference<>(CompletableFuture.completedFuture(null));
+        AtomicReference<CompletableFuture<Object>> instagramFutureRef = new AtomicReference<>(CompletableFuture.completedFuture(null));
+    
+        if (postDTO.getPostToYoutube()) {
+            youtubeFutureRef.set(CompletableFuture.supplyAsync(() -> {
+                File processedFile = processedFileRef.get();
+                if (processedFile != null) {
+                    return createYoutubePost(youtubeAccess, postDTO, processedFile);
+                } else {
+                    return createYoutubePost(youtubeAccess, postDTO, null);
+                }
+            }, executor));
+        }
+    
+        if (postDTO.getPostToInstagram()) {
+            instagramFutureRef.set(CompletableFuture.supplyAsync(() -> {
+                List<String> postUrls = postUrlsRef.get();
+                return createInstagramPost(postDTO, files, instaAccess, postUrls);
+            }, executor));
+        }
+    
+        CompletableFuture<Void> allDone = CompletableFuture.allOf(
+            youtubeFutureRef.get(),
+            instagramFutureRef.get()
+        );
+    
+        return allDone.thenApply(v -> {
+            try {
+                Object youtubeRes = youtubeFutureRef.get().get();
+                Object instagramRes = instagramFutureRef.get().get();
+    
+                PostResultDTO postResultDTO = new PostResultDTO();
+    
+                if (youtubeRes != null) {
+                    if (youtubeRes instanceof ErrorDTO) {
+                        postResultDTO.setYoutubeLink("Error");
+                    } else {
+                        postResultDTO.setYoutubeLink((String) youtubeRes);
+                    }
+                }
+                if (instagramRes != null) {
+                    if (instagramRes instanceof ErrorDTO) {
+                        postResultDTO.setInstagramLink("Error");
+                    } else {
+                        postResultDTO.setInstagramLink((String) instagramRes);
+                    }
+                }
+    
+                List<String> postUrls = postUrlsRef.get();
+                if (postUrls != null) {
+                    for (String url : postUrls) {
+                        fileUploadService.deleteFile(url);
+                    }
+                } else {
+                    System.out.println("No postUrls found");
+                    System.out.println(processedFileRef.get().getAbsolutePath());
+                    fileUploadService.deleteLocalFile(processedFileRef.get());
+                }
+    
+                if (postResultDTO.getInstagramLink() == null && postResultDTO.getYoutubeLink() == null) {
+                    return handleError("Error creating posts");
+                }
+                return postResultDTO;
+    
+            } catch (Exception e) {
+                System.out.println("Error during concurrent execution: " + e.getMessage());
+                return handleError("Error creating posts");
+            }
+        }).join();
+    }    
+
+    private Object createInstagramPost(CreatePostDTO postDTO, MultipartFile[] files, String accessToken, List<String> postUrls) {
         UriComponentsBuilder builder;
         URI uri;
         try {
-            List<String> postUrls = new ArrayList<String>();
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    postUrls.add("https://posts.danbfrost.com/" + fileUploadService.uploadFile(files[i]));
-                }
-            } else {
-                postUrls = Arrays.asList(postDTO.getUrls());
-            }
-
             InstaBusinessAcct instagramAccountRes = getInstagramBusinessAccount(accessToken);
 
             String[] postContainerResArr = new String[postUrls.size()];
             for (int i = 0; i < postUrls.size(); i++) {
+                String fileExtension = postUrls.get(i).substring(postUrls.get(i).lastIndexOf("."));
+                System.out.println(fileExtension);
                 if (postUrls.size() == 1) {
-                    if ("video/mp4".equals(files[i].getContentType()) || "video/quicktime".equals(files[i].getContentType())) {
+                    if (fileExtension.equalsIgnoreCase(".mp4") || fileExtension.equalsIgnoreCase(".mov")) {
                         builder = UriComponentsBuilder
                             .fromUriString("https://graph.facebook.com/v19.0/" + instagramAccountRes.getInstagram_business_account().getId() + "/media")
                             .queryParam("media_type", "REELS")
@@ -304,7 +481,7 @@ public class InstagramService {
                             .queryParam("access_token", accessToken);
                     }
                 } else {
-                    if ("video/mp4".equals(files[i].getContentType()) || "video/quicktime".equals(files[i].getContentType())) {
+                    if (fileExtension.equalsIgnoreCase(".mp4") || fileExtension.equalsIgnoreCase(".mov")) {
                         builder = UriComponentsBuilder
                             .fromUriString("https://graph.facebook.com/v19.0/" + instagramAccountRes.getInstagram_business_account().getId() + "/media")
                             .queryParam("media_type", "VIDEO")
@@ -324,6 +501,7 @@ public class InstagramService {
                 uri = builder.build().encode().toUri();
 
                 postContainerResArr[i] = restTemplate.postForObject(uri, null, GenericIDDTO.class).getId().toString();
+                System.out.println(postContainerResArr[i]);
             }
 
             GenericIDDTO overallRes = null;
@@ -372,10 +550,6 @@ public class InstagramService {
             uri = builder.build().toUri();
             PostDTO mediaURLRes = restTemplate.getForObject(uri, PostDTO.class);
             System.out.println(mediaURLRes.getPermalink());
-
-            for (int i = 0; i < postUrls.size(); i++) {
-                fileUploadService.deleteFile(postUrls.get(i));
-            }
             
             return mediaURLRes.getPermalink();
         } catch (Exception e) {
@@ -397,6 +571,43 @@ public class InstagramService {
             
             return dto;
         }
+    }
+
+    private Object createYoutubePost(String accessToken, CreatePostDTO postDTO, File file) {
+        try {
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+            YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, request -> {
+                request.getHeaders().set("Authorization", "Bearer " + accessToken);
+            }).setApplicationName("Social Connect").build();
+
+            VideoSnippet snippet = new VideoSnippet();
+            snippet.setTitle(postDTO.getCaption());
+            snippet.setDescription(postDTO.getCaption());
+            snippet.setTags(List.of("Shorts", "YouTube"));
+
+            VideoStatus status = new VideoStatus();
+            status.setPrivacyStatus("public");
+
+            FileContent mediaContent;
+            if (file != null) {
+                mediaContent = new FileContent("video/*", file);
+            } else {
+                mediaContent = new FileContent("video/*", new File(System.getProperty("user.dir") + "/uploads/processed_" + postDTO.getUrls()[0].substring(postDTO.getUrls()[0].lastIndexOf("/")+1)));
+            }
+            Video video = new Video();
+            video.setSnippet(snippet);
+            video.setStatus(status);
+
+            YouTube.Videos.Insert videoInsert = youtube.videos().insert("snippet,status", video, mediaContent);
+            Video returnedVideo = videoInsert.execute();
+            System.out.println(returnedVideo.getId());
+            return "https://youtube.com/shorts/" + returnedVideo.getId();
+        } catch (Exception e) {
+            System.out.println(e);
+            return handleError("Something went wrong posting to YouTube");
+        }
+        
     }
 
     private Object createTiktokPost(String accessToken, CreatePostDTO postDTO, String postURL) {
@@ -426,6 +637,40 @@ public class InstagramService {
             ErrorDTO dto = new ErrorDTO();
             dto.setError("Something went wrong posting to TikTok. Please try again later");
             return dto;
+        }
+    }
+
+    public Object replyYoutubeComment(CommentDTO commentDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = userDetail.getUser().getYoutubeAccess();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your YouTube account");
+            return dto;
+        }
+        try {
+            String requestBody = String.format(
+                "{ \"snippet\": { \"parentId\": \"%s\", \"textOriginal\": \"%s\" } }",
+                commentDTO.getId(), commentDTO.getText()
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+
+            org.springframework.http.HttpEntity<String> request = new org.springframework.http.HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                "https://www.googleapis.com/youtube/v3/comments?part=snippet", request, String.class
+            );
+            if (response.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                return "Reply posted successfully!";
+            } else {
+                return handleError("Something went wrong replying to comment. Please try again later");
+            }
+        } catch (Error e) {
+            System.out.println(e);
+            return handleError("Something went wrong replying to comment. Please try again later");
         }
     }
 
@@ -490,7 +735,6 @@ public class InstagramService {
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
             CloseableHttpClient httpclient = HttpClients.createDefault();
             CloseableHttpResponse httpResponse = httpclient.execute(post);
-            System.out.println(httpResponse);
 
             HttpEntity entity = httpResponse.getEntity();
             String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
@@ -498,8 +742,9 @@ public class InstagramService {
             ObjectMapper objectMapper = new ObjectMapper();
             AccessTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, AccessTokenRequestDTO.class);
 
+            UserResponse userResponse;
             if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
-                userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), Long.parseLong(state.split("-")[1]));
+                userResponse = userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), Long.parseLong(state.split("-")[1]));
             } else {
                 ErrorDTO dto = new ErrorDTO();
                 dto.setError("Error getting TikTok access token");
@@ -509,6 +754,86 @@ public class InstagramService {
             if (accessTokenResponse.getError_description() != null) {
                 return accessTokenResponse.getError_description();
             }
+            return userResponse;
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging in. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object youtubeCallback(String code, String state) {
+        try {
+            URIBuilder builder = new URIBuilder("https://oauth2.googleapis.com/token"); 
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("code", code));
+            urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            urlParameters.add(new BasicNameValuePair("client_id", youtubeClientID));
+            urlParameters.add(new BasicNameValuePair("client_secret", youtubeSecret));
+            urlParameters.add(new BasicNameValuePair("redirect_uri", "https://api.danbfrost.com/api/youtubeCallback"));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            YoutubeTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, YoutubeTokenRequestDTO.class);
+
+            UserResponse userResponse;
+            if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null) {
+                userResponse = userService.updateYoutube(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), Long.parseLong(state.split("-")[1]));
+            } else {
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error getting YouTube access token");
+                return dto;
+            }
+
+            return userResponse;
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging in. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object refreshYoutubeToken(String refreshToken, Long userID) {
+        try {
+            URIBuilder builder = new URIBuilder("https://oauth2.googleapis.com/token");
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            urlParameters.add(new BasicNameValuePair("client_id", youtubeClientID));
+            urlParameters.add(new BasicNameValuePair("client_secret", youtubeSecret));
+            urlParameters.add(new BasicNameValuePair("refresh_token", refreshToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+
+            HttpEntity entity = httpResponse.getEntity();
+            String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            YoutubeTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, YoutubeTokenRequestDTO.class);
+
+            if (accessTokenResponse.getAccess_token() != null) {
+                userService.updateYoutube(accessTokenResponse.getAccess_token(), refreshToken, userID);
+            } else {
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error getting YouTube access token");
+                return dto;
+            }
+
             return accessTokenResponse;
         } catch (Exception e) {
             System.out.println(e);
@@ -516,6 +841,132 @@ public class InstagramService {
             dto.setError("Something went wrong logging in. Please try again later");
             return dto;
         }
+    }
+
+    private Object getYoutubeVideos(String accessToken, String refreshToken, Long userID) {
+        Object youtubeRes = fetchYoutubeStatistics(accessToken);
+        if (youtubeRes instanceof ErrorDTO) {
+            Object refreshRes = refreshYoutubeToken(refreshToken, userID);
+            if (refreshRes instanceof ErrorDTO) {
+                return refreshRes;
+            } else {
+                return fetchYoutubeStatistics(((YoutubeTokenRequestDTO) refreshRes).getAccess_token());
+            }
+        }
+        return youtubeRes;
+    }
+
+    private Object fetchYoutubeStatistics(String accessToken) {
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your YouTube account");
+            return dto;
+        }
+
+        try {
+            String channelUrl = "https://www.googleapis.com/youtube/v3/channels";
+            String channelParams = UriComponentsBuilder.fromHttpUrl(channelUrl)
+                .queryParam("part", "contentDetails,snippet")
+                .queryParam("mine", "true")
+                .toUriString();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+
+            org.springframework.http.HttpEntity<?> entity = new org.springframework.http.HttpEntity<>(headers);
+            YoutubeChannelListResponse channelResponse = restTemplate.exchange(channelParams, HttpMethod.GET, entity, YoutubeChannelListResponse.class)
+                .getBody();
+            String uploadsPlaylistId = channelResponse
+                .getItems().get(0).getContentDetails().getRelatedPlaylists().getUploads();
+
+            String playlistUrl = "https://www.googleapis.com/youtube/v3/playlistItems";
+            String playlistParams = UriComponentsBuilder.fromHttpUrl(playlistUrl)
+                .queryParam("part", "contentDetails,snippet")
+                .queryParam("playlistId", uploadsPlaylistId)
+                .queryParam("maxResults", "20")
+                .toUriString();
+            
+            YoutubePlaylistItemListResponse playlistResponse = restTemplate.exchange(playlistParams, HttpMethod.GET, entity, YoutubePlaylistItemListResponse.class)
+                .getBody();
+            List<CompletableFuture<YoutubeAltAnalyticsDTO>> analyticsFutures = new ArrayList<>();
+
+            for (int i = 0; i < Math.min(playlistResponse.getItems().size(), 20); i++) {
+                YoutubePlaylistItemListResponse.Item playlistItem = playlistResponse.getItems().get(i);
+
+                CompletableFuture<YoutubeAltAnalyticsDTO> commentFuture = CompletableFuture.supplyAsync(() -> {
+                    String url = "https://youtubeanalytics.googleapis.com/v2/reports?endDate=" + playlistItem.getContentDetails().getVideoPublishedAt().substring(0,10) +
+                                "&startDate=" + playlistItem.getContentDetails().getVideoPublishedAt().substring(0,10) +
+                                "&metrics=views,likes,shares,averageViewDuration,comments&ids=channel==MINE&dimensions=video&filters=video==" + playlistItem.getContentDetails().getVideoId() +
+                                "&access_token=" + accessToken;
+                                
+                    UriComponentsBuilder commentBuilder = UriComponentsBuilder.fromUriString(url);
+                    URI commentUri = commentBuilder.build().toUri();
+                    
+                    YoutubeAltAnalyticsDTO analyticsRes = restTemplate.getForObject(commentUri, YoutubeAltAnalyticsDTO.class);
+                    return analyticsRes != null ? analyticsRes : new YoutubeAltAnalyticsDTO();
+                }, executor);
+                
+                analyticsFutures.add(commentFuture);
+            }
+
+            List<YoutubeAltAnalyticsDTO> res = new ArrayList<>();
+            for (CompletableFuture<YoutubeAltAnalyticsDTO> analyticsFuture : analyticsFutures) {
+                res.add(analyticsFuture.join());
+            }
+            YoutubeCombinedResponseDTO combinedResponse = new YoutubeCombinedResponseDTO();
+            combinedResponse.setVideos(mergeData(playlistResponse.getItems(), res, accessToken));
+            combinedResponse.setProfilePicture(channelResponse.getItems().get(0).getSnippet().getThumbnails().getMedium().getUrl());
+            return combinedResponse;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return handleError("Error fetching YouTube videos");
+        }
+    }
+
+    private List<YoutubeVideoInfo> mergeData(List<YoutubePlaylistItemListResponse.Item> playlistItems, List<YoutubeAltAnalyticsDTO> analyticsData, String accessToken) {
+        Map<String, Object[]> analyticsMap = new HashMap<>();
+        for (YoutubeAltAnalyticsDTO analytics : analyticsData) {
+            if (analytics.getRows() != null && !analytics.getRows().isEmpty()) {
+                if (analytics.getRows().get(0).length > 0 && analytics.getRows().get(0)[0] instanceof String) {
+                    String videoId = (String) analytics.getRows().get(0)[0];
+                    analyticsMap.put(videoId, analytics.getRows().get(0));
+                }
+            }
+        }
+
+        return playlistItems.stream()
+                .map(item -> {
+                    Object[] stats = analyticsMap.get(item.getContentDetails().getVideoId());
+                    YoutubeVideoInfo videoDTO = new YoutubeVideoInfo();
+                    videoDTO.setContentDetails(item.getContentDetails());
+                    videoDTO.setSnippet(item.getSnippet());
+                    YoutubeAdvancedStatisticsDTO statsDTO = new YoutubeAdvancedStatisticsDTO();
+                    if (stats != null && stats.length > 0) {
+                        statsDTO.setViews((Integer)stats[1]);
+                        statsDTO.setLikes((Integer)stats[2]);
+                        statsDTO.setShares((Integer)stats[3]);
+                        statsDTO.setAverageViewDuration((Integer)stats[4]);
+                        statsDTO.setComments((Integer)stats[5]);
+                    }
+                    if (statsDTO.getComments() != null && statsDTO.getComments() != 0) {
+                        String url = UriComponentsBuilder.fromUriString("https://www.googleapis.com/youtube/v3/commentThreads")
+                            .queryParam("part", "snippet")
+                            .queryParam("videoId", item.getContentDetails().getVideoId())
+                            .queryParam("maxResults", 100)
+                            .build().toUriString();
+                    
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setBearerAuth(accessToken);
+            
+                        org.springframework.http.HttpEntity<?> entity = new org.springframework.http.HttpEntity<>(headers);
+                        YoutubeCommentResponseDTO commentsResponse = restTemplate.exchange(url, HttpMethod.GET, entity, YoutubeCommentResponseDTO.class).getBody();
+                        videoDTO.setComments(commentsResponse);
+                    }
+                    videoDTO.setStatistics(stats != null && stats.length > 0 ? statsDTO : null);
+                    return videoDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     public Object refreshTiktokToken(String refreshToken, Long userID) {
@@ -533,7 +984,6 @@ public class InstagramService {
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
             CloseableHttpClient httpclient = HttpClients.createDefault();
             CloseableHttpResponse httpResponse = httpclient.execute(post);
-            System.out.println("TIKTOK REFRESH RESPONSE:" + httpResponse);
 
             HttpEntity entity = httpResponse.getEntity();
             String responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
@@ -542,7 +992,6 @@ public class InstagramService {
             AccessTokenRequestDTO accessTokenResponse = objectMapper.readValue(responseString, AccessTokenRequestDTO.class);
 
             if (accessTokenResponse.getAccess_token() != null && accessTokenResponse.getRefresh_token() != null && accessTokenResponse.getError_description() == null) {
-                System.out.println(accessTokenResponse.getAccess_token());
                 userService.updateTiktok(accessTokenResponse.getAccess_token(), accessTokenResponse.getRefresh_token(), userID);
             } else {
                 ErrorDTO dto = new ErrorDTO();
@@ -609,10 +1058,65 @@ public class InstagramService {
                 modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
                     mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
                     mapper.using(tokenConverter).map(User::getTiktokAccess, UserResponse::setTiktokConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
                 });
                 UserResponse userResponse = modelMapper.map(user, UserResponse.class);
                 System.out.println("TIKTOK LOGOUT USER RESPONSE: " + userResponse);
                 return userResponse;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Something went wrong logging out. Please try again later");
+            return dto;
+        }
+    }
+
+    public Object youtubeLogout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetail.getUser();
+        String accessToken = user.getYoutubeAccess();
+        if (accessToken == null) {
+            ErrorDTO dto = new ErrorDTO();
+            dto.setError("Please connect your YouTube account");
+            return dto;
+        }
+
+        try {
+            URIBuilder builder = new URIBuilder("https://oauth2.googleapis.com/revoke");
+            HttpPost post = new HttpPost(builder.build());
+
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("token", accessToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpResponse httpResponse = httpclient.execute(post);
+
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                userService.updateYoutube(null, null, userDetail.getUser().getId());
+                user.setPassword(null);
+                user.setYoutubeAccess(null);
+                user.setYoutubeRefresh(null);
+                modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+                Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+                modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                    mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeAccess, UserResponse::setYoutubeConnected);
+                    mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
+                });
+                UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+                return userResponse;
+            } else {
+                ObjectMapper objectMapper = new ObjectMapper();
+                YoutubeErrorDTO youtubeLogoutResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), YoutubeErrorDTO.class);
+                System.out.println(youtubeLogoutResponse.getError());
+                ErrorDTO dto = new ErrorDTO();
+                dto.setError("Error logging out of YouTube");
+                return dto;
             }
 
         } catch (Exception e) {

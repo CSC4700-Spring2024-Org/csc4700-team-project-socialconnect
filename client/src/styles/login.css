@@ -219,9 +219,14 @@
   padding-bottom: 12px;
 }
 
-.checkbox-link {
+.policy-link {
   color: blue;
-  font-size: 0.9em;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.consent-statement {
+  font-size: 0.7rem;
+  margin-bottom: 5%;
+  margin-left: 5%;
 }

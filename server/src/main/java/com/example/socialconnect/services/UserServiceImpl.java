@@ -71,11 +71,13 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetail.getUser();
+        System.out.println(user.getPostStatusMessage());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
         modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
             mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
             mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+            mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
         });
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return userResponse;
@@ -101,8 +103,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateTiktok(String accessToken, String refreshToken, Long id) {
+    public UserResponse updateTiktok(String accessToken, String refreshToken, Long id) {
         userRepository.updateTiktok(accessToken, refreshToken, id);
+        User user = userRepository.findById(id).get();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+        modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+            mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+            mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+            mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
+        });
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        return userResponse;
+    }
+
+    @Override
+    public UserResponse updateYoutube(String accessToken, String refreshToken, Long id) {
+        userRepository.updateYoutube(accessToken, refreshToken, id);
+        User user = userRepository.findById(id).get();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Converter<String, Boolean> tokenConverter = context -> context.getSource() != null;
+        modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+            mapper.using(tokenConverter).map(User::getInstaRefresh, UserResponse::setInstagramConnected);
+            mapper.using(tokenConverter).map(User::getTiktokRefresh, UserResponse::setTiktokConnected);
+            mapper.using(tokenConverter).map(User::getYoutubeRefresh, UserResponse::setYoutubeConnected);
+        });
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        return userResponse;
     }
 
     @Override
@@ -152,5 +179,10 @@ public class UserServiceImpl implements UserService {
             return true;
         }
          
+    }
+
+    @Override
+    public void updatePostStatusMessage(String message, Long id) {
+        userRepository.updatePostStatusMessage(message, id);
     }
 }

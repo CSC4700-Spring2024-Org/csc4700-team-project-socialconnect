@@ -21,16 +21,24 @@ const Post = () => {
     const [postData, setPostData] = useState({caption:'',location:'',mentions:''})
     const [selectedPlatforms, setSelectedPlatforms] = useState([]);
     const [postLinks, setPostLinks] = useState([])
+    const [isFuturePost, setIsFuturePost] = useState(false)
+    const [dateTime, setDateTime] = useState('')
+
 
     const { user, isError, isSuccess, isLoading } = useSelector((state) => state.auth);
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    const getDatetimeFromQuery = () => {
+    useEffect(() => {
       const params = new URLSearchParams(location.search);
-      return params.get('datetime') ? new Date(params.get('datetime')) : new Date();
-    }
+      if (params.get('datetime')) {
+          setIsFuturePost(true);
+          setDateTime(formatDate(new Date(decodeURIComponent(params.get('datetime')))));
+      } else {
+          setDateTime(formatDate(new Date()));
+      }
+    }, [location.search]);
 
     function formatDate(date) {
       const year = date.getFullYear();
@@ -41,7 +49,6 @@ const Post = () => {
   
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
-    const [dateTime, setDateTime] = useState(formatDate(new Date(decodeURIComponent(getDatetimeFromQuery()))))
 
     const platformColors = {
       Instagram: '#FF69B4', 
@@ -64,32 +71,54 @@ const Post = () => {
       );
     };
 
-    const handlePost = async () => {
-      if (selectedPlatforms.includes('Instagram')) {        
-        const formData = new FormData();
-        formData.append('file', files[0]);
-        formData.append('post', new Blob([JSON.stringify({urls: files.map(file => `https://posts.danbfrost.com/${file.name}`), caption: postData.caption, location: postData.location, taggedUsers: postData.mentions.split(',')})], { type: 'application/json' }));
+    const handlePost = async () => {        
+      const formData = new FormData();
+    
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+    
+      formData.append(
+        'post',
+        new Blob(
+          [JSON.stringify({
+            urls: files.map((file) => `https://posts.danbfrost.com/${file.name}`),
+            caption: postData.caption,
+            location: postData.location,
+            taggedUsers: postData.mentions,
+            postToInstagram: selectedPlatforms.includes('Instagram'),
+            postToTiktok: selectedPlatforms.includes('TikTok'),
+            postToYoutube: selectedPlatforms.includes('YouTube')
+          })],
+          { type: 'application/json' }
+        )
+      );
 
-        const res = await instaService.createInstagramPost(formData)
-
+      try {
+        const res = await (isFuturePost ? instaService.createFuturePost(formData, new Date(dateTime).toISOString()) : instaService.createInstagramPost(formData));
         if (res.data.error) {
-          toast.error(res.data.error)
+          toast.error(res.data.error);
         } else {
-          setPostLinks(prev => [...prev, {Instagram:res.data}])
-          setCurrStage(prev => prev + 1)
+          if (!isFuturePost) {
+            setPostLinks((prev) => [...prev, { Instagram: res.data.instagramLink}, { YouTube: res.data.youtubeLink }])
+          }
+          setCurrStage((prev) => prev + 1)
+        }
+      } catch (error) {
+        console.error('Error posting:', error);
+        toast.error('Failed to post.');
+      }
+    }    
+
+    useEffect(() => {
+      if (!isLoading) {
+        if (isSuccess && user) {
+          navigate(`${location.pathname}${location.search}`);
+        } else if (isError || (!isSuccess && !user)) {
+          navigate('/login');
         }
       }
-    }
-
-      useEffect(() => {
-        if (!isLoading) {
-          if (isSuccess && user) {
-            navigate(`${location.pathname}${location.search}`);
-          } else if (isError || (!isSuccess && !user)) {
-            navigate('/login');
-          }
-        }
-      }, [user, isSuccess, isError, navigate, isLoading]);
+    }, [user, isSuccess, isError, navigate, isLoading]);
 
       return (
         <>
@@ -136,16 +165,25 @@ const Post = () => {
                   <label htmlFor="tagging">Tag Users:</label>
                   <input id="tagging" className="styled-input" type="text" placeholder="Tag users..." value={postData.mentions} onChange={(e) => setPostData(prev => ({ ...prev, mentions: e.target.value}))}/>
 
-                  <label htmlFor="datetime">Post Date and Time:</label>
-                  <input
-                    id="datetime"
-                    className="styled-input"
-                    type="datetime-local"
-                    value={dateTime}
-                    onChange={(e) =>
-                      setDateTime(e.target.value)
-                    }
-                  />
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={isFuturePost}
+                      onChange={() => setIsFuturePost((prev) => !prev)}
+                    />
+                    Schedule for Future
+                  </label>
+
+                  {isFuturePost && (
+                    <input
+                      id="datetime"
+                      className="styled-input"
+                      type="datetime-local"
+                      value={dateTime}
+                      onChange={(e) =>
+                        setDateTime(e.target.value)
+                      }
+                    />)}
                 </div>
               </div>
               <div className='post-bottom-container'>
@@ -219,35 +257,55 @@ const Post = () => {
             classNames="slide"
             unmountOnExit
           >
-            <div className="post-container">
-              <div className='post-content-container'>
-                <h2 className='post-content-header'>Success! Here are the links:</h2>
-                <div className='platform-options-container'>
-                  {postLinks.map((post, index) => {
-                    const platformName = Object.keys(post)[0];
-                    const link = post[platformName];
-
-                    const platform = platforms.find(p => p.name === platformName);
-
-                    if (!platform) return null;
-
-                    return (
-                      <div key={index} className={`platform-option ${platform.name}`} onClick={() => window.open(link, '_blank')}>
-                        <div className='platform-name-icon'>
-                          {platform.icon}
-                          <span>{platform.name}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+            <>
+              {isFuturePost ? (
+                <div className="post-container">
+                  <div className="post-content-container">
+                    <h2 className="post-content-header">Success! Your post has been scheduled.</h2>
+                  </div>
+                  <div className="post-bottom-container">
+                    <div className="progress-bar-container">
+                      <PostingProgressBar active={currStage - 1} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className='post-bottom-container'>
-                <div className='progress-bar-container'>
-                  <PostingProgressBar active={currStage-1} />
+              ) : (
+                <div className="post-container">
+                  <div className="post-content-container">
+                    <h2 className="post-content-header">Success! Here are the links:</h2>
+                    <div className="platform-options-container">
+                      {postLinks.map((post, index) => {
+                        const platformName = Object.keys(post)[0];
+                        const link = post[platformName];
+                        if (!link) return null;
+
+                        const platform = platforms.find((p) => p.name === platformName);
+
+                        if (!platform) return null;
+
+                        return (
+                          <div
+                            key={index}
+                            className={`platform-option ${platform.name}`}
+                            onClick={() => window.open(link, '_blank')}
+                          >
+                            <div className="platform-name-icon">
+                              {platform.icon}
+                              <span>{platform.name}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="post-bottom-container">
+                    <div className="progress-bar-container">
+                      <PostingProgressBar active={currStage - 1} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           </CSSTransition>
         </>
       );

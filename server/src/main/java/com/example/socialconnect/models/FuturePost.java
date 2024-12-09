@@ -23,7 +23,7 @@ public class FuturePost {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)
     private User userInfo;
 
@@ -51,12 +51,4 @@ public class FuturePost {
 
     @Column(name="POST_TO_YOUTUBE", nullable=false)
     private Boolean postToYoutube;
-
-    //integer constant - 0 specifies not posted, 1 means partial success, 2 means full success, 3 means error
-    @Column(name = "POST_STATUS", nullable = false)
-    private int postStatus;
-
-    @Column(name = "VIEWED_MESSAGE", nullable = false)
-    private Boolean viewedMessage;
-
 }

@@ -222,7 +222,7 @@ const Login = () => {
                                  </ul>
                               </div>):(<></>)}
 
-                           <div className="checkbox-container">
+                           {/* <div className="checkbox-container">
                               <div className="individual-checkbox-container">
                                  <div className="input-checkbox1">
                                     <input type="checkbox" id="privacypolicy" name="privacypolicy" />
@@ -247,6 +247,13 @@ const Login = () => {
                                     </span>
                                  </div>
                               </div>
+                           </div> */}
+                           <div className= "consent-statement">
+                              By registering, the user consents to Social Connect's 
+                              &nbsp;
+                              <a className="policy-link" onClick={() => onClickNavigate('/privacypolicy')}>Privacy Policy</a>
+                              &nbsp; and &nbsp;
+                              <a className="policy-link" onClick={() => onClickNavigate('/termsandconditions')}>Terms and Conditions</a>.
                            </div>
                            <input type="submit" value="Register" />
                         </form>
