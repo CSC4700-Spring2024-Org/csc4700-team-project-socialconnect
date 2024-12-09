@@ -53,7 +53,7 @@ const Post = () => {
     const platformColors = {
       Instagram: '#FF69B4', 
       TikTok: 'black',      
-      YouTube: 'white',       
+      YouTube: 'red',       
       X: 'black'          
     };
     const platforms = [
