@@ -1,5 +1,7 @@
 Welcome to Social Connect! This is a social media aggregator designed for content creators to be able to manage all their social media accounts from one website.
 
+Demo: https://youtu.be/oi3wZwahV0Y
+
 To run our backend you will need maven installed and to add an application.properties file with your database of choice in there. Then run:
 cd server
 mvn spring-boot:run
